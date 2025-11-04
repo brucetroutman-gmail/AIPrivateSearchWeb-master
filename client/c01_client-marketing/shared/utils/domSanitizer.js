@@ -4,7 +4,7 @@ class DOMSanitizer {
   static sanitizeText(input) {
     if (typeof input !== 'string') return '';
     return input
-      .replace(/[<>\"'&]/g, (match) => {
+      .replace(/[<>"'&]/g, (match) => {
         const entities = { '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;', '&': '&amp;' };
         return entities[match];
       });

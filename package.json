@@ -1,19 +1,30 @@
 {
   "name": "aiprivatesearch-web",
-  "version": "1.01.0",
+  "version": "1.02.0",
   "type": "module",
   "description": "AIPrivateSearch Marketing Website",
   "main": "server/s01_server-marketing/server.mjs",
   "scripts": {
     "start": "node server/s01_server-marketing/server.mjs",
-    "dev": "node --watch server/s01_server-marketing/server.mjs"
+    "dev": "node --watch server/s01_server-marketing/server.mjs",
+    "lint": "eslint 'client/**/*.{js,mjs}' 'server/**/*.{js,mjs}' --config ./security/eslint.config.mjs",
+    "lint:fix": "eslint 'client/**/*.{js,mjs}' 'server/**/*.{js,mjs}' --config ./security/eslint.config.mjs --fix",
+    "lint:security": "./security/lint.sh",
+    "security-check": "./security/security-check.sh"
   },
   "dependencies": {
-    "express": "^4.18.2",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "express": "^4.18.2"
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "eslint": "^9.39.1",
+    "eslint-plugin-no-unsanitized": "^4.1.4",
+    "eslint-plugin-security": "^3.0.1",
+    "globals": "^16.5.0"
   }
 }

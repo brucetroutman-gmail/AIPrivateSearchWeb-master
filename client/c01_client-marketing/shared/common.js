@@ -280,7 +280,7 @@ export function calculatePricing(plan, computers = 1, years = 1) {
     if (plan === 'premium') {
         total = total * Math.min(computers, 5);
     } else if (plan === 'professional') {
-        total = total;
+        // Professional plan uses base price as-is
     }
     
     if (plan !== 'professional') {

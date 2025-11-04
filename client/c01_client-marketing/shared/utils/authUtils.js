@@ -17,7 +17,7 @@ class AuthUtils {
         return data.user;
       }
       return null;
-    } catch (error) {
+    } catch {
       return null;
     }
   }

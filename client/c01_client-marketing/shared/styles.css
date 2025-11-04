@@ -108,6 +108,15 @@ body {
   background: var(--primary-hover);
 }
 
+.mode-toggle {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mode-toggle:hover {
+  color: #87ceeb !important;
+}
+
 /* Marketing-specific styles */
 .hero {
   padding: 8rem 0 4rem;

@@ -8,6 +8,18 @@
     <script src="csrf.js"></script>
 </head>
 <body>
+    <header class="header">
+        <div class="header-content">
+            <a href="index.html" class="logo">AIPrivateSearch</a>
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="#" onclick="toggleDarkMode()" class="mode-toggle">Mode</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    
     <div class="container">
         <div class="login-form">
             <h1>Login to AIPrivateSearch</h1>
@@ -62,5 +74,6 @@
             }
         });
     </script>
+    <script type="module" src="shared/common.js"></script>
 </body>
 </html>
