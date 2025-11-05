@@ -1,6 +1,7 @@
 // AIPrivateSearch Marketing Website - Common JavaScript
 import { DOMSanitizer } from './utils/domSanitizer.js';
 import AuthUtils from './utils/authUtils.js';
+import './utils/apiConfig.js';
 
 // Simple rate limiting
 let messageCallCount = 0;
@@ -297,7 +298,7 @@ export function calculatePricing(plan, computers = 1, years = 1) {
 // API functions
 export async function submitSignup(userData) {
     try {
-        const response = await fetch('/api/signup', {
+        const response = await fetch(`${window.API_BASE_URL}/api/signup`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -314,7 +315,7 @@ export async function submitSignup(userData) {
 
 export async function submitContact(contactData) {
     try {
-        const response = await fetch('/api/contact', {
+        const response = await fetch(`${window.API_BASE_URL}/api/contact`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

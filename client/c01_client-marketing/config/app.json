@@ -1,5 +1,9 @@
 {
   "app-name": "AIPrivateSearch Marketing",
   "bearer-token-timeout": 300,
-  "subscription-tier": 1
+  "subscription-tier": 1,
+  "ports": {
+    "frontend": 3002,
+    "backend": 3002
+  }
 }

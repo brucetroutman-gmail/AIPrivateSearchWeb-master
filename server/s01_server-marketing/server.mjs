@@ -8,7 +8,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 3002;
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
+const appConfig = JSON.parse(readFileSync(join(__dirname, '../../client/c01_client-marketing/config/app.json'), 'utf8'));
+const PORT = process.env.PORT || appConfig.ports.backend;
 
 // Middleware
 app.use(cors());
