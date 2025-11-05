@@ -44,7 +44,7 @@ Your app is a well-structured marketing website for AIPrivateSearch, a private A
 **Design & User Experience**
 - Professional, modern design with good visual hierarchy
 - Responsive layout that works on mobile devices
-- Clear value proposition focused on privacy and HIPAA compliance
+- Clear value proposition focused on privacy and PII compliance
 - Well-structured pricing tiers with clear differentiation
 - Smooth scrolling navigation and good accessibility
 

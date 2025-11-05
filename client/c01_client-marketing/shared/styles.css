@@ -120,8 +120,8 @@ body {
 /* Marketing-specific styles */
 .hero {
   padding: 8rem 0 4rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: var(--card-bg);
+  color: var(--text-color);
   text-align: center;
 }
 
@@ -136,12 +136,13 @@ body {
   font-weight: 800;
   margin-bottom: 1.5rem;
   line-height: 1.1;
+  color: var(--title-color);
 }
 
 .hero-subtitle {
   font-size: 1.25rem;
   margin-bottom: 2rem;
-  opacity: 0.9;
+  color: var(--text-color);
   max-width: 700px;
   margin-left: auto;
   margin-right: auto;
@@ -157,7 +158,22 @@ body {
 
 .hero-note {
   font-size: 0.9rem;
-  opacity: 0.8;
+  color: var(--text-color);
+}
+
+.hero-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin: 1rem auto;
+  max-width: 700px;
+  box-shadow: var(--shadow);
+}
+
+.hero-card .hero-subtitle,
+.hero-card .hero-note {
+  margin: 0;
 }
 
 .btn {
