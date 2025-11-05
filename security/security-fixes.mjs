@@ -42,7 +42,7 @@ async function fixClientSecurity() {
     console.log('Fixing client-side security issues...');
     
     // Fix multi-mode-search.js XSS issues
-    const multiSearchPath = './client/c01_client-first-app/multi-mode-search.js';
+    const multiSearchPath = './client/c01_client-marketing/multi-mode-search.js';
     let content = await fs.readFile(multiSearchPath, 'utf8');
     
     // Replace unsafe innerHTML assignments with safe alternatives
@@ -71,7 +71,7 @@ function sanitizeHtml(html) {
     await fs.writeFile(multiSearchPath, content);
     
     // Fix common.js XSS issues
-    const commonPath = './client/c01_client-first-app/shared/common.js';
+    const commonPath = './client/c01_client-marketing/shared/common.js';
     let commonContent = await fs.readFile(commonPath, 'utf8');
     
     commonContent = commonContent.replace(

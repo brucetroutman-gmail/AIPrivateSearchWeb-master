@@ -24,7 +24,7 @@ VIOLATIONS=0
 
 for pattern in "${BANNED_PATTERNS[@]}"; do
     echo "  Checking for: $pattern"
-    matches=$(grep -r -n "$pattern" client/c01_client-first-app/ --include="*.js" --include="*.mjs" || true)
+    matches=$(grep -r -n "$pattern" client/c01_client-marketing/ --include="*.js" --include="*.mjs" || true)
     
     # Filter out safe innerHTML usage for innerHTML
     if [[ "$pattern" == "innerHTML.*=" ]]; then
@@ -44,7 +44,7 @@ done
 # 2. Run ESLint security rules
 echo ""
 echo "📋 Running ESLint security scan..."
-npx eslint "client/c01_client-first-app/**/*.{js,mjs}" --config ./security/eslint.security.config.mjs --rule 'no-eval: error' --rule 'no-implied-eval: error' --rule 'no-new-func: error'
+npx eslint "client/c01_client-marketing/**/*.{js,mjs}" --config ./security/eslint.security.config.mjs --rule 'no-eval: error' --rule 'no-implied-eval: error' --rule 'no-new-func: error'
 
 # 3. Check for hardcoded secrets
 echo ""
