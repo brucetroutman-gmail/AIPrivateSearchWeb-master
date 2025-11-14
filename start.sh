@@ -24,11 +24,17 @@ FRONTEND_PID=$!
 # Wait a moment for servers to start
 sleep 2
 
-# Open browser to frontend URL
-if command -v open >/dev/null 2>&1; then
-    open "http://localhost:$FRONTEND_PORT"
-elif command -v xdg-open >/dev/null 2>&1; then
-    xdg-open "http://localhost:$FRONTEND_PORT"
+# Open browser only if not on Ubuntu server (detect GUI availability)
+if [ -n "$DISPLAY" ] || [ "$(uname)" = "Darwin" ]; then
+    # Open browser to frontend URL
+    if command -v open >/dev/null 2>&1; then
+        open "http://localhost:$FRONTEND_PORT"
+    elif command -v xdg-open >/dev/null 2>&1; then
+        xdg-open "http://localhost:$FRONTEND_PORT"
+    fi
+else
+    echo "Server mode detected - browser not opened"
+    echo "Access website at: http://localhost:$FRONTEND_PORT"
 fi
 
 echo "Marketing website started. Press Ctrl+C to stop."
