@@ -1,25 +1,30 @@
-// API Configuration - reads backend port from app.json
+// API Configuration for Marketing Website
 (function() {
-  let API_BASE_URL = 'http://localhost:3002';
+  'use strict';
   
-  // Load API configuration from app.json synchronously
+  // Read app.json synchronously to get backend port
+  let API_BASE_URL = 'http://localhost:3002'; // Default fallback
+  
   try {
+    // Use XMLHttpRequest for synchronous loading
     const xhr = new XMLHttpRequest();
-    xhr.open('GET', './config/app.json', false); // synchronous
+    xhr.open('GET', './config/app.json', false); // false = synchronous
     xhr.send();
+    
     if (xhr.status === 200) {
       const config = JSON.parse(xhr.responseText);
-      console.log('Marketing - Loaded config:', config);
+      console.log('Loaded config:', config);
+      
       if (config.ports && config.ports.backend) {
         API_BASE_URL = `http://localhost:${config.ports.backend}`;
-        console.log('Marketing - Set API_BASE_URL to:', API_BASE_URL);
+        console.log('Set API_BASE_URL to:', API_BASE_URL);
       }
     }
   } catch (error) {
-    console.warn('Marketing - Could not load API config, using default port 3002:', error);
+    console.warn('Failed to load app.json, using default API_BASE_URL:', error);
   }
   
-  // Set global API base URL
+  // Set global API_BASE_URL
   window.API_BASE_URL = API_BASE_URL;
-  console.log('Marketing - Final API_BASE_URL:', window.API_BASE_URL);
+  console.log('Final API_BASE_URL:', window.API_BASE_URL);
 })();

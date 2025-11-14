@@ -1,5 +1,7 @@
 to do AIPrivateSearch Marketing Website
 
+001. Initial setup, changed ports --done
+
 ## PENDING TASKS
 
 ### High Priority Marketing Tasks
