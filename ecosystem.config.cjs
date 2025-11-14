@@ -1,8 +1,9 @@
 module.exports = {
   apps: [
     {
-      name: 'aiprivatesearch-frontend',
-      script: 'client/c01_client-marketing/server.mjs',
+      name: 'aips-frontend',
+      script: './client/c01_client-marketing/server.mjs',
+      cwd: '/webs/aiprivatesearchweb',
       env: {
         PORT: 56301,
         NODE_ENV: 'production'
@@ -11,14 +12,17 @@ module.exports = {
       autorestart: true,
       watch: false,
       max_memory_restart: '1G',
+      max_restarts: 5,
+      min_uptime: '10s',
       error_file: './logs/frontend-error.log',
       out_file: './logs/frontend-out.log',
       log_file: './logs/frontend-combined.log',
       time: true
     },
     {
-      name: 'aiprivatesearch-backend',
-      script: 'server/s01_server-marketing/server.mjs',
+      name: 'aips-backend',
+      script: './server/s01_server-marketing/server.mjs',
+      cwd: '/webs/aiprivatesearchweb',
       env: {
         PORT: 56302,
         NODE_ENV: 'production'
@@ -27,6 +31,8 @@ module.exports = {
       autorestart: true,
       watch: false,
       max_memory_restart: '1G',
+      max_restarts: 5,
+      min_uptime: '10s',
       error_file: './logs/backend-error.log',
       out_file: './logs/backend-out.log',
       log_file: './logs/backend-combined.log',

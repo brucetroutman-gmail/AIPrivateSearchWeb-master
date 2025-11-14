@@ -31,10 +31,10 @@ pm2 monit
 pm2 logs
 
 # Frontend logs only
-pm2 logs aiprivatesearch-frontend
+pm2 logs aips-frontend
 
 # Backend logs only
-pm2 logs aiprivatesearch-backend
+pm2 logs aips-backend
 ```
 
 ## Application Status
@@ -46,6 +46,23 @@ pm2 status
 ```bash
 pm2 save
 pm2 startup
+```
+
+## Troubleshooting
+```bash
+# Check error logs
+pm2 logs --err
+
+# Check specific app logs
+pm2 logs aips-frontend --err
+pm2 logs aips-backend --err
+
+# Delete errored apps and restart
+pm2 delete all
+pm2 start ecosystem.config.cjs
+
+# Flush logs
+pm2 flush
 ```
 
 ## Application URLs
