@@ -1,6 +1,6 @@
 to do AIPrivateSearch Marketing Website
 
-001. Initial setup, changed ports --done
+001. Change ports in app.json to 56301, 56302
 
 ## PENDING TASKS
 

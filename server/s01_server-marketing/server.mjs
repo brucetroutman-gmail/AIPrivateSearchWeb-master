@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { readFileSync } from 'fs';
 import authRoutes from './routes/auth.mjs';
 
 const __filename = fileURLToPath(import.meta.url);

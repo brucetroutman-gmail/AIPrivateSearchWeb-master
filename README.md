@@ -37,7 +37,7 @@ npm start
 ```
 
 #### 3. Access Website
-- **Marketing Site**: http://localhost:3002
+- **Marketing Site**: http://localhost:56302
 
 ### Development Workflow
 
@@ -94,4 +94,4 @@ I have a 'release' command that bumps version by 0.01, or 'release N' for major 
 
 ---
 
-**Version**: 1.06 | **License**: [Creative Commons Attribution-NonCommercial (CC BY-NC-ND)](https://creativecommons.org/licenses/by-nc-nd/4.0/) | **Website**: AIPrivateSearch Marketing
+**Version**: 1.07 | **License**: [Creative Commons Attribution-NonCommercial (CC BY-NC-ND)](https://creativecommons.org/licenses/by-nc-nd/4.0/) | **Website**: AIPrivateSearch Marketing
