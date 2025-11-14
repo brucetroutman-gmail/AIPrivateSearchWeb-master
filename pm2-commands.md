@@ -2,22 +2,22 @@
 
 ## Start Application
 ```bash
-pm2 start ecosystem.config.js
+pm2 start ecosystem.config.cjs
 ```
 
 ## Stop Application
 ```bash
-pm2 stop ecosystem.config.js
+pm2 stop ecosystem.config.cjs
 ```
 
 ## Restart Application
 ```bash
-pm2 restart ecosystem.config.js
+pm2 restart ecosystem.config.cjs
 ```
 
 ## Delete Application
 ```bash
-pm2 delete ecosystem.config.js
+pm2 delete ecosystem.config.cjs
 ```
 
 ## Monitor Applications
