@@ -13,11 +13,15 @@ echo "Starting AIPrivateSearch Marketing Website..."
 echo "Frontend: http://localhost:$FRONTEND_PORT"
 echo "Backend: http://localhost:$BACKEND_PORT"
 
-# Start the server (frontend and backend run on same port for marketing site)
+# Start the backend server
 PORT=$BACKEND_PORT node server/s01_server-marketing/server.mjs &
-SERVER_PID=$!
+BACKEND_PID=$!
 
-# Wait a moment for server to start
+# Start the frontend server
+PORT=$FRONTEND_PORT node client/c01_client-marketing/server.mjs &
+FRONTEND_PID=$!
+
+# Wait a moment for servers to start
 sleep 2
 
 # Open browser to frontend URL
@@ -29,5 +33,15 @@ fi
 
 echo "Marketing website started. Press Ctrl+C to stop."
 
-# Wait for server process
-wait $SERVER_PID
+# Function to cleanup processes
+cleanup() {
+    echo "Stopping servers..."
+    kill $BACKEND_PID $FRONTEND_PID 2>/dev/null
+    exit 0
+}
+
+# Set trap for cleanup
+trap cleanup SIGINT SIGTERM
+
+# Wait for processes
+wait $BACKEND_PID $FRONTEND_PID

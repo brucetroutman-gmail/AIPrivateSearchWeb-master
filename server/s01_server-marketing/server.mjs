@@ -17,7 +17,6 @@ const PORT = process.env.PORT || appConfig.ports.backend;
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static(join(__dirname, '../../client/c01_client-marketing')));
 
 // CSRF Token endpoint
 app.get('/api/csrf-token', (req, res) => {
@@ -28,22 +27,7 @@ app.get('/api/csrf-token', (req, res) => {
 // Authentication routes
 app.use('/api/auth', authRoutes);
 
-// Serve main pages
-app.get('/', (req, res) => {
-  res.sendFile(join(__dirname, '../../client/c01_client-marketing/index.html'));
-});
-
-app.get('/pricing', (req, res) => {
-  res.sendFile(join(__dirname, '../../client/c01_client-marketing/pricing.html'));
-});
-
-app.get('/signup', (req, res) => {
-  res.sendFile(join(__dirname, '../../client/c01_client-marketing/signup.html'));
-});
-
-app.get('/download', (req, res) => {
-  res.sendFile(join(__dirname, '../../client/c01_client-marketing/download.html'));
-});
+// Backend API only - static files served by client server
 
 // API Routes
 app.post('/api/signup', (req, res) => {

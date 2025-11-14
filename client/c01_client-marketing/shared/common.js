@@ -163,7 +163,7 @@ function toggleDarkMode() {
 // Load saved theme
 function loadTheme() {
   const savedTheme = localStorage.getItem('theme');
-  const theme = savedTheme || 'light'; // Default to light for marketing site
+  const theme = savedTheme || 'dark'; // Default to dark for marketing site
   document.documentElement.setAttribute('data-theme', theme);
 }
 
