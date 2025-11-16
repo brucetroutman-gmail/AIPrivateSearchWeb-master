@@ -5,13 +5,30 @@
 
 cd "$(dirname "$0")"
 
-# Read ports from app.json
+# Read ports from app.json - ONLY use config file values
+if [ ! -f "client/c01_client-marketing/config/app.json" ]; then
+    echo "❌ Config file not found: client/c01_client-marketing/config/app.json"
+    exit 1
+fi
+
 FRONTEND_PORT=$(node -p "JSON.parse(require('fs').readFileSync('./client/c01_client-marketing/config/app.json', 'utf8')).ports.frontend")
 BACKEND_PORT=$(node -p "JSON.parse(require('fs').readFileSync('./client/c01_client-marketing/config/app.json', 'utf8')).ports.backend")
+
+if [ -z "$FRONTEND_PORT" ] || [ -z "$BACKEND_PORT" ]; then
+    echo "❌ Failed to read ports from config file"
+    exit 1
+fi
 
 echo "Starting AIPrivateSearch Marketing Website..."
 echo "Frontend: http://localhost:$FRONTEND_PORT"
 echo "Backend: http://localhost:$BACKEND_PORT"
+
+# Kill any existing aiprivatesearchweb processes to free up ports
+lsof -ti :$BACKEND_PORT | xargs kill -9 2>/dev/null || true
+lsof -ti :$FRONTEND_PORT | xargs kill -9 2>/dev/null || true
+# Only kill aiprivatesearchweb specific processes (avoid killing other apps)
+pkill -f "aiprivatesearchweb" 2>/dev/null || true
+sleep 2
 
 # Start the backend server
 PORT=$BACKEND_PORT node server/s01_server-marketing/server.mjs &
@@ -42,7 +59,12 @@ echo "Marketing website started. Press Ctrl+C to stop."
 # Function to cleanup processes
 cleanup() {
     echo "Stopping servers..."
-    kill $BACKEND_PID $FRONTEND_PID 2>/dev/null
+    kill $BACKEND_PID $FRONTEND_PID 2>/dev/null || true
+    sleep 1
+    lsof -ti :$BACKEND_PORT | xargs kill -9 2>/dev/null || true
+    lsof -ti :$FRONTEND_PORT | xargs kill -9 2>/dev/null || true
+    # Only kill aiprivatesearchweb specific processes
+    pkill -f "aiprivatesearchweb" 2>/dev/null || true
     exit 0
 }
 

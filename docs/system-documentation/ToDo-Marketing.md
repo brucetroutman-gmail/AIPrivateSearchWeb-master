@@ -1,7 +1,5 @@
 to do AIPrivateSearch Marketing Website
 
-001. Change ports in app.json to 56301, 56302  --done
-
 ## PENDING TASKS
 
 ### High Priority Marketing Tasks
@@ -52,7 +50,19 @@ to do AIPrivateSearch Marketing Website
 289. Add penetration testing schedule
 290. Create security awareness training materials
 
-## RECENTLY COMPLETED (v1.00)
+-------------------------------------------------------
+
+## RECENTLY COMPLETED (v1.11)
+- Changed ports in app.json to 56301, 56302
+- Added client-server architecture with separate frontend/backend
+- Installed uuid dependency for authentication
+- Set dark mode as default theme
+- Added Ubuntu server support with PM2 configuration
+- Created ecosystem.config.cjs for proper PM2 deployment
+- Shortened PM2 app names to aips-frontend/backend
+- Added conditional browser opening for server environments
+
+## COMPLETED FOUNDATION (v1.00)
 - Created marketing website with Node.js ES6 architecture
 - Implemented secure authentication system with Bearer tokens
 - Added CSRF protection and input sanitization
