@@ -271,9 +271,9 @@ function setupAnalytics() {
 // Pricing calculator
 export function calculatePricing(plan, computers = 1, years = 1) {
     const prices = {
-        standard: 49,
+        standard: 99,
         premium: 199,
-        professional: 2999
+        professional: 299
     };
     
     let total = prices[plan] || 0;
@@ -284,13 +284,11 @@ export function calculatePricing(plan, computers = 1, years = 1) {
         // Professional plan uses base price as-is
     }
     
-    if (plan !== 'professional') {
-        total = total * years;
-    }
+    total = total * years;
     
     return {
-        monthly: total / (plan === 'professional' ? 12 : (12 * years)),
-        yearly: total / (plan === 'professional' ? 1 : years),
+        monthly: total / (12 * years),
+        yearly: total / years,
         total: total
     };
 }
