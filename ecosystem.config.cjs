@@ -3,7 +3,7 @@ module.exports = {
     {
       name: 'aips-frontend',
       script: './client/c01_client-marketing/server.mjs',
-      cwd: '/webs/aiprivatesearchweb',
+      cwd: '/webs/AIPrivateSearch/repo/aiprivatesearchweb',
       env: {
         PORT: 56301,
         NODE_ENV: 'production'
@@ -22,7 +22,7 @@ module.exports = {
     {
       name: 'aips-backend',
       script: './server/s01_server-marketing/server.mjs',
-      cwd: '/webs/aiprivatesearchweb',
+      cwd: '/webs/AIPrivateSearch/repo/aiprivatesearchweb',
       env: {
         PORT: 56302,
         NODE_ENV: 'production'

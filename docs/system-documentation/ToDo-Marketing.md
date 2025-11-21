@@ -52,6 +52,10 @@ to do AIPrivateSearch Marketing Website
 
 -------------------------------------------------------
 
+## RECENTLY COMPLETED (v1.13)
+- Added gold "Coming Soon!" banner above hero title
+- Fixed paths in ecosystem.config.cjs for proper PM2 deployment
+
 ## RECENTLY COMPLETED (v1.11)
 - Changed ports in app.json to 56301, 56302
 - Added client-server architecture with separate frontend/backend
