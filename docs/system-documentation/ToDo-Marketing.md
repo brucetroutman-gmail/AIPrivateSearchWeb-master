@@ -52,6 +52,11 @@ to do AIPrivateSearch Marketing Website
 
 -------------------------------------------------------
 
+
+## RECENTLY COMPLETED (v1.15)
+- Updated pricing structure - Standard $99/yr, Premium $199/yr, Professional $299/yr with revised features and support options
+- Added sherlock icons
+
 ## RECENTLY COMPLETED (v1.13)
 - Added gold "Coming Soon!" banner above hero title
 - Fixed paths in ecosystem.config.cjs for proper PM2 deployment
