@@ -1342,47 +1342,11 @@ mark.search-highlight,
   border-bottom-color: var(--border-color);
 }
 
-[data-theme="dark"] .result-excerpt h4 {
-  color: #bdc3c7;
-}
-
-[data-theme="dark"] .result-excerpt code {
-  background: #444;
-  color: #e0e0e0;
-}
-
-[data-theme="dark"] .result-excerpt strong {
-  color: #e0e0e0;
-}
-
-[data-theme="dark"] .result-excerpt em {
-  color: #bdc3c7;
-}
-
-/* Filename link styling in result headers */
-.filename-link {
-  color: #007bff !important;
-  text-decoration: none !important;
-  font-weight: bold !important;
-  transition: color 0.2s ease !important;
-}
-
-.filename-link:hover {
-  color: #0056b3 !important;
-  text-decoration: underline !important;
-}
-
-[data-theme="dark"] .filename-link {
-  color: #87ceeb !important;
-}
-
-[data-theme="dark"] .filename-link:hover {
-  color: #b0e0e6 !important;
-}
-
-/* User Management Styles */
-.container {
-  max-width: 1200px;
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 2rem;
 }
