@@ -50,12 +50,12 @@ to do AIPrivateSearch Marketing Website
 289. Add penetration testing schedule
 290. Create security awareness training materials
 
-
 -------------------------------------------------------
 
 
 ## RECENTLY COMPLETED (v1.17)
 - Added "Get Customized Solution" pricing card with custom search tool, selected models, and tuned embeddings
+- Removed old footer structure, reverted to simple copyright notice
 
 ## RECENTLY COMPLETED (v1.15)
 - Updated pricing structure - Standard $99/yr, Premium $199/yr, Professional $299/yr with revised features and support options

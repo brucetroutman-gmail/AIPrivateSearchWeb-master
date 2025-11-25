@@ -190,9 +190,26 @@ function toggleMenu() {
   }
 }
 
+// Load footer dynamically
+async function loadFooter() {
+  try {
+    const response = await fetch('./shared/footer.html');
+    if (response.ok) {
+      const footerHTML = await response.text();
+      const footerPlaceholder = document.getElementById('footer-placeholder');
+      if (footerPlaceholder) {
+        footerPlaceholder.innerHTML = footerHTML;
+      }
+    }
+  } catch (error) {
+    console.error('Failed to load footer:', error);
+  }
+}
+
 // Smooth scrolling for anchor links
 document.addEventListener('DOMContentLoaded', async function() {
     loadTheme();
+    loadFooter();
     
     // Optional authentication check for protected pages
     const isProtectedPage = document.body.classList.contains('protected-page');
