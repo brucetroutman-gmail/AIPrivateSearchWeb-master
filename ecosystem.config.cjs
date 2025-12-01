@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: 'aips-frontend',
+      name: 'aipsweb-c56301',
       script: './client/c01_client-marketing/server.mjs',
       cwd: '/webs/AIPrivateSearch/repo/aiprivatesearchweb',
       env: {
@@ -20,7 +20,7 @@ module.exports = {
       time: true
     },
     {
-      name: 'aips-backend',
+      name: 'aipsweb-s56302',
       script: './server/s01_server-marketing/server.mjs',
       cwd: '/webs/AIPrivateSearch/repo/aiprivatesearchweb',
       env: {
