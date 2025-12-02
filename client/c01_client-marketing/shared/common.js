@@ -190,6 +190,22 @@ function toggleMenu() {
   }
 }
 
+// Load header dynamically
+async function loadHeader() {
+  try {
+    const response = await fetch('./shared/header.html');
+    if (response.ok) {
+      const headerHTML = await response.text();
+      const headerPlaceholder = document.getElementById('header-placeholder');
+      if (headerPlaceholder) {
+        headerPlaceholder.innerHTML = headerHTML;
+      }
+    }
+  } catch (error) {
+    console.error('Failed to load header:', error);
+  }
+}
+
 // Load footer dynamically
 async function loadFooter() {
   try {
@@ -209,6 +225,7 @@ async function loadFooter() {
 // Smooth scrolling for anchor links
 document.addEventListener('DOMContentLoaded', async function() {
     loadTheme();
+    loadHeader();
     loadFooter();
     
     // Optional authentication check for protected pages
