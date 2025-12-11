@@ -227,6 +227,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     loadTheme();
     loadHeader();
     loadFooter();
+    updateRegistrationLinks();
     
     // Optional authentication check for protected pages
     const isProtectedPage = document.body.classList.contains('protected-page');
@@ -378,6 +379,25 @@ export function formatDate(date) {
     }).format(new Date(date));
 }
 
+// Environment detection and URL configuration
+function getCustomerRegistrationUrl() {
+  const hostname = window.location.hostname;
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return 'http://localhost:56303/customer-registration.html';
+  } else {
+    return 'https://custmgr.aiprivatesearch.com/customer-registration.html';
+  }
+}
+
+// Update registration links on page load
+function updateRegistrationLinks() {
+  const registrationUrl = getCustomerRegistrationUrl();
+  const links = document.querySelectorAll('a[href="http://localhost:56303/customer-registration.html"]');
+  links.forEach(link => {
+    link.href = registrationUrl;
+  });
+}
+
 // Make functions globally available
 if (typeof window !== 'undefined') {
   window.showUserMessage = showUserMessage;
@@ -388,6 +408,7 @@ if (typeof window !== 'undefined') {
   window.validateEmail = validateEmail;
   window.getUserEmail = getUserEmail;
   window.handleLogout = handleLogout;
+  window.getCustomerRegistrationUrl = getCustomerRegistrationUrl;
 }
 
 window.AIPrivateSearchWeb = {
