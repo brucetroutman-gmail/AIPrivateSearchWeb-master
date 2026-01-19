@@ -48,7 +48,7 @@ to do AIPrivateSearch Marketing Website
 287. Create security incident response procedures
 288. Implement backup and disaster recovery
 289. Add penetration testing schedule
-290. Create security awareness training materials
+290. Create security awareness training materialsto connect 
 
 -------------------------------------------------------
 
