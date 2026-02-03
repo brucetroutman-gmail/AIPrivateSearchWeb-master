@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download - AIPrivateSearch</title>
+    <meta name="description" content="Download AIPrivateSearch installer for your Mac.">
+    <link rel="stylesheet" href="shared/styles.css">
+    <script src="shared/utils/apiConfig.js"></script>
+    <script src="shared/utils/domSanitizer.js"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="index.html" class="logo">AIPrivateSearch</a>
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="index.html#features">Features</a></li>
+                    <li><a href="index.html#pricing">Pricing</a></li>
+                    <li><a href="index.html#industries">Industries</a></li>
+                    <li><a href="download.html">Download</a></li>
+                    <li><a href="#" onclick="toggleDarkMode()" class="mode-toggle">Mode</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero" style="padding: 4rem 0;">
+            <div class="container" style="max-width: 600px;">
+                <h1 style="margin-bottom: 2rem;">Download AIPrivateSearch</h1>
+                
+                <div class="hero-card" style="margin-bottom: 2rem;">
+                    <h3 style="color: var(--title-color); margin-bottom: 1rem;">Existing Customers</h3>
+                    <p style="margin-bottom: 1.5rem;">Enter your account name to download the installer.</p>
+                    
+                    <form id="downloadForm" onsubmit="handleDownload(event)">
+                        <label for="accountName">Account Name</label>
+                        <input type="text" id="accountName" name="accountName" required placeholder="Enter your account name">
+                        
+                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Download Installer</button>
+                    </form>
+                </div>
+
+                <div class="hero-card">
+                    <h3 style="color: var(--title-color); margin-bottom: 1rem;">New Customer?</h3>
+                    <p style="margin-bottom: 1rem;">Start your free trial today - no credit card required.</p>
+                    <a href="http://localhost:56303/customer-registration.html" class="btn btn-outline" style="width: 100%; display: block; text-align: center;">Start Free Trial</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer placeholder -->
+    <div id="footer-placeholder"></div>
+
+    <script type="module" src="shared/common.js"></script>
+    <script>
+        function handleDownload(event) {
+            event.preventDefault();
+            
+            const accountName = document.getElementById('accountName').value.trim();
+            if (!accountName) {
+                alert('Please enter your account name');
+                return;
+            }
+            
+            // Sanitize account name
+            const sanitizedAccount = DOMSanitizer.sanitizeText(accountName);
+            
+            // Trigger download
+            const downloadUrl = '/downloads/AIPrivateSearch-Installer.dmg';
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = 'AIPrivateSearch-Installer.dmg';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Show success message
+            const form = document.getElementById('downloadForm');
+            form.innerHTML = `
+                <div style="text-align: center; padding: 2rem;">
+                    <p style="color: var(--success); font-size: 1.2rem; margin-bottom: 1rem;">✓ Download Started</p>
+                    <p style="color: var(--text-color);">Account: ${sanitizedAccount}</p>
+                    <p style="color: var(--text-muted); margin-top: 1rem; font-size: 0.9rem;">If the download doesn't start automatically, <a href="${downloadUrl}" style="color: var(--primary);">click here</a>.</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
