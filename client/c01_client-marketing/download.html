@@ -10,6 +10,31 @@
     <script type="module">
         import { DOMSanitizer } from './shared/utils/domSanitizer.js';
         window.DOMSanitizer = DOMSanitizer;
+        
+        // Make handleDownload available globally
+        window.handleDownload = function(event) {
+            event.preventDefault();
+            
+            const accountName = document.getElementById('accountName').value.trim();
+            if (!accountName) {
+                alert('Please enter your account name');
+                return;
+            }
+            
+            // Sanitize account name
+            const sanitizedAccount = DOMSanitizer.sanitizeText(accountName);
+            
+            // Show success message immediately
+            const form = document.getElementById('downloadForm');
+            form.innerHTML = `
+                <div style="text-align: center; padding: 2rem;">
+                    <p style="color: var(--success); font-size: 1.2rem; margin-bottom: 1rem;">✓ Download Ready</p>
+                    <p style="color: var(--text-color); margin-bottom: 1.5rem;">Account: ${sanitizedAccount}</p>
+                    <a href="/downloads/AIPrivateSearch-Installer.dmg" download="AIPrivateSearch-Installer.dmg" class="btn btn-primary" style="display: inline-block;">Click to Download</a>
+                    <p style="color: var(--text-muted); margin-top: 1rem; font-size: 0.9rem;">Click the button above to start your download.</p>
+                </div>
+            `;
+        };
     </script>
 </head>
 <body>
@@ -58,30 +83,5 @@
     <div id="footer-placeholder"></div>
 
     <script type="module" src="shared/common.js"></script>
-    <script>
-        function handleDownload(event) {
-            event.preventDefault();
-            
-            const accountName = document.getElementById('accountName').value.trim();
-            if (!accountName) {
-                alert('Please enter your account name');
-                return;
-            }
-            
-            // Sanitize account name
-            const sanitizedAccount = DOMSanitizer.sanitizeText(accountName);
-            
-            // Show success message immediately
-            const form = document.getElementById('downloadForm');
-            form.innerHTML = `
-                <div style="text-align: center; padding: 2rem;">
-                    <p style="color: var(--success); font-size: 1.2rem; margin-bottom: 1rem;">✓ Download Ready</p>
-                    <p style="color: var(--text-color); margin-bottom: 1.5rem;">Account: ${sanitizedAccount}</p>
-                    <a href="/downloads/AIPrivateSearch-Installer.dmg" download="AIPrivateSearch-Installer.dmg" class="btn btn-primary" style="display: inline-block;">Click to Download</a>
-                    <p style="color: var(--text-muted); margin-top: 1rem; font-size: 0.9rem;">Click the button above to start your download.</p>
-                </div>
-            `;
-        }
-    </script>
 </body>
 </html>
