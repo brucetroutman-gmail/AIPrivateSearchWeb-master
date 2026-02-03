@@ -379,6 +379,58 @@ export function formatDate(date) {
     }).format(new Date(date));
 }
 
+// Show download form for existing customers
+function showDownloadForm() {
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal-dialog" style="max-width: 400px;">
+      <h3 style="margin-bottom: 1rem; color: var(--title-color);">Download Installer</h3>
+      <p style="margin-bottom: 1rem; color: var(--text-color);">Enter your account name to download the AIPrivateSearch installer.</p>
+      <input type="text" id="accountName" placeholder="Account Name" class="modal-input" style="margin-bottom: 1rem;">
+      <div class="modal-buttons">
+        <button class="modal-button cancel" onclick="closeDownloadForm()">Cancel</button>
+        <button class="modal-button ok" onclick="handleDownload()">Download</button>
+      </div>
+    </div>
+  `;
+  modal.id = 'downloadModal';
+  document.body.appendChild(modal);
+  document.getElementById('accountName').focus();
+}
+
+function closeDownloadForm() {
+  const modal = document.getElementById('downloadModal');
+  if (modal) {
+    document.body.removeChild(modal);
+  }
+}
+
+function handleDownload() {
+  const accountName = document.getElementById('accountName').value.trim();
+  if (!accountName) {
+    showUserMessage('Please enter your account name');
+    return;
+  }
+  
+  // Sanitize account name
+  const sanitizedAccount = DOMSanitizer.sanitizeText(accountName);
+  
+  // Close modal
+  closeDownloadForm();
+  
+  // Trigger download
+  const downloadUrl = '/downloads/AIPrivateSearch-Installer.dmg';
+  const link = document.createElement('a');
+  link.href = downloadUrl;
+  link.download = 'AIPrivateSearch-Installer.dmg';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  showUserMessage(`Download started for account: ${sanitizedAccount}`);
+}
+
 // Environment detection and URL configuration
 function getCustomerRegistrationUrl() {
   const hostname = window.location.hostname;
@@ -389,12 +441,28 @@ function getCustomerRegistrationUrl() {
   }
 }
 
+function getDeviceRegistrationUrl() {
+  const hostname = window.location.hostname;
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return 'http://localhost:56303/device-registration.html';
+  } else {
+    return 'https://custmgr.aiprivatesearch.com/device-registration.html';
+  }
+}
+
 // Update registration links on page load
 function updateRegistrationLinks() {
-  const registrationUrl = getCustomerRegistrationUrl();
-  const links = document.querySelectorAll('a[href="http://localhost:56303/customer-registration.html"]');
-  links.forEach(link => {
-    link.href = registrationUrl;
+  const customerRegUrl = getCustomerRegistrationUrl();
+  const deviceRegUrl = getDeviceRegistrationUrl();
+  
+  const customerLinks = document.querySelectorAll('a[href="http://localhost:56303/customer-registration.html"]');
+  customerLinks.forEach(link => {
+    link.href = customerRegUrl;
+  });
+  
+  const deviceLinks = document.querySelectorAll('a[href="http://localhost:56303/device-registration.html"]');
+  deviceLinks.forEach(link => {
+    link.href = deviceRegUrl;
   });
 }
 
@@ -408,7 +476,11 @@ if (typeof window !== 'undefined') {
   window.validateEmail = validateEmail;
   window.getUserEmail = getUserEmail;
   window.handleLogout = handleLogout;
+  window.showDownloadForm = showDownloadForm;
+  window.closeDownloadForm = closeDownloadForm;
+  window.handleDownload = handleDownload;
   window.getCustomerRegistrationUrl = getCustomerRegistrationUrl;
+  window.getDeviceRegistrationUrl = getDeviceRegistrationUrl;
 }
 
 window.AIPrivateSearchWeb = {
