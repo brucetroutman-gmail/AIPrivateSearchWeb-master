@@ -71,22 +71,14 @@
             // Sanitize account name
             const sanitizedAccount = DOMSanitizer.sanitizeText(accountName);
             
-            // Trigger download
-            const downloadUrl = '/downloads/AIPrivateSearch-Installer.dmg';
-            const link = document.createElement('a');
-            link.href = downloadUrl;
-            link.download = 'AIPrivateSearch-Installer.dmg';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            // Show success message
+            // Show success message immediately
             const form = document.getElementById('downloadForm');
             form.innerHTML = `
                 <div style="text-align: center; padding: 2rem;">
-                    <p style="color: var(--success); font-size: 1.2rem; margin-bottom: 1rem;">✓ Download Started</p>
-                    <p style="color: var(--text-color);">Account: ${sanitizedAccount}</p>
-                    <p style="color: var(--text-muted); margin-top: 1rem; font-size: 0.9rem;">If the download doesn't start automatically, <a href="${downloadUrl}" style="color: var(--primary);">click here</a>.</p>
+                    <p style="color: var(--success); font-size: 1.2rem; margin-bottom: 1rem;">✓ Download Ready</p>
+                    <p style="color: var(--text-color); margin-bottom: 1.5rem;">Account: ${sanitizedAccount}</p>
+                    <a href="/downloads/AIPrivateSearch-Installer.dmg" download="AIPrivateSearch-Installer.dmg" class="btn btn-primary" style="display: inline-block;">Click to Download</a>
+                    <p style="color: var(--text-muted); margin-top: 1rem; font-size: 0.9rem;">Click the button above to start your download.</p>
                 </div>
             `;
         }
