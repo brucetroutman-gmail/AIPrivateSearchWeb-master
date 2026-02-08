@@ -1,0 +1,69 @@
+#!/bin/bash
+
+# AIPrivateSearch Server Launcher
+APP_SUPPORT="/Users/Shared/AIPrivateSearch"
+LOG_FILE="$APP_SUPPORT/logs/start.log"
+REPO_DIR="$APP_SUPPORT/repo/aiprivatesearch"
+
+# Create directories
+mkdir -p "$APP_SUPPORT/logs"
+
+# Redirect output to log
+exec 1> >(tee -a "$LOG_FILE")
+exec 2>&1
+
+echo "=== AIPrivateSearch Starting at $(date) ==="
+echo ""
+
+# Function to show dialog
+show_dialog() {
+    local title="$1"
+    local message="$2"
+    local type="${3:-informational}"
+    
+    osascript <<-APPLESCRIPT 2>/dev/null || echo "$message"
+        tell application "System Events"
+            activate
+            display dialog "$message" with title "$title" buttons {"OK"} default button "OK" with icon $type
+        end tell
+APPLESCRIPT
+}
+
+# Check if repository exists
+if [ ! -d "$REPO_DIR" ]; then
+    show_dialog "Installation Required" \
+        "AIPrivateSearch is not installed.\n\nPlease run AIPrivateSearch-installer.app first." \
+        "stop"
+    exit 1
+fi
+
+# Check if Node.js is available
+if [ ! -f "$APP_SUPPORT/node/bin/node" ]; then
+    show_dialog "Installation Required" \
+        "Node.js is not installed.\n\nPlease run AIPrivateSearch-installer.app first." \
+        "stop"
+    exit 1
+fi
+
+# Add Node.js to PATH
+export PATH="$APP_SUPPORT/node/bin:$PATH"
+
+# Change to repository directory
+cd "$REPO_DIR"
+
+echo "🚀 Starting AIPrivateSearch servers..."
+
+# Check if start.sh exists
+if [ ! -f "start.sh" ]; then
+    echo "❌ start.sh not found in repository"
+    show_dialog "Error" \
+        "start.sh not found in repository.\n\nPlease reinstall AIPrivateSearch." \
+        "stop"
+    exit 1
+fi
+
+# Start the application using start.sh
+echo "📦 Running start.sh..."
+bash start.sh
+
+echo "=== AIPrivateSearch session ended at $(date) ==="
