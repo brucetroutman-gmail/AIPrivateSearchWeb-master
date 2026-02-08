@@ -23,7 +23,7 @@ app.use(express.static(__dirname, {
       res.setHeader('Content-Type', 'text/css; charset=utf-8');
     } else if (path.endsWith('.dmg')) {
       res.setHeader('Content-Type', 'application/x-apple-diskimage');
-      res.setHeader('Content-Disposition', 'attachment; filename="AIPrivateSearch-installer.dmg"');
+      res.setHeader('Content-Disposition', 'attachment; filename="aiprivatesearch.dmg"');
     }
   }
 }));
