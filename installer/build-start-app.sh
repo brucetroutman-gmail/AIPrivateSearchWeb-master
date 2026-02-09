@@ -72,6 +72,13 @@ APP_SUPPORT="/Users/Shared/AIPrivateSearch"
 LOG_FILE="$APP_SUPPORT/logs/start.log"
 REPO_DIR="$APP_SUPPORT/repo/aiprivatesearch"
 
+# Detect if running from DMG or during drag-to-install
+APP_PATH="$(dirname "$(dirname "$(dirname "$0")")")"  
+if [[ "$APP_PATH" == *"/Volumes/"* ]] || [[ "$APP_PATH" != "/Applications"* ]]; then
+    # Running from DMG or not in Applications - exit silently
+    exit 0
+fi
+
 # Create directories
 mkdir -p "$APP_SUPPORT/logs"
 
@@ -101,7 +108,7 @@ if [ ! -d "$REPO_DIR" ]; then
     show_dialog "Installation Required" \
         "AIPrivateSearch is not installed.\n\nPlease run AIPrivateSearch-installer.app first." \
         "stop"
-    exit 1
+    exit 0
 fi
 
 # Check if Node.js is available
@@ -109,7 +116,7 @@ if [ ! -f "$APP_SUPPORT/node/bin/node" ]; then
     show_dialog "Installation Required" \
         "Node.js is not installed.\n\nPlease run AIPrivateSearch-installer.app first." \
         "stop"
-    exit 1
+    exit 0
 fi
 
 # Add Node.js to PATH
@@ -126,7 +133,7 @@ if [ ! -f "start.sh" ]; then
     show_dialog "Error" \
         "start.sh not found in repository.\n\nPlease reinstall AIPrivateSearch." \
         "stop"
-    exit 1
+    exit 0
 fi
 
 # Start the application using start.sh
