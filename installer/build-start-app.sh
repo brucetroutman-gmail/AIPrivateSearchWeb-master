@@ -131,6 +131,8 @@ fi
 
 # Start the application using start.sh
 echo "📦 Running start.sh..."
+# Prevent auto-opening browser
+export AIPS_NO_BROWSER=1
 bash start.sh
 
 echo "=== AIPrivateSearch session ended at $(date) ==="
