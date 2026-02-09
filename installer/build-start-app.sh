@@ -56,6 +56,8 @@ cat > "$APP_DIR/Contents/Info.plist" << 'EOF'
     <string>AIPrivateSearch needs to start servers and open browser.</string>
     <key>NSPrincipalClass</key>
     <string>NSApplication</string>
+    <key>LSUIElement</key>
+    <true/>
 </dict>
 </plist>
 EOF
