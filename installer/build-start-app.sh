@@ -71,11 +71,14 @@ cat > "$APP_DIR/Contents/MacOS/$APP_NAME" << 'LAUNCHER_EOF'
 APP_SUPPORT="/Users/Shared/AIPrivateSearch"
 LOG_FILE="$APP_SUPPORT/logs/start.log"
 REPO_DIR="$APP_SUPPORT/repo/aiprivatesearch"
+LOCK_FILE="$APP_SUPPORT/.start_allowed"
 
-# Detect if running from DMG or during drag-to-install
-APP_PATH="$(dirname "$(dirname "$(dirname "$0")")")"  
-if [[ "$APP_PATH" == *"/Volumes/"* ]] || [[ "$APP_PATH" != "/Applications"* ]]; then
-    # Running from DMG or not in Applications - exit silently
+# Check if this is first run after installation
+if [ ! -f "$LOCK_FILE" ]; then
+    # Create lock file to allow future runs
+    mkdir -p "$APP_SUPPORT"
+    touch "$LOCK_FILE"
+    # Exit silently on first run (during drag-to-install)
     exit 0
 fi
 
