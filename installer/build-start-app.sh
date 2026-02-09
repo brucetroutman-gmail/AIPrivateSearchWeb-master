@@ -147,10 +147,6 @@ LAUNCHER_EOF
 
 chmod +x "$APP_DIR/Contents/MacOS/$APP_NAME"
 
-# Ad-hoc code sign to prevent Gatekeeper issues
-echo "✍️  Ad-hoc code signing..."
-codesign --force --deep --sign - "$APP_DIR" 2>/dev/null || echo "⚠️  Code signing skipped (not critical)"
-
 # Create placeholder icon
 echo "🎨 Creating placeholder icon..."
 touch "$APP_DIR/Contents/Resources/AppIcon.icns"
