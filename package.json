@@ -1,6 +1,6 @@
 {
   "name": "aiprivatesearch-web",
-  "version": "1.32",
+  "version": "1.33",
   "type": "module",
   "description": "AIPrivateSearch Marketing Website",
   "main": "server/s01_server-marketing/server.mjs",
