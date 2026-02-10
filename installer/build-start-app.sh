@@ -152,15 +152,32 @@ show_progress "Preparing to start...\n\nSetting up environment and checking comp
 # Add Node.js to PATH
 export PATH="$APP_SUPPORT/node/bin:$PATH"
 
+# Copy start-user-app.sh to shared location if not exists or if outdated
+if [ ! -f "$APP_SUPPORT/start-user-app.sh" ]; then
+    echo "📋 Copying start-user-app.sh to shared location..."
+    # Get the script directory (where this launcher is running from)
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    # Copy from the app bundle's embedded copy
+    if [ -f "$SCRIPT_DIR/../Resources/start-user-app.sh" ]; then
+        cp "$SCRIPT_DIR/../Resources/start-user-app.sh" "$APP_SUPPORT/start-user-app.sh"
+        chmod +x "$APP_SUPPORT/start-user-app.sh"
+    fi
+fi
+
 # Change to repository directory
 cd "$REPO_DIR"
 
 echo "🚀 Starting AIPrivateSearch servers..."
 show_progress "Starting servers...\n\nLaunching backend and frontend servers.\n\nThis may take 30-60 seconds."
 
-# Start the application using repo's start.sh
-echo "📦 Running start.sh..."
-bash start.sh
+# Start the application using start-user-app.sh if available, otherwise use repo's start.sh
+if [ -f "$APP_SUPPORT/start-user-app.sh" ]; then
+    echo "📦 Running start-user-app.sh..."
+    bash "$APP_SUPPORT/start-user-app.sh"
+else
+    echo "📦 Running start.sh..."
+    bash start.sh
+fi
 
 show_progress "Application Started!\n\nAIPrivateSearch is now running.\n\nChrome browser should open automatically."
 
@@ -168,6 +185,16 @@ echo "=== AIPrivateSearch session ended at $(date) ==="
 LAUNCHER_EOF
 
 chmod +x "$APP_DIR/Contents/MacOS/$APP_NAME"
+
+# Copy start-user-app.sh to app bundle Resources
+echo "📋 Embedding start-user-app.sh in app bundle..."
+if [ -f "start-user-app.sh" ]; then
+    cp "start-user-app.sh" "$APP_DIR/Contents/Resources/start-user-app.sh"
+    chmod +x "$APP_DIR/Contents/Resources/start-user-app.sh"
+    echo "✅ start-user-app.sh embedded"
+else
+    echo "⚠️  start-user-app.sh not found"
+fi
 
 # Create placeholder icon
 echo "🎨 Creating placeholder icon..."
