@@ -13,6 +13,17 @@ notify() {
     osascript -e "display notification \"$message\" with title \"$title\"" 2>/dev/null
 }
 
+# Function to show progress dialog
+show_progress() {
+    local message="$1"
+    osascript <<-APPLESCRIPT 2>/dev/null
+        tell application "System Events"
+            activate
+            display dialog "$message" with title "AIPrivateSearch" buttons {"Continue"} default button "Continue" with icon note
+        end tell
+APPLESCRIPT
+}
+
 # Check if this is first run after installation
 if [ ! -f "$LOCK_FILE" ]; then
     # Create lock file to allow future runs
@@ -23,7 +34,7 @@ if [ ! -f "$LOCK_FILE" ]; then
 fi
 
 # Send start notification
-notify "AIPrivateSearch" "Starting application..."
+show_progress "Starting AIPrivateSearch...\n\nInitializing application components.\n\nThis will take a moment."
 
 # Create directories
 mkdir -p "$APP_SUPPORT/logs"
@@ -51,25 +62,25 @@ APPLESCRIPT
 
 # Check if repository exists
 if [ ! -d "$REPO_DIR" ]; then
-    notify "AIPrivateSearch" "Installation required - please run installer first"
+    show_progress "Installation Required!\n\nAIPrivateSearch is not installed.\n\nPlease run AIPrivateSearch-installer.app first."
     show_dialog "Installation Required" \
         "AIPrivateSearch is not installed.\n\nPlease run AIPrivateSearch-installer.app first." \
         "stop"
     exit 1
 fi
 
-notify "AIPrivateSearch" "Checking Node.js..."
+show_progress "Checking Node.js...\n\nVerifying Node.js installation."
 
 # Check if Node.js is available
 if [ ! -f "$APP_SUPPORT/node/bin/node" ]; then
-    notify "AIPrivateSearch" "Node.js required - please run installer first"
+    show_progress "Node.js Required!\n\nNode.js is not installed.\n\nPlease run AIPrivateSearch-installer.app first."
     show_dialog "Installation Required" \
         "Node.js is not installed.\n\nPlease run AIPrivateSearch-installer.app first." \
         "stop"
     exit 1
 fi
 
-notify "AIPrivateSearch" "Preparing to start servers..."
+show_progress "Preparing to start...\n\nSetting up environment and checking components."
 
 # Add Node.js to PATH
 export PATH="$APP_SUPPORT/node/bin:$PATH"
@@ -85,12 +96,12 @@ fi
 cd "$REPO_DIR"
 
 echo "🚀 Starting AIPrivateSearch servers..."
-notify "AIPrivateSearch" "Starting servers..."
+show_progress "Starting servers...\n\nLaunching backend and frontend servers.\n\nThis may take 30-60 seconds."
 
 # Start the application using start-user-app.sh
 echo "📦 Running start-user-app.sh..."
 bash "$APP_SUPPORT/start-user-app.sh"
 
-notify "AIPrivateSearch" "Application started successfully!"
+show_progress "Application Started!\n\nAIPrivateSearch is now running.\n\nChrome browser should open automatically."
 
 echo "=== AIPrivateSearch session ended at $(date) ==="
