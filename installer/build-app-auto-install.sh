@@ -647,6 +647,17 @@ fi
 
 echo "✅ Step 6 completed!"
 show_progress "6" "Step 6 Complete!\n\nDependencies installed successfully.\n\nNext: Downloading AI models"
+
+# Copy start-user-app.sh to shared location
+echo "📋 Copying start-user-app.sh to shared location..."
+if [ -f "\$APP_SUPPORT/repo/aiprivatesearchweb/installer/start-user-app.sh" ]; then
+    cp "\$APP_SUPPORT/repo/aiprivatesearchweb/installer/start-user-app.sh" "\$APP_SUPPORT/start-user-app.sh"
+    chmod +x "\$APP_SUPPORT/start-user-app.sh"
+    echo "✅ start-user-app.sh copied successfully"
+else
+    echo "⚠️  start-user-app.sh not found in marketing repo"
+fi
+
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  🤖 Step 7: AI Model Download"

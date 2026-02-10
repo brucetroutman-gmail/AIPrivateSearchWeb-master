@@ -3,7 +3,7 @@
 # AIPrivateSearch Simple Test Installer
 APP_SUPPORT="/Users/Shared/AIPrivateSearch"
 LOG_FILE="$APP_SUPPORT/logs/install.log"
-INSTALLER_VERSION="9.4"
+INSTALLER_VERSION="9.6"
 
 # Function to send notification
 notify() {
@@ -70,7 +70,7 @@ This password is only used during installation and not stored." \
         if [ -n "$ADMIN_PASSWORD" ]; then
             echo "✅ Administrator password provided"
             # Test password validity
-            TEMP_TEST_FILE="/tmp/aips_test_11574"
+            TEMP_TEST_FILE="/tmp/aips_test_16825"
             echo "$ADMIN_PASSWORD" > "$TEMP_TEST_FILE"
             if sudo -S -v < "$TEMP_TEST_FILE" 2>/dev/null; then
                 rm -f "$TEMP_TEST_FILE"
@@ -290,20 +290,20 @@ else
             # Create expect script to handle password prompt
             cat > /tmp/ollama_expect.sh << 'EXPECT_EOF'
 #!/bin/bash
-TEMP_PASS_FILE="/tmp/aips_pass_11574"
+TEMP_PASS_FILE="/tmp/aips_pass_16825"
 echo "" > ""
 
 # Run installer with password file
 export SUDO_ASKPASS=/tmp/aips_askpass.sh
 echo '#!/bin/bash' > /tmp/aips_askpass.sh
-echo 'cat /tmp/aips_pass_11574' >> /tmp/aips_askpass.sh
+echo 'cat /tmp/aips_pass_16825' >> /tmp/aips_askpass.sh
 chmod +x /tmp/aips_askpass.sh
 
 # Run installer with SUDO_ASKPASS
 /tmp/ollama_install.sh
 
 # Cleanup
-rm -f /tmp/aips_pass_11574 /tmp/aips_askpass.sh
+rm -f /tmp/aips_pass_16825 /tmp/aips_askpass.sh
 EXPECT_EOF
             
             chmod +x /tmp/ollama_expect.sh
@@ -571,6 +571,17 @@ fi
 
 echo "✅ Step 6 completed!"
 show_progress "6" "Step 6 Complete!\n\nDependencies installed successfully.\n\nNext: Downloading AI models"
+
+# Copy start-user-app.sh to shared location
+echo "📋 Copying start-user-app.sh to shared location..."
+if [ -f "$APP_SUPPORT/repo/aiprivatesearchweb/installer/start-user-app.sh" ]; then
+    cp "$APP_SUPPORT/repo/aiprivatesearchweb/installer/start-user-app.sh" "$APP_SUPPORT/start-user-app.sh"
+    chmod +x "$APP_SUPPORT/start-user-app.sh"
+    echo "✅ start-user-app.sh copied successfully"
+else
+    echo "⚠️  start-user-app.sh not found in marketing repo"
+fi
+
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  🤖 Step 7: AI Model Download"
