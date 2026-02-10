@@ -82,6 +82,15 @@ fi
 
 show_progress "Preparing to start...\n\nSetting up environment and checking components."
 
+# Kill any existing AIPrivateSearch processes
+echo "🧹 Checking for existing processes..."
+pkill -f "aiprivatesearch-start" 2>/dev/null || true
+pkill -f "start.sh" 2>/dev/null || true
+pkill -f "start-user-app.sh" 2>/dev/null || true
+lsof -ti :56305 | xargs kill -9 2>/dev/null || true
+lsof -ti :56306 | xargs kill -9 2>/dev/null || true
+sleep 2
+
 # Add Node.js to PATH
 export PATH="$APP_SUPPORT/node/bin:$PATH"
 
