@@ -100,6 +100,17 @@ if [ ! -f "$LOCK_FILE" ]; then
     exit 0
 fi
 
+# Kill any existing AIPrivateSearch processes FIRST
+echo "🧹 Cleaning up existing processes..."
+pkill -9 -f "aiprivatesearch-start" 2>/dev/null || true
+pkill -9 -f "start.sh" 2>/dev/null || true
+pkill -9 -f "start-user-app.sh" 2>/dev/null || true
+pkill -9 -f "node.*server.mjs" 2>/dev/null || true
+pkill -9 -f "npx serve" 2>/dev/null || true
+lsof -ti :56305 | xargs kill -9 2>/dev/null || true
+lsof -ti :56306 | xargs kill -9 2>/dev/null || true
+sleep 3
+
 # Send start notification
 show_progress "Starting AIPrivateSearch...\n\nInitializing application components.\n\nThis will take a moment."
 
@@ -148,15 +159,6 @@ if [ ! -f "$APP_SUPPORT/node/bin/node" ]; then
 fi
 
 show_progress "Preparing to start...\n\nSetting up environment and checking components."
-
-# Kill any existing AIPrivateSearch processes
-echo "🧹 Checking for existing processes..."
-pkill -f "aiprivatesearch-start" 2>/dev/null || true
-pkill -f "start.sh" 2>/dev/null || true
-pkill -f "start-user-app.sh" 2>/dev/null || true
-lsof -ti :56305 | xargs kill -9 2>/dev/null || true
-lsof -ti :56306 | xargs kill -9 2>/dev/null || true
-sleep 2
 
 # Add Node.js to PATH
 export PATH="$APP_SUPPORT/node/bin:$PATH"
