@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Function to send notification
+notify() {
+    local title="$1"
+    local message="$2"
+    osascript -e "display notification \"$message\" with title \"$title\"" 2>/dev/null
+}
+
 echo "🚀 Starting AIPrivateSearch..."
 
 # Read ports from app.json config - ONLY use config file values
@@ -28,6 +35,7 @@ sleep 1
 
 # Ensure Ollama service is running
 echo "🔍 Checking Ollama service..."
+notify "AIPrivateSearch" "Checking Ollama service..."
 if ! curl -s http://localhost:11434/api/tags >/dev/null 2>&1; then
     echo "🚀 Starting Ollama service..."
     if ! pgrep -f "ollama serve" > /dev/null; then
@@ -92,6 +100,7 @@ MODELS_UPDATED=false
 
 # Start backend server in background
 echo "🔧 Starting servers..."
+notify "AIPrivateSearch" "Starting backend server..."
 cd server/s01_server-first-app
 
 # Check for .env-aips file in /Users/Shared/AIPrivateSearch
@@ -190,6 +199,7 @@ fi
 
 echo ""
 echo "✅ Application started successfully!"
+notify "AIPrivateSearch" "Application ready! Opening browser..."
 echo "🔗 Frontend: http://localhost:$FRONTEND_PORT"
 echo "🔗 Backend API: http://localhost:$BACKEND_PORT"
 echo ""

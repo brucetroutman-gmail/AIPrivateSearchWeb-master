@@ -73,6 +73,13 @@ LOG_FILE="$APP_SUPPORT/logs/start.log"
 REPO_DIR="$APP_SUPPORT/repo/aiprivatesearch"
 LOCK_FILE="$APP_SUPPORT/.start_allowed"
 
+# Function to send notification
+notify() {
+    local title="$1"
+    local message="$2"
+    osascript -e "display notification \"$message\" with title \"$title\"" 2>/dev/null
+}
+
 # Check if this is first run after installation
 if [ ! -f "$LOCK_FILE" ]; then
     # Create lock file to allow future runs
@@ -81,6 +88,9 @@ if [ ! -f "$LOCK_FILE" ]; then
     # Exit silently on first run (during drag-to-install)
     exit 0
 fi
+
+# Send start notification
+notify "AIPrivateSearch" "Starting application..."
 
 # Create directories
 mkdir -p "$APP_SUPPORT/logs"
@@ -108,19 +118,25 @@ APPLESCRIPT
 
 # Check if repository exists
 if [ ! -d "$REPO_DIR" ]; then
+    notify "AIPrivateSearch" "Installation required - please run installer first"
     show_dialog "Installation Required" \
         "AIPrivateSearch is not installed.\n\nPlease run AIPrivateSearch-installer.app first." \
         "stop"
     exit 1
 fi
 
+notify "AIPrivateSearch" "Checking Node.js..."
+
 # Check if Node.js is available
 if [ ! -f "$APP_SUPPORT/node/bin/node" ]; then
+    notify "AIPrivateSearch" "Node.js required - please run installer first"
     show_dialog "Installation Required" \
         "Node.js is not installed.\n\nPlease run AIPrivateSearch-installer.app first." \
         "stop"
     exit 1
 fi
+
+notify "AIPrivateSearch" "Preparing to start servers..."
 
 # Add Node.js to PATH
 export PATH="$APP_SUPPORT/node/bin:$PATH"
@@ -136,10 +152,13 @@ fi
 cd "$REPO_DIR"
 
 echo "🚀 Starting AIPrivateSearch servers..."
+notify "AIPrivateSearch" "Starting servers..."
 
 # Start the application using start-user-app.sh
 echo "📦 Running start-user-app.sh..."
 bash "$APP_SUPPORT/start-user-app.sh"
+
+notify "AIPrivateSearch" "Application started successfully!"
 
 echo "=== AIPrivateSearch session ended at $(date) ==="
 LAUNCHER_EOF
