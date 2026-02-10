@@ -81,6 +81,13 @@ APP_SUPPORT="/Users/Shared/AIPrivateSearch"
 LOG_FILE="\$APP_SUPPORT/logs/install.log"
 INSTALLER_VERSION="$NEW_VERSION"
 
+# Function to send notification
+notify() {
+    local title="\$1"
+    local message="\$2"
+    osascript -e "display notification \"\$message\" with title \"\$title\"" 2>/dev/null
+}
+
 # Create directories
 mkdir -p "\$APP_SUPPORT"/{logs,data,sources,config,repo}
 
@@ -158,6 +165,7 @@ Click OK to continue." \\
     "note"
 
 echo "🚀 Starting architecture detection test..."
+notify "AIPrivateSearch Installer" "Step 1: Detecting Mac architecture..."
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  🔄 Step 1: Mac Info Detection"
@@ -209,6 +217,7 @@ echo "✅ Mac info detection completed successfully"
 
 echo ""
 echo "✅ Step 1 completed successfully!"
+notify "AIPrivateSearch Installer" "Step 1 complete - Mac info detected"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  📦 Step 2: Node.js Installation"
@@ -220,7 +229,9 @@ if [ -f "\$APP_SUPPORT/node/bin/node" ]; then
     CURRENT_NODE=\$("\$APP_SUPPORT/node/bin/node" --version)
     echo "✅ Node.js already installed: \$CURRENT_NODE"
     echo "Skipping Node.js installation"
+    notify "AIPrivateSearch Installer" "Node.js already installed: \$CURRENT_NODE"
 else
+    notify "AIPrivateSearch Installer" "Step 2: Installing Node.js..."
     echo "📥 Installing Node.js \$NODE_VERSION for \$NODE_ARCH..."
     
     cd "\$APP_SUPPORT"
@@ -282,6 +293,7 @@ else
 fi
 
 echo "✅ Step 2 completed!"
+notify "AIPrivateSearch Installer" "Step 2 complete - Node.js ready"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  🤖 Step 3: Ollama Installation"
@@ -291,6 +303,7 @@ echo ""
 # Check if Ollama already installed (check multiple locations)
 if command -v ollama &> /dev/null || [ -f "/Applications/Ollama.app/Contents/Resources/ollama" ] || [ -f "\$APP_SUPPORT/ollama" ]; then
     echo "✅ Ollama already installed"
+    notify "AIPrivateSearch Installer" "Ollama already installed"
     
     # Get version from available location
     if command -v ollama &> /dev/null; then
@@ -316,6 +329,7 @@ if command -v ollama &> /dev/null || [ -f "/Applications/Ollama.app/Contents/Res
     fi
 else
     echo "📥 Installing Ollama..."
+    notify "AIPrivateSearch Installer" "Step 3: Installing Ollama..."
     
     cd "\$APP_SUPPORT"
     
@@ -417,6 +431,7 @@ EXPECT_EOF
 fi
 
 echo "✅ Step 3 completed!"
+notify "AIPrivateSearch Installer" "Step 3 complete - Ollama ready"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  🌐 Step 4: Chrome Installation"
@@ -428,8 +443,10 @@ if [ -d "/Applications/Google Chrome.app" ]; then
     echo "✅ Chrome already installed"
     CHROME_VERSION=\$(/Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome --version 2>/dev/null || echo "Unknown version")
     echo "📝 Current version: \$CHROME_VERSION"
+    notify "AIPrivateSearch Installer" "Chrome already installed"
 else
     echo "📥 Installing Chrome..."
+    notify "AIPrivateSearch Installer" "Step 4: Installing Chrome..."
     
     cd "\$APP_SUPPORT"
     
@@ -482,6 +499,7 @@ else
 fi
 
 echo "✅ Step 4 completed!"
+notify "AIPrivateSearch Installer" "Step 4 complete - Chrome ready"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  📦 Step 5: Repository Setup"
@@ -490,6 +508,7 @@ echo ""
 
 # Always download fresh repository (no existing check)
 echo "📥 Downloading fresh AIPrivateSearch repository..."
+notify "AIPrivateSearch Installer" "Step 5: Downloading repository..."
 
 cd "\$APP_SUPPORT"
 
@@ -558,6 +577,7 @@ fi
     fi
 
 echo "✅ Step 5 completed!"
+notify "AIPrivateSearch Installer" "Step 5 complete - Repository ready"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  📦 Step 6: Dependency Installation"
@@ -566,6 +586,7 @@ echo ""
 
 # Install dependencies using our installed Node.js
 echo "📦 Installing project dependencies..."
+notify "AIPrivateSearch Installer" "Step 6: Installing dependencies..."
 
 # Ensure we're in the repository directory
 cd "\$APP_SUPPORT/repo/aiprivatesearch"
@@ -605,6 +626,7 @@ else
 fi
 
 echo "✅ Step 6 completed!"
+notify "AIPrivateSearch Installer" "Step 6 complete - Dependencies installed"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  🤖 Step 7: AI Model Download"
@@ -613,6 +635,7 @@ echo ""
 
 # Download AI models from model-list.json
 echo "🤖 Downloading AI models from configuration..."
+notify "AIPrivateSearch Installer" "Step 7: Downloading AI models..."
 
 # Verify Ollama is available
 if command -v ollama &> /dev/null; then
@@ -695,6 +718,7 @@ echo "✅ Step 7 completed!"
 echo ""
 echo "🎉 AI model download completed!"
 echo "Next: Start servers"
+notify "AIPrivateSearch Installer" "Installation complete! Ready to start."
 
 show_dialog "Step 7 Complete" \\
     "AI model download completed!
