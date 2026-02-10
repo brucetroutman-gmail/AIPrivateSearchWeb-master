@@ -111,7 +111,7 @@ if [ ! -d "$REPO_DIR" ]; then
     show_dialog "Installation Required" \
         "AIPrivateSearch is not installed.\n\nPlease run AIPrivateSearch-installer.app first." \
         "stop"
-    exit 0
+    exit 1
 fi
 
 # Check if Node.js is available
@@ -119,31 +119,27 @@ if [ ! -f "$APP_SUPPORT/node/bin/node" ]; then
     show_dialog "Installation Required" \
         "Node.js is not installed.\n\nPlease run AIPrivateSearch-installer.app first." \
         "stop"
-    exit 0
+    exit 1
 fi
 
 # Add Node.js to PATH
 export PATH="$APP_SUPPORT/node/bin:$PATH"
+
+# Copy start-user-app.sh to shared location if not exists
+if [ ! -f "$APP_SUPPORT/start-user-app.sh" ]; then
+    echo "📋 Copying start-user-app.sh to shared location..."
+    cp "$APP_SUPPORT/repo/aiprivatesearchweb/installer/start-user-app.sh" "$APP_SUPPORT/start-user-app.sh"
+    chmod +x "$APP_SUPPORT/start-user-app.sh"
+fi
 
 # Change to repository directory
 cd "$REPO_DIR"
 
 echo "🚀 Starting AIPrivateSearch servers..."
 
-# Check if start.sh exists
-if [ ! -f "start.sh" ]; then
-    echo "❌ start.sh not found in repository"
-    show_dialog "Error" \
-        "start.sh not found in repository.\n\nPlease reinstall AIPrivateSearch." \
-        "stop"
-    exit 0
-fi
-
-# Start the application using start.sh
-echo "📦 Running start.sh..."
-# Prevent auto-opening browser
-export AIPS_NO_BROWSER=1
-bash start.sh
+# Start the application using start-user-app.sh
+echo "📦 Running start-user-app.sh..."
+bash "$APP_SUPPORT/start-user-app.sh"
 
 echo "=== AIPrivateSearch session ended at $(date) ==="
 LAUNCHER_EOF
