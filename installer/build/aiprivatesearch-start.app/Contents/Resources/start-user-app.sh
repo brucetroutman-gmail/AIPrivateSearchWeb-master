@@ -26,6 +26,16 @@ sleep 2
 pkill -f "npx serve" 2>/dev/null || true
 sleep 1
 
+# Kill any existing AIPrivateSearch server processes to free up ports
+# Kill processes by port to ensure clean shutdown
+lsof -ti :$BACKEND_PORT | xargs kill -9 2>/dev/null || true
+lsof -ti :$FRONTEND_PORT | xargs kill -9 2>/dev/null || true
+# Kill only AIPrivateSearch specific processes (avoid killing custmgr)
+pkill -f "npx serve" 2>/dev/null || true
+sleep 2
+pkill -f "npx serve" 2>/dev/null || true
+sleep 1
+
 # Ensure Ollama service is running
 echo "🔍 Checking Ollama service..."
 if ! curl -s http://localhost:11434/api/tags >/dev/null 2>&1; then
