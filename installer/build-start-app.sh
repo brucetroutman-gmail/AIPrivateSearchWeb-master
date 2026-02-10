@@ -152,22 +152,15 @@ show_progress "Preparing to start...\n\nSetting up environment and checking comp
 # Add Node.js to PATH
 export PATH="$APP_SUPPORT/node/bin:$PATH"
 
-# Copy start-user-app.sh to shared location if not exists
-if [ ! -f "$APP_SUPPORT/start-user-app.sh" ]; then
-    echo "📋 Copying start-user-app.sh to shared location..."
-    cp "$APP_SUPPORT/repo/aiprivatesearchweb/installer/start-user-app.sh" "$APP_SUPPORT/start-user-app.sh"
-    chmod +x "$APP_SUPPORT/start-user-app.sh"
-fi
-
 # Change to repository directory
 cd "$REPO_DIR"
 
 echo "🚀 Starting AIPrivateSearch servers..."
 show_progress "Starting servers...\n\nLaunching backend and frontend servers.\n\nThis may take 30-60 seconds."
 
-# Start the application using start-user-app.sh
-echo "📦 Running start-user-app.sh..."
-bash "$APP_SUPPORT/start-user-app.sh"
+# Start the application using repo's start.sh
+echo "📦 Running start.sh..."
+bash start.sh
 
 show_progress "Application Started!\n\nAIPrivateSearch is now running.\n\nChrome browser should open automatically."
 
