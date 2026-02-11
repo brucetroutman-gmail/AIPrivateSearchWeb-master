@@ -75,7 +75,7 @@ pull_model_safe() {
     local model="$1"
     echo "📥 Pulling $model..."
     
-    if /usr/local/bin/ollama pull "$model" 2>&1; then
+    if /Users/Shared/AIPrivateSearch/ollama pull "$model" 2>&1; then
         echo "✅ $model ready"
         MODELS_UPDATED=true
         return 0
@@ -95,7 +95,7 @@ fi
 
 echo "🔍 Checking required models..."
 for model in $REQUIRED_MODELS; do
-    if ! /usr/local/bin/ollama list 2>/dev/null | grep -q "^${model}"; then
+    if ! /Users/Shared/AIPrivateSearch/ollama list 2>/dev/null | grep -q "^${model}"; then
         pull_model_safe "$model"
         sleep 2
     fi

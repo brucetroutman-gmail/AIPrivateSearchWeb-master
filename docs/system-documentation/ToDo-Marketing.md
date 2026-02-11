@@ -26,30 +26,32 @@ to do AIPrivateSearch Marketing Website
 269. Add resource library (whitepapers, guides)
 270. Create customer referral program
 
+### Installer & Distribution
+271. Revisit Ollama installation location - consider installing to /Applications or /usr/local/bin instead of /Users/Shared/AIPrivateSearch for better system integration and handling existing installations
+
 ### Technical Enhancements
-271. Implement progressive web app (PWA) features
-272. Add offline functionality for key pages
-273. Optimize page load speeds and performance
-274. Implement advanced form validation
-275. Add multi-language support (i18n)
-276. Create mobile app download links
-277. Implement advanced search functionality
-278. Add user dashboard for registered users
-279. Create API documentation portal
-280. Implement automated testing suite
+272. Implement progressive web app (PWA) features
+273. Add offline functionality for key pages
+274. Optimize page load speeds and performance
+275. Implement advanced form validation
+276. Add multi-language support (i18n)
+277. Create mobile app download links
+278. Implement advanced search functionality
+279. Add user dashboard for registered users
+280. Create API documentation portal
+281. Implement automated testing suite
 
 ### Security & Compliance
-281. Add GDPR compliance and cookie consent
-282. Implement privacy policy and terms of service
-283. Add security badges and certifications display
-284. Create compliance documentation portal
-285. Implement data retention and deletion policies
-286. Add audit logging for user actions
-287. Create security incident response procedures 
-
-288. Implement backup and disaster recovery
-289. Add penetration testing schedule
-290. Create security awareness training materialsto connect 
+282. Add GDPR compliance and cookie consent
+283. Implement privacy policy and terms of service
+284. Add security badges and certifications display
+285. Create compliance documentation portal
+286. Implement data retention and deletion policies
+287. Add audit logging for user actions
+288. Create security incident response procedures
+289. Implement backup and disaster recovery
+290. Add penetration testing schedule
+291. Create security awareness training materials 
 
 -------------------------------------------------------
 
