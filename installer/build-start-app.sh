@@ -103,14 +103,6 @@ fi
 # Send start notification
 show_progress "Starting AIPrivateSearch...\n\nInitializing application components.\n\nThis will take a moment."
 
-# Check if servers are already running
-if lsof -ti :56305 >/dev/null 2>&1 && lsof -ti :56306 >/dev/null 2>&1; then
-    echo "✅ Servers already running"
-    show_progress "Already Running!\n\nAIPrivateSearch is already running.\n\nOpening browser..."
-    open -a "Google Chrome" http://localhost:56305 2>/dev/null || open http://localhost:56305
-    exit 0
-fi
-
 # Create directories
 mkdir -p "$APP_SUPPORT/logs"
 

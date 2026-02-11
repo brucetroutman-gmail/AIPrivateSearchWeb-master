@@ -1,6 +1,27 @@
 #!/bin/bash
 
+# Function to show progress dialog
+show_progress() {
+    local message="$1"
+    osascript <<-APPLESCRIPT 2>/dev/null
+        tell application "System Events"
+            activate
+            display dialog "$message" with title "AIPrivateSearch" buttons {"Continue"} default button "Continue" with icon note
+        end tell
+APPLESCRIPT
+}
+
 echo "🚀 Starting AIPrivateSearch..."
+
+# Kill any existing processes FIRST (before reading ports)
+echo "🧹 Cleaning up existing processes..."
+pkill -9 -f "npx serve" 2>/dev/null || true
+pkill -9 -f "node.*server.mjs" 2>/dev/null || true
+lsof -ti :56305 | xargs kill -9 2>/dev/null || true
+lsof -ti :56306 | xargs kill -9 2>/dev/null || true
+sleep 2
+
+show_progress "Cleanup Successful!\n\nAll existing processes stopped.\n\nReady to start fresh."
 
 # Read ports from app.json config - ONLY use config file values
 if [ ! -f "client/c01_client-first-app/config/app.json" ]; then
@@ -15,26 +36,6 @@ if [ -z "$FRONTEND_PORT" ] || [ -z "$BACKEND_PORT" ]; then
     echo "❌ Failed to read ports from config file"
     exit 1
 fi
-
-# Kill any existing AIPrivateSearch server processes to free up ports
-# Kill processes by port to ensure clean shutdown
-lsof -ti :$BACKEND_PORT | xargs kill -9 2>/dev/null || true
-lsof -ti :$FRONTEND_PORT | xargs kill -9 2>/dev/null || true
-# Kill only AIPrivateSearch specific processes (avoid killing custmgr)
-pkill -f "npx serve" 2>/dev/null || true
-sleep 2
-pkill -f "npx serve" 2>/dev/null || true
-sleep 1
-
-# Kill any existing AIPrivateSearch server processes to free up ports
-# Kill processes by port to ensure clean shutdown
-lsof -ti :$BACKEND_PORT | xargs kill -9 2>/dev/null || true
-lsof -ti :$FRONTEND_PORT | xargs kill -9 2>/dev/null || true
-# Kill only AIPrivateSearch specific processes (avoid killing custmgr)
-pkill -f "npx serve" 2>/dev/null || true
-sleep 2
-pkill -f "npx serve" 2>/dev/null || true
-sleep 1
 
 # Ensure Ollama service is running
 echo "🔍 Checking Ollama service..."
