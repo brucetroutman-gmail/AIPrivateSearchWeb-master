@@ -174,12 +174,14 @@ show_progress "Starting servers...\n\nLaunching backend and frontend servers.\n\
 if [ -f "$APP_SUPPORT/start-user-app.sh" ]; then
     echo "📦 Running start-user-app.sh..."
     bash "$APP_SUPPORT/start-user-app.sh"
+    # Open browser after start completes
+    open -a "Google Chrome" http://localhost:56305 2>/dev/null || open http://localhost:56305
 else
     echo "📦 Running start.sh..."
     bash start.sh
 fi
 
-show_progress "Application Started!\n\nAIPrivateSearch is now running.\n\nChrome browser should open automatically."
+show_progress "Application Started!\n\nAIPrivateSearch is now running.\n\nChrome browser opened."
 
 echo "=== AIPrivateSearch session ended at $(date) ==="
 LAUNCHER_EOF
