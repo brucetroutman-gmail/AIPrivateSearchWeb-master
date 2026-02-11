@@ -65,14 +65,17 @@ else
 fi
 
 # Simplified and reliable model management
-echo "Checking model status..."
+echo "Checking model status...
+
+# Track if we updated any models
+MODELS_UPDATED=false
 
 # Function to safely pull a model with retries
 pull_model_safe() {
     local model="$1"
     echo "📥 Pulling $model..."
     
-    if ollama pull "$model" >/dev/null 2>&1; then
+    if /usr/local/bin/ollama pull "$model" 2>&1; then
         echo "✅ $model ready"
         MODELS_UPDATED=true
         return 0
@@ -92,14 +95,11 @@ fi
 
 echo "🔍 Checking required models..."
 for model in $REQUIRED_MODELS; do
-    if ! ollama list 2>/dev/null | grep -q "^${model}"; then
+    if ! /usr/local/bin/ollama list 2>/dev/null | grep -q "^${model}"; then
         pull_model_safe "$model"
-        sleep 2  # Brief pause between models
+        sleep 2
     fi
 done
-
-# Track if we updated any models
-MODELS_UPDATED=false
 
 # Start backend server in background
 echo "🔧 Starting servers..."
