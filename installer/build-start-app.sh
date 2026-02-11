@@ -80,13 +80,17 @@ notify() {
     osascript -e "display notification \"$message\" with title \"$title\"" 2>/dev/null
 }
 
-# Function to show progress dialog
+# Progress tracking
+PROGRESS_LOG=""
+
+# Function to show progress dialog with cumulative messages
 show_progress() {
     local message="$1"
+    PROGRESS_LOG="${PROGRESS_LOG}${message}\n\n"
     osascript <<-APPLESCRIPT 2>/dev/null
         tell application "System Events"
             activate
-            display dialog "$message" with title "AIPrivateSearch" buttons {"Continue"} default button "Continue" with icon note
+            display dialog "$PROGRESS_LOG" with title "AIPrivateSearch" buttons {"Continue"} default button "Continue" with icon note
         end tell
 APPLESCRIPT
 }
@@ -100,18 +104,14 @@ if [ ! -f "$LOCK_FILE" ]; then
     exit 0
 fi
 
-# Send start notification
-show_progress "Starting AIPrivateSearch...\n\nInitializing application components.\n\nThis will take a moment."
-
 # Create directories
 mkdir -p "$APP_SUPPORT/logs"
 
-# Redirect output to log
-exec 1> >(tee -a "$LOG_FILE")
-exec 2>&1
+echo "=== AIPrivateSearch Starting at $(date) ===" >> "$LOG_FILE"
+echo "" >> "$LOG_FILE"
 
-echo "=== AIPrivateSearch Starting at $(date) ==="
-echo ""
+# Send start notification
+show_progress "✓ Starting AIPrivateSearch...\nInitializing application components."
 
 # Function to show dialog
 show_dialog() {
@@ -129,25 +129,21 @@ APPLESCRIPT
 
 # Check if repository exists
 if [ ! -d "$REPO_DIR" ]; then
-    show_progress "Installation Required!\n\nAIPrivateSearch is not installed.\n\nPlease run AIPrivateSearch-installer.app first."
     show_dialog "Installation Required" \
         "AIPrivateSearch is not installed.\n\nPlease run AIPrivateSearch-installer.app first." \
         "stop"
     exit 1
 fi
 
-show_progress "Checking Node.js...\n\nVerifying Node.js installation."
-
 # Check if Node.js is available
 if [ ! -f "$APP_SUPPORT/node/bin/node" ]; then
-    show_progress "Node.js Required!\n\nNode.js is not installed.\n\nPlease run AIPrivateSearch-installer.app first."
     show_dialog "Installation Required" \
         "Node.js is not installed.\n\nPlease run AIPrivateSearch-installer.app first." \
         "stop"
     exit 1
 fi
 
-show_progress "Preparing to start...\n\nSetting up environment and checking components."
+show_progress "✓ Verified installation\nStarting servers..."
 
 # Add Node.js to PATH
 export PATH="$APP_SUPPORT/node/bin:$PATH"
@@ -167,23 +163,25 @@ fi
 # Change to repository directory
 cd "$REPO_DIR"
 
-echo "🚀 Starting AIPrivateSearch servers..."
-show_progress "Starting servers...\n\nLaunching backend and frontend servers.\n\nThis may take 30-60 seconds."
+echo "🚀 Starting AIPrivateSearch servers..." >> "$LOG_FILE"
 
 # Start the application using start-user-app.sh if available, otherwise use repo's start.sh
 if [ -f "$APP_SUPPORT/start-user-app.sh" ]; then
-    echo "📦 Running start-user-app.sh..."
-    bash "$APP_SUPPORT/start-user-app.sh"
-    # Open browser after start completes
+    echo "📦 Running start-user-app.sh..." >> "$LOG_FILE"
+    bash "$APP_SUPPORT/start-user-app.sh" >> "$LOG_FILE" 2>&1 &
+    sleep 5
+    show_progress "✓ Servers launched\nOpening browser..."
     open -a "Google Chrome" http://localhost:56305 2>/dev/null || open http://localhost:56305
 else
-    echo "📦 Running start.sh..."
-    bash start.sh
+    echo "📦 Running start.sh..." >> "$LOG_FILE"
+    bash start.sh >> "$LOG_FILE" 2>&1 &
+    sleep 5
+    show_progress "✓ Servers launched\nOpening browser..."
 fi
 
-show_progress "Application Started!\n\nAIPrivateSearch is now running.\n\nChrome browser opened."
+show_progress "✓ Application started!\nChrome browser opened."
 
-echo "=== AIPrivateSearch session ended at $(date) ==="
+echo "=== AIPrivateSearch session ended at $(date) ===" >> "$LOG_FILE"
 LAUNCHER_EOF
 
 chmod +x "$APP_DIR/Contents/MacOS/$APP_NAME"
