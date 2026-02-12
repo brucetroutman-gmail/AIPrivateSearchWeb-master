@@ -103,18 +103,19 @@ if [ ! -f "$LOCK_FILE" ]; then
 fi
 
 mkdir -p "$APP_SUPPORT/logs"
+echo "=== Starting app kill at $(date) ===" >> "$LOG_FILE"
 
 # Ask user if they want detailed messages
 SHOW_DETAILS=$(osascript <<-APPLESCRIPT 2>/dev/null
     tell application "System Events"
         activate
-        set userChoice to button returned of (display dialog "Show detailed installation messages in Terminal?" buttons {"No", "Yes"} default button "No" with title "AIPrivateSearch")
+        display dialog "Show detailed installation messages in Terminal?\n\nThis will open a Terminal window showing real-time server logs." buttons {"No", "Yes"} default button "No" with title "AIPrivateSearch" with icon note
     end tell
-    return userChoice
+    return button returned of result
 APPLESCRIPT
 )
 
-echo "=== Starting app kill at $(date) ===" >> "$LOG_FILE"
+echo "User selected: $SHOW_DETAILS" >> "$LOG_FILE"
 
 show_progress "✓ Starting AIPrivateSearch...\nKilling existing servers."
 
