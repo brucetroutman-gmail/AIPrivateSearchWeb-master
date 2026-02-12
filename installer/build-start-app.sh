@@ -104,6 +104,16 @@ fi
 
 mkdir -p "$APP_SUPPORT/logs"
 
+# Ask user if they want detailed messages
+SHOW_DETAILS=$(osascript <<-APPLESCRIPT 2>/dev/null
+    tell application "System Events"
+        activate
+        set userChoice to button returned of (display dialog "Show detailed installation messages in Terminal?" buttons {"No", "Yes"} default button "No" with title "AIPrivateSearch")
+    end tell
+    return userChoice
+APPLESCRIPT
+)
+
 echo "=== Starting app kill at $(date) ===" >> "$LOG_FILE"
 
 show_progress "✓ Starting AIPrivateSearch...\nKilling existing servers."
@@ -211,7 +221,19 @@ echo "=== Servers started at $(date) ===" >> "$LOG_FILE"
 
 show_progress "✓ Servers started\nOpening browser..."
 open -a "Google Chrome" http://localhost:$FRONTEND_PORT 2>/dev/null || open http://localhost:$FRONTEND_PORT
-show_progress "✓ Application started!\nChrome browser opened."
+
+# Open Terminal with log tail only if user chose Yes
+if [ "$SHOW_DETAILS" = "Yes" ]; then
+    osascript <<-APPLESCRIPT 2>/dev/null
+        tell application "Terminal"
+            do script "tail -f /Users/Shared/AIPrivateSearch/logs/start.log"
+            activate
+        end tell
+APPLESCRIPT
+    show_progress "✓ Application started!\nChrome browser opened.\nTerminal opened with log viewer."
+else
+    show_progress "✓ Application started!\nChrome browser opened."
+fi
 
 exit 0
 LAUNCHER_EOF

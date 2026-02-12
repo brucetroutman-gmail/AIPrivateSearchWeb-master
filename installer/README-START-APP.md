@@ -125,6 +125,12 @@ Killing node server.mjs...
 Killing port 56305...
 Killing port 56306...
 === Finished app kill at [timestamp] ===
+Starting Ollama...
+Checking models: qwen2:0.5b gemma2:2b llama3.2:3b...
+Pulling qwen2:0.5b...
+Creating .env-aips...
+Creating data files...
+Installing dependencies...
 Starting backend...
 Starting frontend...
 === Servers started at [timestamp] ===
@@ -155,6 +161,11 @@ ps aux | grep "node.*server.mjs"
 **Browser doesn't open:**
 - Servers may still be starting (check log)
 - Chrome may not be installed (app falls back to default browser)
+
+**Ollama models take too long to download:**
+- First run may take 5-10 minutes depending on internet speed
+- Models are only downloaded once, subsequent runs are fast
+- Check progress in log file: `tail -f /Users/Shared/AIPrivateSearch/logs/start.log`
 
 **Dialogs don't appear:**
 - Check if AppleScript permissions are granted
@@ -228,6 +239,15 @@ This script is designed for terminal execution with interactive monitoring:
 - **Terminal**: Designed for developers (full control and monitoring)
 
 ## Version History
+
+**v1.1.0** - Current release
+- Added Ollama model checking and auto-pull
+- Dynamic port reading from app.json
+- Auto-creation of .env-aips file
+- User data files check and copy
+- npm dependencies auto-install
+- Enhanced progress dialogs (7 steps)
+- Comprehensive logging
 
 **v1.0.0** - Initial release
 - Lock file mechanism for first-run detection
