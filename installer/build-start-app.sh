@@ -236,10 +236,6 @@ echo "=== Servers started at $(date) ===" >> "$LOG_FILE"
 show_progress "✓ Servers started\nOpening browser..."
 open -a "Google Chrome" http://localhost:$FRONTEND_PORT 2>/dev/null || open http://localhost:$FRONTEND_PORT
 
-if [ "$SHOW_DETAILS" = "Yes" ]; then
-    show_progress "✓ Application started!\nChrome browser opened.\nTerminal showing live logs."
-fi
-
 exit 0
 LAUNCHER_EOF
 
