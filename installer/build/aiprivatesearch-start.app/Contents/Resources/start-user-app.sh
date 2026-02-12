@@ -239,10 +239,12 @@ cleanup() {
 trap cleanup INT TERM EXIT
 
 # Keep both servers running
-while kill -0 $BACKEND_PID 2>/dev/null && kill -0 $FRONTEND_PID 2>/dev/null; do
+while true; do
+    if ! kill -0 $BACKEND_PID 2>/dev/null || ! kill -0 $FRONTEND_PID 2>/dev/null; then
+        echo "One or both servers stopped unexpectedly"
+        echo "Backend running: $(kill -0 $BACKEND_PID 2>/dev/null && echo 'Yes' || echo 'No')"
+        echo "Frontend running: $(kill -0 $FRONTEND_PID 2>/dev/null && echo 'Yes' || echo 'No')"
+        cleanup
+    fi
     sleep 5
 done
-
-echo "One or both servers stopped unexpectedly"
-echo "Backend running: $(kill -0 $BACKEND_PID 2>/dev/null && echo 'Yes' || echo 'No')"
-echo "Frontend running: $(kill -0 $FRONTEND_PID 2>/dev/null && echo 'Yes' || echo 'No')"
