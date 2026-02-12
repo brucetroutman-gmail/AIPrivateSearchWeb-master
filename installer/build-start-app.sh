@@ -85,14 +85,16 @@ PROGRESS_LOG=""
 
 # Function to show progress dialog with cumulative messages
 show_progress() {
-    local message="$1"
-    PROGRESS_LOG="${PROGRESS_LOG}${message}\n\n"
-    osascript <<-APPLESCRIPT 2>/dev/null
-        tell application "System Events"
-            activate
-            display dialog "$PROGRESS_LOG" with title "AIPrivateSearch" buttons {"Continue"} default button "Continue" with icon note
-        end tell
+    if [ "$SHOW_DETAILS" = "Yes" ]; then
+        local message="$1"
+        PROGRESS_LOG="${PROGRESS_LOG}${message}\n\n"
+        osascript <<-APPLESCRIPT 2>/dev/null
+            tell application "System Events"
+                activate
+                display dialog "$PROGRESS_LOG" with title "AIPrivateSearch" buttons {"Continue"} default button "Continue" with icon note
+            end tell
 APPLESCRIPT
+    fi
 }
 
 # Check if this is first run after installation
@@ -236,8 +238,6 @@ open -a "Google Chrome" http://localhost:$FRONTEND_PORT 2>/dev/null || open http
 
 if [ "$SHOW_DETAILS" = "Yes" ]; then
     show_progress "✓ Application started!\nChrome browser opened.\nTerminal showing live logs."
-else
-    show_progress "✓ Application started!\nChrome browser opened."
 fi
 
 exit 0
