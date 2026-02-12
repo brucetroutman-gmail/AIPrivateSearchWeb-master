@@ -224,10 +224,9 @@ cleanup() {
     lsof -ti :$BACKEND_PORT | xargs kill -9 2>/dev/null || true
     lsof -ti :$FRONTEND_PORT | xargs kill -9 2>/dev/null || true
     pkill -f 'npx serve' 2>/dev/null || true
-    # Only kill AIPrivateSearch specific processes (avoid killing custmgr)
     
     # Disable history saving on Apple Silicon Macs to prevent terminal lockup
-    if [[ $(uname -m) == "arm64" ]]; then
+    if [[ $(uname -m) == "arm64" ]] && [ -z "$LAUNCHED_FROM_APP" ]; then
         unset HISTFILE
         set +o history
         exec /bin/bash --norc --noprofile -c "exit 0" < /dev/null
@@ -235,16 +234,24 @@ cleanup() {
     exit 0
 }
 
-# Set trap for cleanup
-trap cleanup INT TERM EXIT
+# Set trap for cleanup only if launched from terminal
+if [ -z "$LAUNCHED_FROM_APP" ]; then
+    trap cleanup INT TERM EXIT
+fi
 
 # Keep both servers running
-while true; do
-    if ! kill -0 $BACKEND_PID 2>/dev/null || ! kill -0 $FRONTEND_PID 2>/dev/null; then
-        echo "One or both servers stopped unexpectedly"
-        echo "Backend running: $(kill -0 $BACKEND_PID 2>/dev/null && echo 'Yes' || echo 'No')"
-        echo "Frontend running: $(kill -0 $FRONTEND_PID 2>/dev/null && echo 'Yes' || echo 'No')"
-        cleanup
-    fi
-    sleep 5
-done
+if [ -z "$LAUNCHED_FROM_APP" ]; then
+    # Terminal mode: monitor and cleanup
+    while true; do
+        if ! kill -0 $BACKEND_PID 2>/dev/null || ! kill -0 $FRONTEND_PID 2>/dev/null; then
+            echo "One or both servers stopped unexpectedly"
+            echo "Backend running: $(kill -0 $BACKEND_PID 2>/dev/null && echo 'Yes' || echo 'No')"
+            echo "Frontend running: $(kill -0 $FRONTEND_PID 2>/dev/null && echo 'Yes' || echo 'No')"
+            cleanup
+        fi
+        sleep 5
+    done
+else
+    # App mode: just exit and let servers run
+    echo "Servers started in background (app mode)"
+fi

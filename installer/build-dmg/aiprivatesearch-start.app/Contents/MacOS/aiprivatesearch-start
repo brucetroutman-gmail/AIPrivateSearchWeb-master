@@ -81,37 +81,50 @@ show_progress "✓ Verified installation\nStarting servers..."
 # Add Node.js to PATH
 export PATH="$APP_SUPPORT/node/bin:$PATH"
 
-# Copy start-user-app.sh to shared location if not exists or if outdated
-if [ ! -f "$APP_SUPPORT/start-user-app.sh" ]; then
-    echo "📋 Copying start-user-app.sh to shared location..."
-    # Get the script directory (where this launcher is running from)
-    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    # Copy from the app bundle's embedded copy
-    if [ -f "$SCRIPT_DIR/../Resources/start-user-app.sh" ]; then
-        cp "$SCRIPT_DIR/../Resources/start-user-app.sh" "$APP_SUPPORT/start-user-app.sh"
-        chmod +x "$APP_SUPPORT/start-user-app.sh"
-    fi
-fi
-
 # Change to repository directory
 cd "$REPO_DIR"
 
 echo "🚀 Starting AIPrivateSearch servers..." >> "$LOG_FILE"
 
-# Start the application using start-user-app.sh if available, otherwise use repo's start.sh
-if [ -f "$APP_SUPPORT/start-user-app.sh" ]; then
-    echo "📦 Running start-user-app.sh..." >> "$LOG_FILE"
-    bash "$APP_SUPPORT/start-user-app.sh" >> "$LOG_FILE" 2>&1 &
-    sleep 5
-    show_progress "✓ Servers launched\nOpening browser..."
-    open -a "Google Chrome" http://localhost:56305 2>/dev/null || open http://localhost:56305
+# Kill any existing processes
+pkill -9 -f "npx serve" 2>/dev/null || true
+pkill -9 -f "node.*server.mjs" 2>/dev/null || true
+lsof -ti :56305 | xargs kill -9 2>/dev/null || true
+lsof -ti :56306 | xargs kill -9 2>/dev/null || true
+sleep 2
+
+# Read ports from config
+FRONTEND_PORT=$(node -p "JSON.parse(require('fs').readFileSync('./client/c01_client-first-app/config/app.json', 'utf8')).ports.frontend")
+BACKEND_PORT=$(node -p "JSON.parse(require('fs').readFileSync('./client/c01_client-first-app/config/app.json', 'utf8')).ports.backend")
+
+# Ensure Ollama is running
+if [ -x "/usr/local/bin/ollama" ]; then
+    OLLAMA_CMD="/usr/local/bin/ollama"
+elif [ -x "$APP_SUPPORT/ollama" ]; then
+    OLLAMA_CMD="$APP_SUPPORT/ollama"
 else
-    echo "📦 Running start.sh..." >> "$LOG_FILE"
-    bash start.sh >> "$LOG_FILE" 2>&1 &
-    sleep 5
-    show_progress "✓ Servers launched\nOpening browser..."
+    OLLAMA_CMD="ollama"
 fi
 
+if ! curl -s http://localhost:11434/api/tags >/dev/null 2>&1; then
+    if ! pgrep -f "ollama serve" > /dev/null; then
+        $OLLAMA_CMD serve >> "$LOG_FILE" 2>&1 &
+        sleep 3
+    fi
+fi
+
+# Start backend
+cd server/s01_server-first-app
+npm start >> "$LOG_FILE" 2>&1 &
+sleep 5
+
+# Start frontend
+cd ../../client/c01_client-first-app
+npx serve . -l $FRONTEND_PORT >> "$LOG_FILE" 2>&1 &
+sleep 3
+
+show_progress "✓ Servers launched\nOpening browser..."
+open -a "Google Chrome" http://localhost:56305 2>/dev/null || open http://localhost:56305
 show_progress "✓ Application started!\nChrome browser opened."
 
 echo "=== AIPrivateSearch session ended at $(date) ===" >> "$LOG_FILE"
