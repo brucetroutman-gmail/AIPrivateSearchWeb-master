@@ -117,6 +117,17 @@ APPLESCRIPT
 
 echo "User selected: $SHOW_DETAILS" >> "$LOG_FILE"
 
+# Open Terminal immediately if user chose Yes
+if [ "$SHOW_DETAILS" = "Yes" ]; then
+    osascript <<-APPLESCRIPT 2>/dev/null
+        tell application "Terminal"
+            do script "tail -f /Users/Shared/AIPrivateSearch/logs/start.log"
+            activate
+        end tell
+APPLESCRIPT
+    sleep 1
+fi
+
 show_progress "✓ Starting AIPrivateSearch...\nKilling existing servers."
 
 # Kill any existing processes
@@ -220,26 +231,12 @@ sleep 3
 
 echo "=== Servers started at $(date) ===" >> "$LOG_FILE"
 
-echo "About to show progress and open browser..." >> "$LOG_FILE"
 show_progress "✓ Servers started\nOpening browser..."
-echo "Opening Chrome..." >> "$LOG_FILE"
 open -a "Google Chrome" http://localhost:$FRONTEND_PORT 2>/dev/null || open http://localhost:$FRONTEND_PORT
-echo "Chrome opened" >> "$LOG_FILE"
 
-# Open Terminal with log tail only if user chose Yes
-echo "Checking SHOW_DETAILS value: '$SHOW_DETAILS'" >> "$LOG_FILE"
 if [ "$SHOW_DETAILS" = "Yes" ]; then
-    echo "Opening Terminal..." >> "$LOG_FILE"
-    osascript <<-APPLESCRIPT 2>> "$LOG_FILE"
-        tell application "Terminal"
-            do script "tail -f /Users/Shared/AIPrivateSearch/logs/start.log"
-            activate
-        end tell
-APPLESCRIPT
-    echo "Terminal opened" >> "$LOG_FILE"
-    show_progress "✓ Application started!\nChrome browser opened.\nTerminal opened with log viewer."
+    show_progress "✓ Application started!\nChrome browser opened.\nTerminal showing live logs."
 else
-    echo "Skipping Terminal (user selected: $SHOW_DETAILS)" >> "$LOG_FILE"
     show_progress "✓ Application started!\nChrome browser opened."
 fi
 
