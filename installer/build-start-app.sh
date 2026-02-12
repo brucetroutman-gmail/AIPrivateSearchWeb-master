@@ -121,7 +121,29 @@ sleep 2
 
 echo "=== Finished app kill at $(date) ===" >> "$LOG_FILE"
 
-show_progress "✓ Servers stopped\nReady to start."
+show_progress "✓ Servers stopped\nStarting new servers..."
+
+# Add Node.js to PATH
+export PATH="$APP_SUPPORT/node/bin:$PATH"
+
+# Change to repository directory
+cd "$REPO_DIR"
+
+echo "Starting backend..." >> "$LOG_FILE"
+cd server/s01_server-first-app
+npm start >> "$LOG_FILE" 2>&1 &
+sleep 5
+
+echo "Starting frontend..." >> "$LOG_FILE"
+cd ../../client/c01_client-first-app
+npx serve . -l 56305 >> "$LOG_FILE" 2>&1 &
+sleep 3
+
+echo "=== Servers started at $(date) ===" >> "$LOG_FILE"
+
+show_progress "✓ Servers started\nOpening browser..."
+open -a "Google Chrome" http://localhost:56305 2>/dev/null || open http://localhost:56305
+show_progress "✓ Application started!\nChrome browser opened."
 
 exit 0
 LAUNCHER_EOF
