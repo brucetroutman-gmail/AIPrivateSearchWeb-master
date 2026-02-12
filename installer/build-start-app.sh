@@ -121,7 +121,39 @@ sleep 2
 
 echo "=== Finished app kill at $(date) ===" >> "$LOG_FILE"
 
-show_progress "✓ Servers stopped\nStarting new servers..."
+show_progress "✓ Servers stopped\nChecking Ollama models..."
+
+# Determine which Ollama to use
+if [ -x "/usr/local/bin/ollama" ]; then
+    OLLAMA_CMD="/usr/local/bin/ollama"
+elif [ -x "$APP_SUPPORT/ollama" ]; then
+    OLLAMA_CMD="$APP_SUPPORT/ollama"
+else
+    OLLAMA_CMD="ollama"
+fi
+
+# Ensure Ollama is running
+if ! curl -s http://localhost:11434/api/tags >/dev/null 2>&1; then
+    if ! pgrep -f "ollama serve" > /dev/null; then
+        echo "Starting Ollama..." >> "$LOG_FILE"
+        $OLLAMA_CMD serve >> "$LOG_FILE" 2>&1 &
+        sleep 3
+    fi
+fi
+
+# Check and pull models
+if [ -f "$REPO_DIR/client/c01_client-first-app/config/models-list.json" ]; then
+    REQUIRED_MODELS=$(grep '"modelName"' "$REPO_DIR/client/c01_client-first-app/config/models-list.json" | cut -d'"' -f4 | sort -u)
+    echo "Checking models: $REQUIRED_MODELS" >> "$LOG_FILE"
+    for model in $REQUIRED_MODELS; do
+        if ! $OLLAMA_CMD list 2>/dev/null | grep -q "^${model}"; then
+            echo "Pulling $model..." >> "$LOG_FILE"
+            $OLLAMA_CMD pull "$model" >> "$LOG_FILE" 2>&1 || true
+        fi
+    done
+fi
+
+show_progress "✓ Ollama models checked\nPreparing configuration..."
 
 # Add Node.js to PATH
 export PATH="$APP_SUPPORT/node/bin:$PATH"
@@ -129,20 +161,56 @@ export PATH="$APP_SUPPORT/node/bin:$PATH"
 # Change to repository directory
 cd "$REPO_DIR"
 
+# Read ports from config
+FRONTEND_PORT=$(node -p "JSON.parse(require('fs').readFileSync('./client/c01_client-first-app/config/app.json', 'utf8')).ports.frontend")
+BACKEND_PORT=$(node -p "JSON.parse(require('fs').readFileSync('./client/c01_client-first-app/config/app.json', 'utf8')).ports.backend")
+
+# Check for .env-aips file
+if [ ! -f "$APP_SUPPORT/.env-aips" ]; then
+    echo "Creating .env-aips..." >> "$LOG_FILE"
+    cat > "$APP_SUPPORT/.env-aips" << 'ENVEOF'
+NODE_ENV=development
+DB_HOST=localhost
+DB_PORT=3306
+DB_USERNAME=root
+DB_PASSWORD=
+DB_DATABASE=iodd2
+ENVEOF
+fi
+
+# Check for data files
+if [ ! -f "$APP_SUPPORT/data/users.json" ]; then
+    echo "Creating data files..." >> "$LOG_FILE"
+    mkdir -p "$APP_SUPPORT/data"
+    [ -f "data/users.json" ] && cp "data/users.json" "$APP_SUPPORT/data/"
+    [ -f "data/sessions.json" ] && cp "data/sessions.json" "$APP_SUPPORT/data/"
+fi
+
 echo "Starting backend..." >> "$LOG_FILE"
 cd server/s01_server-first-app
+
+# Check dependencies
+if [ ! -d "node_modules" ]; then
+    echo "Installing dependencies..." >> "$LOG_FILE"
+    npm install --silent --no-audit --no-fund >> "$LOG_FILE" 2>&1
+fi
+
+show_progress "✓ Configuration ready\nStarting backend server..."
+
 npm start >> "$LOG_FILE" 2>&1 &
 sleep 5
 
+show_progress "✓ Backend started\nStarting frontend server..."
+
 echo "Starting frontend..." >> "$LOG_FILE"
 cd ../../client/c01_client-first-app
-npx serve . -l 56305 >> "$LOG_FILE" 2>&1 &
+npx serve . -l $FRONTEND_PORT >> "$LOG_FILE" 2>&1 &
 sleep 3
 
 echo "=== Servers started at $(date) ===" >> "$LOG_FILE"
 
 show_progress "✓ Servers started\nOpening browser..."
-open -a "Google Chrome" http://localhost:56305 2>/dev/null || open http://localhost:56305
+open -a "Google Chrome" http://localhost:$FRONTEND_PORT 2>/dev/null || open http://localhost:$FRONTEND_PORT
 show_progress "✓ Application started!\nChrome browser opened."
 
 exit 0
