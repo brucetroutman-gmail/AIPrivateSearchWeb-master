@@ -97,118 +97,33 @@ APPLESCRIPT
 
 # Check if this is first run after installation
 if [ ! -f "$LOCK_FILE" ]; then
-    # Create lock file to allow future runs
     mkdir -p "$APP_SUPPORT"
     touch "$LOCK_FILE"
-    # Exit silently on first run (during drag-to-install)
     exit 0
 fi
 
-# Create directories
 mkdir -p "$APP_SUPPORT/logs"
 
-echo "=== AIPrivateSearch Starting at $(date) ===" >> "$LOG_FILE"
-echo "" >> "$LOG_FILE"
+echo "=== Starting app kill at $(date) ===" >> "$LOG_FILE"
 
-# Send start notification
-show_progress "✓ Starting AIPrivateSearch...\nInitializing application components."
-
-# Function to show dialog
-show_dialog() {
-    local title="$1"
-    local message="$2"
-    local type="${3:-informational}"
-    
-    osascript <<-APPLESCRIPT 2>/dev/null || echo "$message"
-        tell application "System Events"
-            activate
-            display dialog "$message" with title "$title" buttons {"OK"} default button "OK" with icon $type
-        end tell
-APPLESCRIPT
-}
-
-# Check if repository exists
-if [ ! -d "$REPO_DIR" ]; then
-    show_dialog "Installation Required" \
-        "AIPrivateSearch is not installed.\n\nPlease run AIPrivateSearch-installer.app first." \
-        "stop"
-    exit 1
-fi
-
-# Check if Node.js is available
-if [ ! -f "$APP_SUPPORT/node/bin/node" ]; then
-    show_dialog "Installation Required" \
-        "Node.js is not installed.\n\nPlease run AIPrivateSearch-installer.app first." \
-        "stop"
-    exit 1
-fi
-
-show_progress "✓ Verified installation\nStarting servers..."
-
-# Add Node.js to PATH
-export PATH="$APP_SUPPORT/node/bin:$PATH"
-
-# Change to repository directory
-cd "$REPO_DIR"
-
-echo "🚀 Starting AIPrivateSearch servers..." >> "$LOG_FILE"
+show_progress "✓ Starting AIPrivateSearch...\nKilling existing servers."
 
 # Kill any existing processes
-pkill -9 -f "npx serve" 2>/dev/null || true
-pkill -9 -f "node.*server.mjs" 2>/dev/null || true
-lsof -ti :56305 | xargs kill -9 2>/dev/null || true
-lsof -ti :56306 | xargs kill -9 2>/dev/null || true
+echo "Killing npx serve..." >> "$LOG_FILE"
+pkill -9 -f "npx serve" 2>> "$LOG_FILE" || true
+echo "Killing node server.mjs..." >> "$LOG_FILE"
+pkill -9 -f "node.*server.mjs" 2>> "$LOG_FILE" || true
+echo "Killing port 56305..." >> "$LOG_FILE"
+lsof -ti :56305 | xargs kill -9 2>> "$LOG_FILE" || true
+echo "Killing port 56306..." >> "$LOG_FILE"
+lsof -ti :56306 | xargs kill -9 2>> "$LOG_FILE" || true
 sleep 2
 
-# Read ports from config
-FRONTEND_PORT=$(node -p "JSON.parse(require('fs').readFileSync('./client/c01_client-first-app/config/app.json', 'utf8')).ports.frontend")
-BACKEND_PORT=$(node -p "JSON.parse(require('fs').readFileSync('./client/c01_client-first-app/config/app.json', 'utf8')).ports.backend")
+echo "=== Finished app kill at $(date) ===" >> "$LOG_FILE"
 
-# Ensure Ollama is running
-if [ -x "/usr/local/bin/ollama" ]; then
-    OLLAMA_CMD="/usr/local/bin/ollama"
-elif [ -x "$APP_SUPPORT/ollama" ]; then
-    OLLAMA_CMD="$APP_SUPPORT/ollama"
-else
-    OLLAMA_CMD="ollama"
-fi
+show_progress "✓ Servers stopped\nReady to start."
 
-if ! curl -s http://localhost:11434/api/tags >/dev/null 2>&1; then
-    if ! pgrep -f "ollama serve" > /dev/null; then
-        $OLLAMA_CMD serve >> "$LOG_FILE" 2>&1 &
-        sleep 3
-    fi
-fi
-
-# Start backend
-cd server/s01_server-first-app
-npm start >> "$LOG_FILE" 2>&1 &
-
-# Wait for backend to be ready
-for i in {1..30}; do
-    if curl -s http://localhost:$BACKEND_PORT/api/licensing/status >/dev/null 2>&1; then
-        break
-    fi
-    sleep 1
-done
-
-# Start frontend
-cd ../../client/c01_client-first-app
-npx serve . -l $FRONTEND_PORT >> "$LOG_FILE" 2>&1 &
-
-# Wait for frontend to be ready
-for i in {1..15}; do
-    if curl -s http://localhost:$FRONTEND_PORT >/dev/null 2>&1; then
-        break
-    fi
-    sleep 1
-done
-
-show_progress "✓ Servers launched\nOpening browser..."
-open -a "Google Chrome" http://localhost:56305 2>/dev/null || open http://localhost:56305
-show_progress "✓ Application started!\nChrome browser opened."
-
-echo "=== AIPrivateSearch session ended at $(date) ===" >> "$LOG_FILE"
+exit 0
 LAUNCHER_EOF
 
 chmod +x "$APP_DIR/Contents/MacOS/$APP_NAME"
