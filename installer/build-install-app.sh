@@ -83,12 +83,16 @@ INSTALLER_VERSION="$NEW_VERSION"
 
 # Detect if running from DMG (bundled resources available)
 DMG_RESOURCES=""
-if [ -d "/Volumes/AIPrivateSearch/Resources" ]; then
+APP_BUNDLE_RESOURCES="\$(dirname "\$0")/../Resources"
+
+if [ -d "\$APP_BUNDLE_RESOURCES" ] && [ -f "\$APP_BUNDLE_RESOURCES/manifest.txt" ]; then
+    DMG_RESOURCES="\$APP_BUNDLE_RESOURCES"
+    echo "✅ Bundled resources found in app bundle"
+elif [ -d "/Volumes/AIPrivateSearch/Resources" ]; then
     DMG_RESOURCES="/Volumes/AIPrivateSearch/Resources"
     echo "✅ Running from DMG - bundled resources available"
-elif [ -d "\$(dirname "\$0")/../../Resources" ]; then
-    DMG_RESOURCES="\$(dirname "\$0")/../../Resources"
-    echo "✅ Bundled resources found"
+else
+    echo "⚠️  No bundled resources found - will download"
 fi
 
 # Progress tracking

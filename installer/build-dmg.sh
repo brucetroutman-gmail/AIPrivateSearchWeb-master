@@ -48,10 +48,16 @@ fi
 # Copy pre-downloaded resources
 RESOURCES_DIR="./build-resources"
 if [ -d "$RESOURCES_DIR" ]; then
-    echo "📋 Copying pre-downloaded resources..."
+    echo "📋 Copying pre-downloaded resources to installer app..."
+    mkdir -p "$BUILD_DIR/$APP_NAME.app/Contents/Resources"
+    cp -R "$RESOURCES_DIR"/* "$BUILD_DIR/$APP_NAME.app/Contents/Resources/"
+    echo "✓ Resources bundled in installer app (Node.js, Ollama)"
+    
+    # Also copy to DMG for visibility
+    echo "📋 Copying resources to DMG..."
     mkdir -p "$DMG_DIR/Resources"
     cp -R "$RESOURCES_DIR"/* "$DMG_DIR/Resources/"
-    echo "✓ Resources copied (Node.js, Ollama)"
+    echo "✓ Resources copied to DMG"
 else
     echo "⚠️  Warning: Resources not found in $RESOURCES_DIR"
     echo "   Run build-prepare-resources.sh first to pre-download Node.js and Ollama"
