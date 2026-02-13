@@ -198,7 +198,12 @@ async function loadHeader() {
       const headerHTML = await response.text();
       const headerPlaceholder = document.getElementById('header-placeholder');
       if (headerPlaceholder) {
-        headerPlaceholder.innerHTML = headerHTML;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(headerHTML, 'text/html');
+        headerPlaceholder.textContent = '';
+        while (doc.body.firstChild) {
+          headerPlaceholder.appendChild(doc.body.firstChild);
+        }
       }
     }
   } catch (error) {
@@ -214,7 +219,12 @@ async function loadFooter() {
       const footerHTML = await response.text();
       const footerPlaceholder = document.getElementById('footer-placeholder');
       if (footerPlaceholder) {
-        footerPlaceholder.innerHTML = footerHTML;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(footerHTML, 'text/html');
+        footerPlaceholder.textContent = '';
+        while (doc.body.firstChild) {
+          footerPlaceholder.appendChild(doc.body.firstChild);
+        }
       }
     }
   } catch (error) {
