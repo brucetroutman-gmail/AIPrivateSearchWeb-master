@@ -1,599 +1,279 @@
-# AIPrivateSearch macOS Distribution System
+# AIPrivateSearch Installer Build System
 
-Complete solution for distributing AIPrivateSearch as a professional macOS application.
-
-## Overview
-
-This package includes everything needed to create professional macOS installers:
-
-- **.app Bundle** - Standard macOS application
-- **.pkg Installer** - Professional installer package  
-- **.dmg Disk Image** - Drag-to-install disk image
-- **Code Signing & Notarization** - Scripts and guides for Apple distribution
-
-## Quick Start
-
-### Prerequisites
-
-1. **macOS** (10.15 or later)
-2. **Xcode Command Line Tools**
-   ```bash
-   xcode-select --install
-   ```
-
-### Build Everything
-
-```bash
-# Make scripts executable
-chmod +x *.sh
-
-# Build all formats
-./build-all.sh
-```
-
-Or build individually:
-```bash
-./build-app.sh    # Creates .app bundle
-./build-pkg.sh    # Creates .pkg installer
-./build-dmg.sh    # Creates .dmg disk image
-```
-
-## File Structure
-
-```
-aiprivatesearch-installer/
-├── build-app.sh              # Creates .app bundle
-├── build-pkg.sh              # Creates .pkg installer
-├── build-dmg.sh              # Creates .dmg disk image
-├── build-all.sh              # Builds everything
-├── CODE-SIGNING-GUIDE.md     # Complete signing/notarization guide
-├── README.md                 # This file
-└── integrate-source.sh       # Helper to integrate your source code
-```
-
-After building:
-```
-aiprivatesearch-installer/
-├── build/
-│   └── AIPrivateSearch.app   # Application bundle
-├── build-pkg/                # PKG build artifacts
-├── build-dmg/                # DMG build artifacts
-├── AIPrivateSearch-1.0.0.pkg # Final installer
-└── AIPrivateSearch-1.0.0.dmg # Final disk image
-```
-
-## Integration with Your Source Code
-
-### Method 1: Manual Integration
-
-1. Build the app structure:
-   ```bash
-   ./build-app.sh
-   ```
-
-2. Copy your application files:
-   ```bash
-   # Copy your server and client code
-   cp -R /path/to/your/aiprivatesearch/* \
-     ./build/AIPrivateSearch.app/Contents/Resources/app/
-   ```
-
-3. Copy sample documents:
-   ```bash
-   cp -R /path/to/your/sources/local-documents \
-     ./build/AIPrivateSearch.app/Contents/Resources/samples/
-   ```
-
-### Method 2: Automated Integration
-
-Create `integrate-source.sh`:
-
-```bash
-#!/bin/bash
-
-SOURCE_DIR="/path/to/your/aiprivatesearch/repo"
-APP_RESOURCES="./build/AIPrivateSearch.app/Contents/Resources"
-
-# Build app structure first
-./build-app.sh
-
-# Copy application files
-echo "Copying application files..."
-cp -R "$SOURCE_DIR"/* "$APP_RESOURCES/app/"
-
-# Copy samples
-if [ -d "$SOURCE_DIR/sources/local-documents" ]; then
-    mkdir -p "$APP_RESOURCES/samples"
-    cp -R "$SOURCE_DIR/sources/local-documents" "$APP_RESOURCES/samples/"
-fi
-
-# Copy config templates
-if [ -d "$SOURCE_DIR/client/c01_client-first-app/config" ]; then
-    cp -R "$SOURCE_DIR/client/c01_client-first-app/config" "$APP_RESOURCES/config-templates/"
-fi
-
-echo "✅ Integration complete!"
-```
-
-## Distribution Formats Explained
-
-### .app Bundle (Recommended for GitHub)
-
-**Best for:**
-- Open source projects
-- Developer distribution
-- Advanced users
-- GitHub releases
-
-**Installation:**
-1. Download AIPrivateSearch.app.zip
-2. Unzip
-3. Drag to Applications folder
-4. Launch
-
-**Pros:**
-- Familiar to Mac users
-- No installer needed
-- Easy to update
-
-**Cons:**
-- No automated prerequisite checking
-- User must manually check Node.js/Ollama
-
-### .pkg Installer (Recommended for General Users)
-
-**Best for:**
-- General public
-- Enterprise deployment
-- Automated installation
-- First-time users
-
-**Installation:**
-1. Download AIPrivateSearch-1.0.0.pkg
-2. Double-click
-3. Follow installer wizard
-4. Launch from Applications
-
-**Pros:**
-- Professional appearance
-- Checks prerequisites
-- Guided installation
-- Can run scripts (setup, permissions)
-
-**Cons:**
-- Requires Apple Developer ID to sign
-- More complex to build
-
-### .dmg Disk Image (Recommended for Website Distribution)
-
-**Best for:**
-- Website downloads
-- Professional distribution
-- Traditional Mac software
-- Users expecting drag-to-install
-
-**Installation:**
-1. Download AIPrivateSearch-1.0.0.dmg
-2. Double-click to mount
-3. Drag app to Applications folder
-4. Eject disk image
-5. Launch from Applications
-
-**Pros:**
-- Professional, polished experience
-- Visual drag-to-install interface
-- Can include README and extras
-- Smaller download (compressed)
-
-**Cons:**
-- Requires macOS to create
-- Extra step (mounting) for users
-
-## What Gets Installed
-
-### User Locations
-
-```
-~/Library/Application Support/AIPrivateSearch/
-├── app/                      # Application files (server, client)
-├── logs/                     # Application logs
-│   └── app.log
-├── data/                     # User data
-│   ├── users.json
-│   └── sessions.json
-├── sources/                  # User documents
-│   └── local-documents/
-└── config/                   # Configuration backups
-
-~/.config/aiprivatesearch/
-├── .env                      # Environment configuration
-└── setup-complete            # First-run flag
-```
-
-### System Locations
-
-```
-/Applications/
-└── AIPrivateSearch.app       # The application
-```
-
-## Testing Your Build
-
-### 1. Test the .app Bundle
-
-```bash
-# Open the app
-open ./build/AIPrivateSearch.app
-
-# Check if it launches properly
-# Verify prerequisite checking works
-# Test configuration wizard
-```
-
-### 2. Test the .pkg Installer
-
-```bash
-# Install the package
-open ./AIPrivateSearch-1.0.0.pkg
-
-# Verify installation
-ls -la /Applications/AIPrivateSearch.app
-ls -la ~/Library/Application\ Support/AIPrivateSearch/
-```
-
-### 3. Test the .dmg
-
-```bash
-# Mount the DMG
-open ./AIPrivateSearch-1.0.0.dmg
-
-# Verify the interface
-# Drag app to Applications
-# Test the installed app
-```
-
-### 4. Test Uninstallation
-
-```bash
-# Run uninstall script
-bash /Applications/AIPrivateSearch.app/Contents/Resources/Uninstall.sh
-
-# Verify cleanup
-ls ~/Library/Application\ Support/ | grep AIPrivateSearch
-ls ~/.config/ | grep aiprivatesearch
-```
-
-## Code Signing and Notarization
-
-### Why Sign and Notarize?
-
-Without signing and notarization, users will see:
-> "AIPrivateSearch.app can't be opened because it is from an unidentified developer"
-
-### Requirements
-
-1. **Apple Developer Account** ($99/year)
-   - Enroll at: https://developer.apple.com/programs/
-
-2. **Developer Certificates**
-   - Developer ID Application (for .app and .dmg)
-   - Developer ID Installer (for .pkg)
-
-### Complete Guide
-
-See [CODE-SIGNING-GUIDE.md](CODE-SIGNING-GUIDE.md) for detailed instructions.
-
-### Quick Signing Commands
-
-```bash
-# Sign .app
-codesign --deep --force --verify --verbose \
-  --sign "Developer ID Application: Your Name" \
-  --options runtime \
-  --timestamp \
-  AIPrivateSearch.app
-
-# Sign .pkg
-productsign \
-  --sign "Developer ID Installer: Your Name" \
-  AIPrivateSearch-1.0.0.pkg \
-  AIPrivateSearch-1.0.0-signed.pkg
-
-# Notarize and staple
-xcrun notarytool submit AIPrivateSearch-1.0.0.dmg \
-  --keychain-profile "YourProfile" \
-  --wait
-
-xcrun stapler staple AIPrivateSearch-1.0.0.dmg
-```
-
-## Distribution Strategies
-
-### 1. GitHub Releases (Recommended for Open Source)
-
-**Setup:**
-1. Create a new release on GitHub
-2. Upload both .dmg and .pkg
-3. Include SHA256 checksums
-4. Write clear release notes
-
-**Release Assets:**
-```
-AIPrivateSearch-1.0.0.dmg          (for most users)
-AIPrivateSearch-1.0.0.dmg.sha256   (checksum)
-AIPrivateSearch-1.0.0.pkg          (alternative)
-AIPrivateSearch-1.0.0.pkg.sha256   (checksum)
-```
-
-**Release Notes Template:**
-```markdown
-## AIPrivateSearch v1.0.0
-
-### Installation
-
-**Easy Install (DMG):**
-1. Download `AIPrivateSearch-1.0.0.dmg`
-2. Open the DMG
-3. Drag AIPrivateSearch to Applications
-4. Launch and follow setup wizard
-
-**Installer Package (PKG):**
-1. Download `AIPrivateSearch-1.0.0.pkg`
-2. Double-click and follow installer
-3. Launch from Applications
-
-### Prerequisites
-- Node.js 16+ (https://nodejs.org/)
-- Ollama (https://ollama.com/)
-
-### Checksums
-```
-SHA256 (AIPrivateSearch-1.0.0.dmg) = abc123...
-SHA256 (AIPrivateSearch-1.0.0.pkg) = def456...
-```
-
-### What's New
-- Initial release
-- Local AI search
-- Document indexing
-- Private processing
-```
-
-### 2. Self-Hosted Website
-
-**Setup:**
-1. Upload to your web server
-2. Create a download page
-3. Include installation instructions
-
-**Example Download Page:**
-```html
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Download AIPrivateSearch</title>
-</head>
-<body>
-    <h1>Download AIPrivateSearch for Mac</h1>
-    
-    <h2>Choose Your Download:</h2>
-    
-    <div class="download-option">
-        <h3>Disk Image (.dmg) - Recommended</h3>
-        <a href="AIPrivateSearch-1.0.0.dmg">
-            Download AIPrivateSearch-1.0.0.dmg
-        </a>
-        <p>Size: 45 MB | macOS 10.15+</p>
-    </div>
-    
-    <div class="download-option">
-        <h3>Installer Package (.pkg)</h3>
-        <a href="AIPrivateSearch-1.0.0.pkg">
-            Download AIPrivateSearch-1.0.0.pkg
-        </a>
-        <p>Size: 42 MB | macOS 10.15+</p>
-    </div>
-    
-    <h2>Installation Instructions</h2>
-    <!-- Instructions here -->
-    
-    <h2>System Requirements</h2>
-    <ul>
-        <li>macOS 10.15 (Catalina) or later</li>
-        <li>Node.js 16 or later</li>
-        <li>Ollama for AI models</li>
-        <li>4GB RAM minimum, 8GB recommended</li>
-    </ul>
-</body>
-</html>
-```
-
-### 3. Homebrew Cask (For Advanced Users)
-
-Create a cask definition:
-
-```ruby
-cask "aiprivatesearch" do
-  version "1.0.0"
-  sha256 "abc123..."
-
-  url "https://github.com/username/aiprivatesearch/releases/download/v#{version}/AIPrivateSearch-#{version}.dmg"
-  name "AIPrivateSearch"
-  desc "Private AI-powered search"
-  homepage "https://github.com/username/aiprivatesearch"
-
-  depends_on formula: "node"
-  depends_on cask: "ollama"
-
-  app "AIPrivateSearch.app"
-
-  uninstall script: {
-    executable: "#{appdir}/AIPrivateSearch.app/Contents/Resources/Uninstall.sh",
-    sudo: false
-  }
-
-  zap trash: [
-    "~/Library/Application Support/AIPrivateSearch",
-    "~/.config/aiprivatesearch"
-  ]
-end
-```
-
-Users install with:
-```bash
-brew install --cask aiprivatesearch
-```
-
-## Troubleshooting
-
-### Build Issues
-
-**Issue: "command not found: pkgbuild"**
-```bash
-# Install Xcode Command Line Tools
-xcode-select --install
-```
-
-**Issue: "operation not permitted"**
-```bash
-# Grant Full Disk Access to Terminal
-# System Preferences > Security & Privacy > Privacy > Full Disk Access
-```
-
-### Installation Issues
-
-**Issue: "App is damaged and can't be opened"**
-- App is not signed/notarized
-- User should right-click > Open (first time only)
-- Or sign and notarize properly
-
-**Issue: "Node.js not found after installation"**
-- User needs to install Node.js separately
-- Provide clear prerequisite instructions
-
-### Runtime Issues
-
-**Issue: Port 3000 already in use**
-```bash
-# Find and kill the process
-lsof -ti:3000 | xargs kill -9
-```
-
-**Issue: Configuration file not found**
-```bash
-# Check if .env exists
-ls -la ~/.config/aiprivatesearch/.env
-
-# Create if missing
-cp /Applications/AIPrivateSearch.app/Contents/Resources/env.template \
-   ~/.config/aiprivatesearch/.env
-```
-
-## Customization
-
-### Change App Name
-
-Edit in all build scripts:
-```bash
-APP_NAME="YourAppName"
-BUNDLE_ID="com.yourcompany.yourapp"
-```
-
-### Change Install Location
-
-Edit in `build-app.sh`:
-```bash
-# Default location
-APP_SUPPORT="$HOME/Library/Application Support/YourApp"
-
-# For system-wide installation
-APP_SUPPORT="/Library/Application Support/YourApp"
-```
-
-### Add Custom Prerequisites
-
-Edit the launcher script in `build-app.sh`:
-```bash
-# Add your check
-check_custom_tool() {
-    if ! command -v yourtool &> /dev/null; then
-        show_alert_with_action "Tool Required" \
-            "This app requires YourTool..." \
-            "Cancel" "Download"
-    fi
-}
-```
-
-### Customize DMG Appearance
-
-1. Create background image (600x400px or 1200x800px for Retina)
-2. Save as `.background/background.png`
-3. Edit icon positions in `build-dmg.sh`
-
-## Best Practices
-
-### 1. Version Control
-
-```bash
-# Use semantic versioning
-VERSION="1.0.0"  # Major.Minor.Patch
-
-# Tag releases
-git tag -a v1.0.0 -m "Release version 1.0.0"
-git push origin v1.0.0
-```
-
-### 2. Checksums
-
-```bash
-# Generate checksums
-shasum -a 256 AIPrivateSearch-1.0.0.dmg > AIPrivateSearch-1.0.0.dmg.sha256
-shasum -a 256 AIPrivateSearch-1.0.0.pkg > AIPrivateSearch-1.0.0.pkg.sha256
-
-# Users verify with:
-shasum -a 256 -c AIPrivateSearch-1.0.0.dmg.sha256
-```
-
-### 3. Release Notes
-
-Always include:
-- What's new/changed
-- Known issues
-- Installation instructions
-- Prerequisites
-- Support/contact info
-
-### 4. Testing
-
-Test on:
-- Clean macOS installation (VM recommended)
-- Different macOS versions (10.15, 11, 12, 13, 14)
-- Both Intel and Apple Silicon Macs
-- Without prerequisites installed
-
-## Support
-
-### For Build Issues
-1. Check macOS version (10.15+)
-2. Verify Xcode Command Line Tools installed
-3. Check error messages in build logs
-4. Ensure proper permissions
-
-### For Distribution Issues
-1. Review CODE-SIGNING-GUIDE.md
-2. Verify Developer ID certificates
-3. Check notarization status
-4. Test on clean system
-
-## License
-
-[Your License Here]
-
-## Credits
-
-AIPrivateSearch Distribution System
-Created for professional macOS application deployment
+Complete build system for creating professional macOS installers with pre-bundled dependencies.
 
 ---
 
-**Ready to distribute your app professionally! 🚀**
+## Quick Start
+
+```bash
+cd installer
+./build-all.sh
+```
+
+This creates `aiprivatesearch.dmg` with:
+- AIPrivateSearch-installer.app (one-time setup)
+- aiprivatesearch-start.app (launch servers)
+- Pre-bundled Node.js and Ollama
+
+---
+
+## Build Process
+
+### 1. Prepare Resources (Automatic)
+```bash
+./build-prepare-resources.sh
+```
+Downloads and prepares:
+- Node.js v20.11.0 (arm64/x64)
+- Ollama (universal binary)
+
+### 2. Build Apps
+```bash
+./build-install-app.sh  # Installer app
+./build-start-app.sh    # Start app
+```
+
+### 3. Create DMG
+```bash
+./build-dmg.sh
+```
+Creates DMG with:
+- Both apps
+- Bundled resources
+- 256px icons
+- Applications symlink
+
+### 4. All-in-One
+```bash
+./build-all.sh
+```
+Runs all steps automatically.
+
+---
+
+## File Structure
+
+### Active Build Scripts
+```
+installer/
+├── build-all.sh                    # Master build script
+├── build-prepare-resources.sh      # Download Node.js, Ollama
+├── build-install-app.sh            # Build installer app
+├── build-start-app.sh              # Build start app
+├── build-dmg.sh                    # Create DMG (256px icons)
+└── entitlements.plist              # Code signing entitlements
+```
+
+### Documentation
+```
+installer/
+├── README.md                       # This file
+├── GITHUB-CODE-SIGNING-GUIDE.md    # Automated signing with GitHub Actions
+├── CODE-SIGNING-GUIDE.md           # Manual signing reference
+├── BUILD-PROCESS.md                # Build process details
+├── INSTALLER-APP-README.md         # Installer app documentation
+├── START-APP-README.md             # Start app documentation
+└── FILE-ANALYSIS.md                # File inventory
+```
+
+### Build Output
+```
+installer/
+├── build/                          # Built apps
+│   ├── AIPrivateSearch-installer.app
+│   └── aiprivatesearch-start.app
+├── build-resources/                # Downloaded resources
+│   ├── node-v20.11.0-darwin-arm64.tar.gz
+│   ├── ollama
+│   └── manifest.txt
+├── build-dmg/                      # DMG staging
+└── aiprivatesearch.dmg             # Final DMG
+```
+
+---
+
+## What Gets Installed
+
+### Installation Locations
+
+```
+/Users/Shared/AIPrivateSearch/
+├── node/                           # Node.js v20.11.0
+├── ollama                          # Ollama binary
+├── repo/aiprivatesearch/           # Application code
+├── data/                           # User data
+│   ├── users.json
+│   └── sessions.json
+├── sources/local-documents/        # Sample documents
+├── config/                         # Configuration files
+├── logs/                           # Application logs
+└── .env-aips                       # Environment variables
+
+/Applications/Google Chrome.app     # Chrome (if not installed)
+```
+
+---
+
+## DMG Features
+
+- **256px Icons** - Large, clear app icons
+- **Drag-to-Install** - Applications folder symlink
+- **Pre-bundled Resources** - Node.js and Ollama included
+- **Two Apps**:
+  - Installer (run once for setup)
+  - Start (launch servers daily)
+
+---
+
+## Code Signing & Notarization
+
+### Prerequisites
+1. Apple Developer Program ($99/year)
+2. Developer ID Application certificate
+3. Team ID
+4. App-specific password
+
+### Method 1: Manual Signing (Recommended)
+
+**Best for:** Small teams, infrequent releases
+
+```bash
+# 1. Build
+./build-all.sh
+
+# 2. Sign apps
+cd build
+codesign --deep --force --sign "Developer ID Application" \
+  --options runtime --entitlements ../entitlements.plist \
+  --timestamp AIPrivateSearch-installer.app
+
+codesign --deep --force --sign "Developer ID Application" \
+  --options runtime --entitlements ../entitlements.plist \
+  --timestamp aiprivatesearch-start.app
+
+# 3. Rebuild DMG
+cd ..
+./build-dmg.sh
+
+# 4. Sign DMG
+codesign --deep --force --sign "Developer ID Application" \
+  --timestamp aiprivatesearch.dmg
+
+# 5. Notarize
+xcrun notarytool submit aiprivatesearch.dmg \
+  --apple-id "your@email.com" \
+  --team-id "TEAMID" \
+  --password "xxxx-xxxx-xxxx-xxxx" \
+  --wait
+
+# 6. Staple
+xcrun stapler staple aiprivatesearch.dmg
+```
+
+**Time:** ~15 minutes per release
+
+See [GITHUB-CODE-SIGNING-GUIDE.md](GITHUB-CODE-SIGNING-GUIDE.md) for detailed steps.
+
+### Method 2: GitHub Actions (Automated)
+
+**Best for:** Teams, frequent releases
+
+See [GITHUB-CODE-SIGNING-GUIDE.md](GITHUB-CODE-SIGNING-GUIDE.md) for complete setup.
+
+---
+
+## Testing
+
+### Test Build
+```bash
+# Build
+./build-all.sh
+
+# Mount DMG
+open aiprivatesearch.dmg
+
+# Drag apps to Applications
+# Run installer app
+# Run start app
+```
+
+### Test Signed DMG
+```bash
+# Verify signature
+codesign --verify --verbose aiprivatesearch.dmg
+
+# Test Gatekeeper
+spctl --assess --verbose aiprivatesearch.dmg
+# Should output: "accepted"
+```
+
+---
+
+## Distribution
+
+### GitHub Releases
+1. Create release tag: `git tag v1.0.0 && git push --tags`
+2. Upload `aiprivatesearch.dmg`
+3. Include installation instructions
+
+### Website Download
+1. Upload DMG to web server
+2. Link from download page
+3. Include SHA256 checksum
+
+---
+
+## Troubleshooting
+
+### Build Fails
+```bash
+# Clean and rebuild
+rm -rf build build-resources build-dmg
+./build-all.sh
+```
+
+### DMG Won't Mount
+```bash
+# Check for corruption
+hdiutil verify aiprivatesearch.dmg
+
+# Rebuild
+rm aiprivatesearch.dmg
+./build-dmg.sh
+```
+
+### Gatekeeper Blocks App
+- App not signed: Follow signing guide
+- Certificate expired: Renew in Apple Developer portal
+- Not notarized: Complete notarization steps
+
+---
+
+## Version History
+
+- **v1.45** - Pre-bundled Node.js/Ollama, Chrome app mode, 256px icons
+- **v1.44** - GitHub Actions signing guide
+- **v1.43** - ESLint pre-commit hooks
+- **v1.42** - DMG standardization
+
+---
+
+## Support
+
+- **Documentation**: See all .md files in this folder
+- **Issues**: GitHub Issues
+- **Repository**: https://github.com/brucetroutman-gmail/AIPrivateSearch-master
+
+---
+
+## Quick Reference
+
+| Task | Command |
+|------|---------|
+| Build everything | `./build-all.sh` |
+| Build installer only | `./build-install-app.sh` |
+| Build start app only | `./build-start-app.sh` |
+| Create DMG only | `./build-dmg.sh` |
+| Download resources | `./build-prepare-resources.sh` |
+| Sign and notarize | See GITHUB-CODE-SIGNING-GUIDE.md |
