@@ -15,17 +15,12 @@ rm -rf ./build
 # Build installer app
 echo ""
 echo "📦 Building installer app..."
-./build-app-auto-install.sh
+./build-install-app.sh
 
 # Build start app  
 echo ""
 echo "📦 Building start app..."
 ./build-start-app.sh
-
-# Build PKG
-echo ""
-echo "📦 Building PKG installer..."
-./build-pkg-auto-install.sh
 
 # Build DMG with both apps
 echo ""
@@ -48,6 +43,5 @@ echo "✅ Complete package built successfully!"
 echo "📁 Contents:"
 echo "   - AIPrivateSearch-installer.app (one-time setup)"
 echo "   - aiprivatesearch-start.app (launch servers)"
-echo "   - aiprivatesearch-installer.pkg (PKG installer)"
-echo "   - aiprivatesearch-installer.dmg (DMG package)"
+echo "   - aiprivatesearch.dmg (DMG package with both apps)"
 echo ""

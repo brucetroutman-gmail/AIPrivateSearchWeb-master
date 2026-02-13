@@ -76,10 +76,13 @@ echo "📝 Creating simplified launcher script..."
 cat > "$APP_DIR/Contents/MacOS/$APP_NAME" << LAUNCHER_EOF
 #!/bin/bash
 
-# AIPrivateSearch Simple Test Installer
+# AIPrivateSearch Improved Installer
 APP_SUPPORT="/Users/Shared/AIPrivateSearch"
 LOG_FILE="\$APP_SUPPORT/logs/install.log"
 INSTALLER_VERSION="$NEW_VERSION"
+
+# Progress tracking
+PROGRESS_LOG=""
 
 # Function to send notification
 notify() {
@@ -88,16 +91,18 @@ notify() {
     osascript -e "display notification \"\$message\" with title \"\$title\"" 2>/dev/null
 }
 
-# Function to show progress dialog
+# Function to show progress dialog with cumulative messages
 show_progress() {
-    local step="\$1"
-    local message="\$2"
-    osascript <<-APPLESCRIPT 2>/dev/null
-        tell application "System Events"
-            activate
-            display dialog "\$message" with title "AIPrivateSearch Installer - Step \$step" buttons {"Continue"} default button "Continue" with icon note
-        end tell
+    if [ "\$SHOW_DETAILS" = "Yes" ]; then
+        local message="\$1"
+        PROGRESS_LOG="\${PROGRESS_LOG}\${message}\\n\\n"
+        osascript <<-APPLESCRIPT 2>/dev/null
+            tell application "System Events"
+                activate
+                display dialog "\$PROGRESS_LOG" with title "AIPrivateSearch Installer" buttons {"Continue"} default button "Continue" with icon note
+            end tell
 APPLESCRIPT
+    fi
 }
 
 # Create directories
@@ -107,9 +112,51 @@ mkdir -p "\$APP_SUPPORT"/{logs,data,sources,config,repo}
 exec 1> >(tee -a "\$LOG_FILE")
 exec 2>&1
 
-echo "=== AIPrivateSearch Simple Test Starting at \$(date) ==="
+echo "=== AIPrivateSearch Installer Starting at \$(date) ==="
 echo "Installer Version: \$INSTALLER_VERSION"
 echo ""
+
+# Check for running processes
+echo "🔍 Checking for running AIPrivateSearch processes..."
+RUNNING_PROCESSES=\$(pgrep -f "node server.mjs|npx serve" 2>/dev/null)
+
+if [ ! -z "\$RUNNING_PROCESSES" ]; then
+    show_dialog "Installation Blocked" \\
+        "AIPrivateSearch is currently running!
+
+Please close the running application before installing.
+
+Running processes: \$RUNNING_PROCESSES" \\
+        "stop"
+    exit 1
+fi
+
+echo "✅ No running processes detected"
+echo ""
+
+# Ask user if they want detailed messages
+SHOW_DETAILS=\$(osascript <<-APPLESCRIPT 2>/dev/null
+    tell application "System Events"
+        activate
+        display dialog "Show detailed installation messages in Terminal?\n\nThis will open a Terminal window showing real-time installation progress." buttons {"No", "Yes"} default button "No" with title "AIPrivateSearch Installer" with icon note
+    end tell
+    return button returned of result
+APPLESCRIPT
+)
+
+echo "User selected: \$SHOW_DETAILS"
+echo ""
+
+# Open Terminal immediately if user chose Yes
+if [ "\$SHOW_DETAILS" = "Yes" ]; then
+    osascript <<-APPLESCRIPT 2>/dev/null
+        tell application "Terminal"
+            do script "tail -f /Users/Shared/AIPrivateSearch/logs/install.log"
+            activate
+        end tell
+APPLESCRIPT
+    sleep 1
+fi
 
 # Function to show dialog
 show_dialog() {
@@ -165,19 +212,8 @@ This password is only used during installation and not stored." \\
     return 0
 }
 
-# Show welcome dialog
-show_dialog "AIPrivateSearch Installer v\$INSTALLER_VERSION" \\
-    "Welcome to AIPrivateSearch Simple Test!
-
-Installer Version: \$INSTALLER_VERSION
-
-This will test Mac architecture detection.
-
-Click OK to continue." \\
-    "note"
-
-echo "🚀 Starting architecture detection test..."
-show_progress "1" "Starting Mac architecture detection...\n\nThis will detect your Mac type (Intel or Apple Silicon) and prepare the correct Node.js version."
+echo "🚀 Starting installation..."
+show_progress "✓ Installation started\nDetecting Mac architecture..."
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  🔄 Step 1: Mac Info Detection"
@@ -226,26 +262,19 @@ echo "📦 Node.js target: \$NODE_TAR"
 echo "🌐 Download URL: \$NODE_URL"
 
 echo "✅ Mac info detection completed successfully"
-
-echo ""
-echo "✅ Step 1 completed successfully!"
-show_progress "1" "Step 1 Complete!\n\nMac architecture detected successfully.\n\nNext: Installing Node.js"
+show_progress "✓ Architecture detected: \$NODE_ARCH\nInstalling Node.js..."
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  📦 Step 2: Node.js Installation"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
-show_progress "2" "Starting Node.js installation...\n\nThis will download and install Node.js for your Mac."
-
 # Check if Node.js already installed in our custom location
 if [ -f "\$APP_SUPPORT/node/bin/node" ]; then
     CURRENT_NODE=\$("\$APP_SUPPORT/node/bin/node" --version)
     echo "✅ Node.js already installed: \$CURRENT_NODE"
     echo "Skipping Node.js installation"
-    show_progress "2" "Node.js already installed!\n\nVersion: \$CURRENT_NODE\n\nSkipping installation."
 else
-    show_progress "2" "Installing Node.js...\n\nThis may take a few minutes.\nPlease wait..."
     echo "📥 Installing Node.js \$NODE_VERSION for \$NODE_ARCH..."
     
     cd "\$APP_SUPPORT"
@@ -306,20 +335,17 @@ else
     fi
 fi
 
-echo "✅ Step 2 completed!"
-show_progress "2" "Step 2 Complete!\n\nNode.js installed successfully.\n\nNext: Installing Ollama (AI engine)"
+echo "✅ Node.js installation completed!"
+show_progress "✓ Node.js installed\nInstalling Ollama..."
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  🤖 Step 3: Ollama Installation"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
-show_progress "3" "Starting Ollama installation...\n\nOllama is the AI engine that powers AIPrivateSearch.\n\nThis requires administrator password."
-
 # Check if Ollama already installed (check multiple locations)
 if command -v ollama &> /dev/null || [ -f "/Applications/Ollama.app/Contents/Resources/ollama" ] || [ -f "\$APP_SUPPORT/ollama" ]; then
     echo "✅ Ollama already installed"
-    show_progress "3" "Ollama already installed!\n\nSkipping installation."
     
     # Get version from available location
     if command -v ollama &> /dev/null; then
@@ -345,7 +371,6 @@ if command -v ollama &> /dev/null || [ -f "/Applications/Ollama.app/Contents/Res
     fi
 else
     echo "📥 Installing Ollama..."
-    show_progress "3" "Installing Ollama...\n\nThis may take several minutes.\nPlease wait..."
     
     cd "\$APP_SUPPORT"
     
@@ -446,31 +471,25 @@ EXPECT_EOF
     fi
 fi
 
-echo "✅ Step 3 completed!"
-show_progress "3" "Step 3 Complete!\n\nOllama installed successfully.\n\nNext: Installing Chrome browser"
+echo "✅ Ollama installation completed!"
+show_progress "✓ Ollama installed\nInstalling Chrome..."
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  🌐 Step 4: Chrome Installation"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
-show_progress "4" "Starting Chrome installation...\n\nChrome browser is required for AIPrivateSearch.\n\nThis requires administrator password."
-
 # Check if Chrome already installed
 if [ -d "/Applications/Google Chrome.app" ]; then
     echo "✅ Chrome already installed"
     CHROME_VERSION=\$(/Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome --version 2>/dev/null || echo "Unknown version")
     echo "📝 Current version: \$CHROME_VERSION"
-    show_progress "4" "Chrome already installed!\n\nVersion: \$CHROME_VERSION\n\nSkipping installation."
 else
     echo "📥 Installing Chrome..."
-    show_progress "4" "Installing Chrome...\n\nThis may take a few minutes.\nPlease wait..."
     
     cd "\$APP_SUPPORT"
     
-    # Use Chrome PKG installer (like Ollama approach)
     CHROME_URL="https://dl.google.com/chrome/mac/universal/stable/gcem/GoogleChrome.pkg"
-    echo "📦 Chrome target: Universal PKG installer"
     echo "🌐 Download URL: \$CHROME_URL"
     
     # Get admin password for Chrome installation
@@ -516,15 +535,13 @@ else
     fi
 fi
 
-echo "✅ Step 4 completed!"
-show_progress "4" "Step 4 Complete!\n\nChrome installed successfully.\n\nNext: Downloading AIPrivateSearch code"
+echo "✅ Chrome installation completed!"
+show_progress "✓ Chrome installed\nDownloading repository..."
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  📦 Step 5: Repository Setup"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-
-show_progress "5" "Starting repository download...\n\nDownloading AIPrivateSearch code from GitHub.\n\nThis may take a few minutes."
 
 # Always download fresh repository (no existing check)
 echo "📥 Downloading fresh AIPrivateSearch repository..."
@@ -595,8 +612,58 @@ fi
         echo "❌ Repository download failed"
     fi
 
+# Create .env-aips file
+echo "📝 Creating .env-aips configuration..."
+cat > "\$APP_SUPPORT/.env-aips" << 'ENVEOF'
+# AI Private Search Application Environment Variables
+
+# API Keys
+API_KEY=dev-key
+ADMIN_KEY=admin-key
+NODE_ENV=development
+
+# Default Admin Account
+DEFAULT_ADMIN_EMAIL=adm-std@a.com
+DEFAULT_ADMIN_PASSWORD=123
+
+# Member Database Configuration
+DB_HOST=92.112.184.206
+DB_PORT=3306
+DB_DATABASE=iodd2
+DB_USERNAME=iodd-api
+DB_PASSWORD=IODD@Api
+ENVEOF
+echo "✅ .env-aips created"
+
+# Copy config files
+if [ ! -f "\$APP_SUPPORT/config/app.json" ]; then
+    if [ -f "\$APP_SUPPORT/repo/aiprivatesearch/client/c01_client-first-app/config/app.json" ]; then
+        echo "📁 Copying config files..."
+        cp -r "\$APP_SUPPORT/repo/aiprivatesearch/client/c01_client-first-app/config/"* "\$APP_SUPPORT/config/"
+        echo "✅ Config files copied"
+    fi
+fi
+
+# Copy data files
+if [ ! -f "\$APP_SUPPORT/data/users.json" ]; then
+    if [ -f "\$APP_SUPPORT/repo/aiprivatesearch/data/users.json" ]; then
+        echo "📁 Copying data files..."
+        cp "\$APP_SUPPORT/repo/aiprivatesearch/data/"*.json "\$APP_SUPPORT/data/"
+        echo "✅ Data files copied"
+    fi
+fi
+
+# Copy sample documents
+if [ ! -d "\$APP_SUPPORT/sources/local-documents" ]; then
+    if [ -d "\$APP_SUPPORT/repo/aiprivatesearch/sources/local-documents" ]; then
+        echo "📁 Copying sample documents..."
+        cp -r "\$APP_SUPPORT/repo/aiprivatesearch/sources/local-documents" "\$APP_SUPPORT/sources/"
+        echo "✅ Sample documents copied"
+    fi
+fi
+
 echo "✅ Step 5 completed!"
-show_progress "5" "Step 5 Complete!\n\nRepository downloaded successfully.\n\nNext: Installing dependencies"
+show_progress "✓ Repository downloaded\n✓ Config files copied\n✓ Data files copied\nInstalling dependencies..."
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  📦 Step 6: Dependency Installation"
@@ -645,8 +712,8 @@ else
     cd "\$APP_SUPPORT/repo/aiprivatesearch"
 fi
 
-echo "✅ Step 6 completed!"
-show_progress "6" "Step 6 Complete!\n\nDependencies installed successfully.\n\nNext: Downloading AI models"
+echo "✅ Dependencies installation completed!"
+show_progress "✓ Dependencies installed\nDownloading AI models..."
 
 # Copy start-user-app.sh to shared location
 echo "📋 Copying start-user-app.sh to shared location..."
@@ -663,8 +730,6 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo "  🤖 Step 7: AI Model Download"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-
-show_progress "7" "Starting AI model download...\n\nDownloading AI models for search functionality.\n\nThis may take 10-15 minutes depending on your internet speed."
 
 # Download AI models from model-list.json
 echo "🤖 Downloading AI models from configuration..."
@@ -746,19 +811,15 @@ fi
 echo "📝 Available models:"
 "\$OLLAMA_CMD" list
 
-echo "✅ Step 7 completed!"
-echo ""
-echo "🎉 AI model download completed!"
-echo "Next: Start servers"
-show_progress "7" "Installation Complete!\n\nAll components installed successfully:\n• Node.js\n• Ollama\n• Chrome\n• AIPrivateSearch code\n• Dependencies\n• AI models\n\nYou can now run aiprivatesearch-start.app to launch the application."
+echo "✅ AI models downloaded!"
+show_progress "✓ Installation Complete!\n\nAll components installed:\n• Node.js\n• Ollama\n• Chrome\n• Repository\n• Dependencies\n• AI models\n\nRun aiprivatesearch-start.app to launch."
 
-show_dialog "Step 7 Complete" \\
-    "AI model download completed!
+show_dialog "Installation Complete" \\
+    "AIPrivateSearch installed successfully!
 
-Check the log for details:
-\$LOG_FILE
+Log: \$LOG_FILE
 
-Next: Start servers" \\
+Run aiprivatesearch-start.app to launch the application." \\
     "note"
 LAUNCHER_EOF
 
@@ -774,6 +835,5 @@ echo "📁 Location: $APP_DIR"
 echo ""
 echo "Next steps:"
 echo "1. Test the application: open $APP_DIR"
-echo "2. Build PKG: ./build-pkg-auto-install.sh"
 echo "3. Build DMG: ./build-dmg.sh"
 echo ""

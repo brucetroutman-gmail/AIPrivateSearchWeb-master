@@ -41,13 +41,18 @@ aiprivatesearch-start.app/
 
 ## How It Works
 
+### 0. Verbose Mode Selection
+- Shows dialog: "Show detailed installation messages in Terminal?"
+- **Yes**: Opens Terminal with live log viewer + shows all progress dialogs
+- **No**: Silent mode - no Terminal, no dialogs, just starts servers
+
 ### 1. First Run Detection
 - Checks for lock file: `/Users/Shared/AIPrivateSearch/.start_allowed`
 - If missing: Creates lock file and exits silently (prevents execution during drag-to-Applications)
 - If exists: Proceeds with startup
 
-### 2. Progress Dialogs
-Uses cumulative progress tracking - each dialog shows all previous steps:
+### 2. Progress Dialogs (Verbose Mode Only)
+When "Yes" is selected, cumulative progress tracking shows all previous steps:
 ```
 ✓ Starting AIPrivateSearch...
   Killing existing servers.
@@ -66,10 +71,9 @@ Uses cumulative progress tracking - each dialog shows all previous steps:
 
 ✓ Servers started
   Opening browser...
-
-✓ Application started!
-  Chrome browser opened.
 ```
+
+Note: Final dialog removed for smooth browser opening.
 
 ### 3. Server Cleanup
 Kills existing processes:
@@ -99,10 +103,9 @@ lsof -ti :56306 | xargs kill -9
 - Starts frontend: `cd client/c01_client-first-app && npx serve . -l $FRONTEND_PORT &`
 - Opens Chrome: `http://localhost:$FRONTEND_PORT`
 
-### 7. Exit Behavior
-- App exits immediately after starting servers
-- Servers continue running as background processes
-- No monitoring loop (unlike terminal mode)
+### 8. Verbose vs Silent Mode
+- **Verbose (Yes)**: Terminal opens immediately + progress dialogs at each step
+- **Silent (No)**: No Terminal, no dialogs - servers start in background
 
 ## Debugging
 
@@ -225,22 +228,37 @@ This script is designed for terminal execution with interactive monitoring:
 | Monitoring loop | ✗ No | ✓ Yes |
 | Ctrl+C handling | N/A | ✓ Yes |
 | Exit behavior | Immediate | Waits for Ctrl+C |
-| Progress dialogs | ✓ Yes | ✗ No |
-| Background mode | ✓ Yes | ✗ No |
+| Progress dialogs | ✓ Optional (Yes/No) | ✗ No |
+| Terminal log viewer | ✓ Optional (Yes/No) | ✗ No |
+| Verbose mode | ✓ Yes | ✗ No |
 | PID tracking | ✗ No | ✓ Yes |
 | Auto-restart on crash | ✗ No | ✓ Yes |
 
 **Key Differences:**
+- **App**: Optional verbose mode with Terminal + dialogs, or silent mode
 - **App**: Launches servers and exits immediately (fire-and-forget)
 - **Terminal**: Monitors servers and handles graceful shutdown with Ctrl+C
-- **App**: Uses AppleScript dialogs for user feedback
+- **App**: Uses AppleScript dialogs for user feedback (when verbose)
 - **Terminal**: Uses console output for logging
 - **App**: Designed for end-users (double-click to start)
 - **Terminal**: Designed for developers (full control and monitoring)
 
 ## Version History
 
-**v1.1.0** - Current release
+**v1.2.0** - Current release
+- Added verbose mode selection (Yes/No dialog)
+- Terminal with live log viewer opens immediately when Yes selected
+- Progress dialogs only show in verbose mode
+- Silent mode (No) starts servers without any dialogs or Terminal
+- Removed final dialog for smooth browser opening
+- Ollama model checking and auto-pull
+- Dynamic port reading from app.json
+- Auto-creation of .env-aips file
+- User data files check and copy
+- npm dependencies auto-install
+- Comprehensive logging
+
+**v1.1.0**
 - Added Ollama model checking and auto-pull
 - Dynamic port reading from app.json
 - Auto-creation of .env-aips file

@@ -30,7 +30,7 @@ if [ -d "$BUILD_DIR/$APP_NAME.app" ]; then
     cp -R "$BUILD_DIR/$APP_NAME.app" "$DMG_DIR/"
 else
     echo "❌ Error: $APP_NAME.app not found in $BUILD_DIR"
-    echo "Please run build-app-auto-install.sh first"
+    echo "Please run build-install-app.sh first"
     exit 1
 fi
 

@@ -101,3 +101,42 @@ to do AIPrivateSearch Marketing Website
 - Responsive design for all devices
 - Theme system (light/dark mode)
 - Professional branding and styling
+
+
+## RECENTLY COMPLETED (v1.40)
+- Removed 11 redundant documentation files from installer folder
+- Kept essential docs: BUILD-PROCESS.md, README.md, USER-GUIDE.md, CODE-SIGNING-GUIDE.md
+- Kept script-mapping docs: INSTALLER-APP-SCRIPT-MAPPING.md, START-APP-Script-mapping.md
+- Cleaned installer folder to 9 essential markdown files
+
+## RECENTLY COMPLETED (v1.39)
+- Removed PKG build process (build-install-pkg.sh) - app is for individual users, not enterprise deployment
+- Simplified build-all.sh to only build DMG (contains both apps)
+- Cleaned up all PKG references from documentation
+- Final build output: aiprivatesearch.dmg with installer and start apps
+
+## RECENTLY COMPLETED (v1.38)
+- Renamed build-pkg-auto-install.sh to build-install-pkg.sh for consistency
+- Updated all references in build-all.sh and documentation
+- Consistent naming: build-install-app.sh, build-install-pkg.sh, build-start-app.sh
+
+## RECENTLY COMPLETED (v1.37)
+- Removed 7 unused files from installer folder (build-app.sh, build-auto-install.sh, build-pkg.sh, load-AIPrivateSearch-1108.command, installer-modular-template.sh, integrate-source.sh, setup.sh)
+- Cleaned up installer folder to only active scripts used by build-all.sh
+- Created FILE-ANALYSIS.md documenting build process and file usage
+
+## RECENTLY COMPLETED (v1.36)
+- Renamed build-app-auto-install.sh to build-install-app.sh for consistency with build-start-app.sh
+- Added verbose mode to installer (Terminal + dialogs vs silent)
+- Updated all documentation references to new filename
+
+## RECENTLY COMPLETED (v1.35)
+- Improved both terminal and app installers by combining best features
+- Added running process check to prevent installation conflicts
+- Added .env-aips auto-creation with database credentials
+- Added config file copying (app.json, models-list.json)
+- Added data file copying (users.json, sessions.json)
+- Added sample documents copying (local-documents folder)
+- Simplified terminal installer with architecture detection
+- Enhanced app installer with complete setup flow
+- Created IMPROVED-INSTALLERS.md documentation
