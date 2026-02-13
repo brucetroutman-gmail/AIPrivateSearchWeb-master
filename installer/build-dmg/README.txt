@@ -9,6 +9,9 @@ To install:
 3. Run AIPrivateSearch-installer.app first (one time setup)
 4. Then run aiprivatesearch-start.app to launch the application
 
+Note: This DMG includes pre-downloaded Node.js and Ollama in the Resources folder.
+The installer will use these bundled versions for faster installation.
+
 Usage:
 - First time: Run installer app for complete setup
 - Daily use: Run start app to launch servers

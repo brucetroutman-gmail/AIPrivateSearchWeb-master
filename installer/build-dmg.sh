@@ -24,7 +24,7 @@ rm -f "$DMG_NAME-temp.dmg"
 echo "📁 Creating DMG structure..."
 mkdir -p "$DMG_DIR"
 
-# Copy both apps
+# Copy installer app
 if [ -d "$BUILD_DIR/$APP_NAME.app" ]; then
     echo "📋 Copying $APP_NAME.app..."
     cp -R "$BUILD_DIR/$APP_NAME.app" "$DMG_DIR/"
@@ -45,6 +45,19 @@ else
     exit 1
 fi
 
+# Copy pre-downloaded resources
+RESOURCES_DIR="./build-resources"
+if [ -d "$RESOURCES_DIR" ]; then
+    echo "📋 Copying pre-downloaded resources..."
+    mkdir -p "$DMG_DIR/Resources"
+    cp -R "$RESOURCES_DIR"/* "$DMG_DIR/Resources/"
+    echo "✓ Resources copied (Node.js, Ollama)"
+else
+    echo "⚠️  Warning: Resources not found in $RESOURCES_DIR"
+    echo "   Run build-prepare-resources.sh first to pre-download Node.js and Ollama"
+    echo "   Installer will download at runtime instead"
+fi
+
 # Create Applications symlink for drag-to-install
 echo "🔗 Creating Applications symlink..."
 ln -s /Applications "$DMG_DIR/Applications"
@@ -62,6 +75,9 @@ To install:
 2. Eject this disk image
 3. Run AIPrivateSearch-installer.app first (one time setup)
 4. Then run aiprivatesearch-start.app to launch the application
+
+Note: This DMG includes pre-downloaded Node.js and Ollama in the Resources folder.
+The installer will use these bundled versions for faster installation.
 
 Usage:
 - First time: Run installer app for complete setup
@@ -132,9 +148,31 @@ fi
 
 echo "Mounted at: $MOUNT_DIR"
 
-# Skip complex DMG styling for now - focus on functionality
-echo "🎨 Creating functional DMG..."
-echo "Note: Icon size will be default (128px) - styling can be added later"
+# Set icon size to 256px
+echo "🎨 Setting icon size to 256px..."
+osascript <<-APPLESCRIPT
+    tell application "Finder"
+        tell disk "AIPrivateSearch"
+            open
+            set current view of container window to icon view
+            set toolbar visible of container window to false
+            set statusbar visible of container window to false
+            set the bounds of container window to {400, 100, 1000, 600}
+            set viewOptions to the icon view options of container window
+            set arrangement of viewOptions to not arranged
+            set icon size of viewOptions to 256
+            set position of item "AIPrivateSearch-installer.app" of container window to {150, 200}
+            set position of item "aiprivatesearch-start.app" of container window to {350, 200}
+            set position of item "Applications" of container window to {450, 200}
+            close
+            open
+            update without registering applications
+            delay 2
+        end tell
+    end tell
+APPLESCRIPT
+
+echo "✅ Icon size set to 256px"
 
 # Unmount
 echo "📤 Unmounting DMG..."
@@ -180,8 +218,7 @@ else
 fi
 echo ""
 echo "Next steps:"
-echo "1. Test the DMG on a clean system"
-echo "2. Sign and notarize for distribution:"
-echo "   codesign --deep --force --verify --verbose --sign 'Developer ID Application: Your Name' $DMG_NAME.dmg"
-echo "3. Distribute to users"
+echo "1. Run ./build-prepare-resources.sh to download Node.js and Ollama (if not done)"
+echo "2. Test the DMG on a clean system"
+echo "3. Sign and notarize for distribution"
 echo ""

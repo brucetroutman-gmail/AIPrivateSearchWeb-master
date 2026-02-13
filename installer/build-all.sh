@@ -5,6 +5,16 @@
 
 set -e
 
+# Prepare resources if not already done
+if [ ! -d "./build-resources" ]; then
+    echo ""
+    echo "📦 Preparing bundled resources (Node.js, Ollama)..."
+    ./build-prepare-resources.sh
+else
+    echo ""
+    echo "✅ Bundled resources already prepared"
+fi
+
 echo "🏗️  Building AIPrivateSearch Complete Package"
 echo "=============================================="
 

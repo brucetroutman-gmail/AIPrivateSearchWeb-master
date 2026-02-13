@@ -81,6 +81,16 @@ APP_SUPPORT="/Users/Shared/AIPrivateSearch"
 LOG_FILE="\$APP_SUPPORT/logs/install.log"
 INSTALLER_VERSION="$NEW_VERSION"
 
+# Detect if running from DMG (bundled resources available)
+DMG_RESOURCES=""
+if [ -d "/Volumes/AIPrivateSearch/Resources" ]; then
+    DMG_RESOURCES="/Volumes/AIPrivateSearch/Resources"
+    echo "✅ Running from DMG - bundled resources available"
+elif [ -d "\$(dirname "\$0")/../../Resources" ]; then
+    DMG_RESOURCES="\$(dirname "\$0")/../../Resources"
+    echo "✅ Bundled resources found"
+fi
+
 # Progress tracking
 PROGRESS_LOG=""
 
@@ -281,7 +291,20 @@ else
     
     # Download Node.js
     echo "🌐 Downloading: \$NODE_URL"
-    if curl -L -o "\$NODE_TAR" "\$NODE_URL"; then
+    
+    # Check for bundled Node.js first
+    if [ -n "\$DMG_RESOURCES" ] && [ -f "\$DMG_RESOURCES/\$NODE_TAR" ]; then
+        echo "📦 Using bundled Node.js from DMG"
+        cp "\$DMG_RESOURCES/\$NODE_TAR" .
+        echo "✅ Copied from bundle"
+    elif curl -L -o "\$NODE_TAR" "\$NODE_URL"; then
+        echo "✅ Download completed"
+    else
+        echo "❌ Download failed"
+        exit 1
+    fi
+    
+    if [ -f "\$NODE_TAR" ]; then
         echo "✅ Download completed"
         
         # Extract to user directory (no sudo needed)
@@ -330,8 +353,6 @@ else
         
         # Cleanup
         rm -f "\$NODE_TAR"
-    else
-        echo "❌ Download failed"
     fi
 fi
 
@@ -381,6 +402,25 @@ else
     # Get admin password for Ollama installation
     if get_admin_password; then
         echo "🌐 Installing Ollama with administrator privileges..."
+        
+        # Check for bundled Ollama first
+        if [ -n "\$DMG_RESOURCES" ] && [ -f "\$DMG_RESOURCES/ollama" ]; then
+            echo "📦 Using bundled Ollama from DMG"
+            cp "\$DMG_RESOURCES/ollama" "\$APP_SUPPORT/ollama"
+            chmod +x "\$APP_SUPPORT/ollama"
+            echo "✅ Ollama installed from bundle"
+            
+            # Create symlink
+            echo "🔗 Creating ollama symlink..."
+            ln -sf "\$APP_SUPPORT/ollama" /usr/local/bin/ollama 2>/dev/null || true
+            
+            # Start Ollama service
+            echo "🔄 Starting Ollama service..."
+            nohup "\$APP_SUPPORT/ollama" serve > "\$APP_SUPPORT/logs/ollama.log" 2>&1 &
+            sleep 3
+            echo "✅ Ollama service started"
+        else
+            # Download and install Ollama
         
         # Use a different approach - download and modify the installer
         echo "🌐 Downloading Ollama installer script..."

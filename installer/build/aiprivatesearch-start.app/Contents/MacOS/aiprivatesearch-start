@@ -167,6 +167,18 @@ sleep 3
 echo "=== Servers started at $(date) ===" >> "$LOG_FILE"
 
 show_progress "✓ Servers started\nOpening browser..."
-open -a "Google Chrome" http://localhost:$FRONTEND_PORT 2>/dev/null || open http://localhost:$FRONTEND_PORT
+
+# Open in Chrome app mode (kiosk mode without URL bar)
+if [ -d "/Applications/Google Chrome.app" ]; then
+    echo "Opening Chrome in app mode..." >> "$LOG_FILE"
+    /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
+        --app=http://localhost:$FRONTEND_PORT \
+        --window-size=1400,900 \
+        --disable-features=TranslateUI \
+        >> "$LOG_FILE" 2>&1 &
+else
+    echo "Chrome not found, using default browser..." >> "$LOG_FILE"
+    open http://localhost:$FRONTEND_PORT
+fi
 
 exit 0
