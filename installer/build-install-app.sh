@@ -130,30 +130,18 @@ echo "=== AIPrivateSearch Installer Starting at \$(date) ==="
 echo "Installer Version: \$INSTALLER_VERSION"
 echo ""
 
-# Check for running processes
+# Kill any existing processes
 echo "🔍 Checking for running AIPrivateSearch processes..."
-RUNNING_PROCESSES=\$(pgrep -f "node server.mjs|npx serve" 2>/dev/null)
-
-if [ ! -z "\$RUNNING_PROCESSES" ]; then
-    echo ""
-    echo "❌ ══════════════════════════════════════════════════════════"
-    echo "❌ INSTALLATION BLOCKED"
-    echo "❌ ══════════════════════════════════════════════════════════"
-    echo ""
-    echo "AIPrivateSearch is currently running!"
-    echo ""
-    echo "Please close the running application before installing."
-    echo ""
-    echo "Running processes: \$RUNNING_PROCESSES"
-    echo ""
-    echo "❌ ══════════════════════════════════════════════════════════"
-    echo ""
-    
-    notify "Installation Blocked" "AIPrivateSearch is running. Please close it first."
-    exit 1
-fi
-
-echo "✅ No running processes detected"
+echo "Killing npx serve..."
+pkill -9 -f "npx serve" 2>/dev/null || true
+echo "Killing node server.mjs..."
+pkill -9 -f "node.*server.mjs" 2>/dev/null || true
+echo "Killing port 56305..."
+lsof -ti :56305 | xargs kill -9 2>/dev/null || true
+echo "Killing port 56306..."
+lsof -ti :56306 | xargs kill -9 2>/dev/null || true
+sleep 2
+echo "✅ Servers stopped"
 echo ""
 
 # Ask user if they want detailed messages
