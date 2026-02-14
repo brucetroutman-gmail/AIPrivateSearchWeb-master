@@ -154,35 +154,41 @@ fi
 
 echo "Mounted at: $MOUNT_DIR"
 
-# Wait for Finder to recognize the disk
-echo "⏳ Waiting for Finder..."
-sleep 3
+# Hide Resources folder and README
+echo "🎨 Hiding Resources folder..."
+chflags hidden "$MOUNT_DIR/Resources" 2>/dev/null || true
+chflags hidden "$MOUNT_DIR/README.txt" 2>/dev/null || true
 
-# Set icon size to 256px
-echo "🎨 Setting icon size to 256px..."
-osascript <<-APPLESCRIPT
-    tell application "Finder"
-        tell disk "AIPrivateSearch"
-            open
-            set current view of container window to icon view
-            set toolbar visible of container window to false
-            set statusbar visible of container window to false
-            set the bounds of container window to {400, 100, 1000, 600}
-            set viewOptions to the icon view options of container window
-            set arrangement of viewOptions to not arranged
-            set icon size of viewOptions to 256
-            set position of item "AIPrivateSearch-installer.app" of container window to {150, 200}
-            set position of item "aiprivatesearch-start.app" of container window to {350, 200}
-            set position of item "Applications" of container window to {450, 200}
-            close
-            open
-            update without registering applications
-            delay 2
-        end tell
+# Configure view with AppleScript
+echo "🎨 Configuring DMG view..."
+sleep 2
+
+osascript <<APPLESCRIPT
+tell application "Finder"
+    tell disk "AIPrivateSearch"
+        open
+        set current view of container window to icon view
+        set toolbar visible of container window to false
+        set statusbar visible of container window to false
+        set bounds of container window to {100, 100, 700, 450}
+        
+        set opts to icon view options of container window
+        set arrangement of opts to not arranged
+        set icon size of opts to 128
+        
+        -- Position items
+        set position of item "AIPrivateSearch-installer.app" to {150, 150}
+        set position of item "aiprivatesearch-start.app" to {350, 150}
+        set position of item "Applications" to {450, 150}
+        
+        update without registering applications
+        delay 1
+        close
     end tell
+end tell
 APPLESCRIPT
 
-echo "✅ Icon size set to 256px"
+echo "✅ DMG view configured"
 
 # Unmount
 echo "📤 Unmounting DMG..."

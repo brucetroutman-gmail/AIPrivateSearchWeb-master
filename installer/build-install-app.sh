@@ -105,21 +105,6 @@ notify() {
     osascript -e "display notification \"\$message\" with title \"\$title\"" 2>/dev/null
 }
 
-# Function to show dialog
-show_dialog() {
-    local title="\$1"
-    local message="\$2"
-    local type="\${3:-informational}"
-    
-    echo "\$message"
-    osascript <<-APPLESCRIPT
-        tell application "System Events"
-            activate
-            display dialog "\$message" with title "\$title" buttons {"OK"} default button "OK" with icon "\$type"
-        end tell
-APPLESCRIPT
-}
-
 # Function to show progress dialog with cumulative messages
 show_progress() {
     if [ "\$SHOW_DETAILS" = "Yes" ]; then
@@ -167,7 +152,7 @@ echo ""
 SHOW_DETAILS=\$(osascript <<-APPLESCRIPT 2>/dev/null
     tell application "System Events"
         activate
-        display dialog "Show detailed installation messages in Terminal?\n\nThis will open a Terminal window showing real-time installation progress." buttons {"No", "Yes"} default button "No" with title "AIPrivateSearch Installer" with icon note
+        display dialog "Show detailed installation messages in Terminal?\n\nThis will open a Terminal window showing real-time installation progress." buttons {"No", "Yes"} default button "Yes" with title "AIPrivateSearch Installer" with icon note
     end tell
     return button returned of result
 APPLESCRIPT
@@ -186,6 +171,20 @@ if [ "\$SHOW_DETAILS" = "Yes" ]; then
 APPLESCRIPT
     sleep 1
 fi
+
+# Function to show dialog
+show_dialog() {
+    local title="\$1"
+    local message="\$2"
+    local type="\${3:-informational}"
+    
+    osascript <<-APPLESCRIPT 2>/dev/null || echo "\$message"
+        tell application "System Events"
+            activate
+            display dialog "\$message" with title "\$title" buttons {"OK"} default button "OK" with icon \$type
+        end tell
+APPLESCRIPT
+}
 
 # Function to get admin password once and reuse
 get_admin_password() {
@@ -426,11 +425,9 @@ else
             echo "✅ Ollama service started"
         else
             # Download and install Ollama
-        
-        # Use a different approach - download and modify the installer
-        echo "🌐 Downloading Ollama installer script..."
-        
-        if curl -fsSL https://ollama.com/install.sh -o /tmp/ollama_install.sh; then
+            echo "🌐 Downloading Ollama installer script..."
+            
+            if curl -fsSL https://ollama.com/install.sh -o /tmp/ollama_install.sh; then
             chmod +x /tmp/ollama_install.sh
             
             # Create expect script to handle password prompt
@@ -507,8 +504,9 @@ EXPECT_EOF
                 rm -f /tmp/ollama_install.sh /tmp/ollama_expect.sh
                 echo "❌ Ollama installation failed"
             fi
-        else
-            echo "❌ Failed to download Ollama installer"
+            else
+                echo "❌ Failed to download Ollama installer"
+            fi
         fi
     else
         echo "❌ Administrator password required for Ollama installation"
@@ -869,6 +867,14 @@ Run aiprivatesearch-start.app to launch the application." \\
 LAUNCHER_EOF
 
 chmod +x "$APP_DIR/Contents/MacOS/$APP_NAME"
+
+# Copy uninstall script to app
+echo "📋 Copying uninstall script..."
+if [ -f "uninstall-aiprivatesearch.sh" ]; then
+    cp uninstall-aiprivatesearch.sh "$APP_DIR/Contents/Resources/"
+    chmod +x "$APP_DIR/Contents/Resources/uninstall-aiprivatesearch.sh"
+    echo "✓ Uninstall script included"
+fi
 
 # Create placeholder icon
 echo "🎨 Creating placeholder icon..."

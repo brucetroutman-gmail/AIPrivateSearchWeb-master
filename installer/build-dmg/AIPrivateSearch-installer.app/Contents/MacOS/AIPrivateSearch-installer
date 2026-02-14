@@ -3,7 +3,7 @@
 # AIPrivateSearch Improved Installer
 APP_SUPPORT="/Users/Shared/AIPrivateSearch"
 LOG_FILE="$APP_SUPPORT/logs/install.log"
-INSTALLER_VERSION="3.5"
+INSTALLER_VERSION="4.1"
 
 # Detect if running from DMG (bundled resources available)
 DMG_RESOURCES=""
@@ -27,21 +27,6 @@ notify() {
     local title="$1"
     local message="$2"
     osascript -e "display notification \"$message\" with title \"$title\"" 2>/dev/null
-}
-
-# Function to show dialog
-show_dialog() {
-    local title="$1"
-    local message="$2"
-    local type="${3:-informational}"
-    
-    echo "$message"
-    osascript <<-APPLESCRIPT
-        tell application "System Events"
-            activate
-            display dialog "$message" with title "$title" buttons {"OK"} default button "OK" with icon "$type"
-        end tell
-APPLESCRIPT
 }
 
 # Function to show progress dialog with cumulative messages
@@ -91,7 +76,7 @@ echo ""
 SHOW_DETAILS=$(osascript <<-APPLESCRIPT 2>/dev/null
     tell application "System Events"
         activate
-        display dialog "Show detailed installation messages in Terminal?\n\nThis will open a Terminal window showing real-time installation progress." buttons {"No", "Yes"} default button "No" with title "AIPrivateSearch Installer" with icon note
+        display dialog "Show detailed installation messages in Terminal?\n\nThis will open a Terminal window showing real-time installation progress." buttons {"No", "Yes"} default button "Yes" with title "AIPrivateSearch Installer" with icon note
     end tell
     return button returned of result
 APPLESCRIPT
@@ -110,6 +95,20 @@ if [ "$SHOW_DETAILS" = "Yes" ]; then
 APPLESCRIPT
     sleep 1
 fi
+
+# Function to show dialog
+show_dialog() {
+    local title="$1"
+    local message="$2"
+    local type="${3:-informational}"
+    
+    osascript <<-APPLESCRIPT 2>/dev/null || echo "$message"
+        tell application "System Events"
+            activate
+            display dialog "$message" with title "$title" buttons {"OK"} default button "OK" with icon $type
+        end tell
+APPLESCRIPT
+}
 
 # Function to get admin password once and reuse
 get_admin_password() {
@@ -132,7 +131,7 @@ This password is only used during installation and not stored." \
         if [ -n "$ADMIN_PASSWORD" ]; then
             echo "✅ Administrator password provided"
             # Test password validity
-            TEMP_TEST_FILE="/tmp/aips_test_55940"
+            TEMP_TEST_FILE="/tmp/aips_test_16022"
             echo "$ADMIN_PASSWORD" > "$TEMP_TEST_FILE"
             if sudo -S -v < "$TEMP_TEST_FILE" 2>/dev/null; then
                 rm -f "$TEMP_TEST_FILE"
@@ -350,30 +349,28 @@ else
             echo "✅ Ollama service started"
         else
             # Download and install Ollama
-        
-        # Use a different approach - download and modify the installer
-        echo "🌐 Downloading Ollama installer script..."
-        
-        if curl -fsSL https://ollama.com/install.sh -o /tmp/ollama_install.sh; then
+            echo "🌐 Downloading Ollama installer script..."
+            
+            if curl -fsSL https://ollama.com/install.sh -o /tmp/ollama_install.sh; then
             chmod +x /tmp/ollama_install.sh
             
             # Create expect script to handle password prompt
             cat > /tmp/ollama_expect.sh << 'EXPECT_EOF'
 #!/bin/bash
-TEMP_PASS_FILE="/tmp/aips_pass_55940"
+TEMP_PASS_FILE="/tmp/aips_pass_16022"
 echo "" > ""
 
 # Run installer with password file
 export SUDO_ASKPASS=/tmp/aips_askpass.sh
 echo '#!/bin/bash' > /tmp/aips_askpass.sh
-echo 'cat /tmp/aips_pass_55940' >> /tmp/aips_askpass.sh
+echo 'cat /tmp/aips_pass_16022' >> /tmp/aips_askpass.sh
 chmod +x /tmp/aips_askpass.sh
 
 # Run installer with SUDO_ASKPASS
 /tmp/ollama_install.sh
 
 # Cleanup
-rm -f /tmp/aips_pass_55940 /tmp/aips_askpass.sh
+rm -f /tmp/aips_pass_16022 /tmp/aips_askpass.sh
 EXPECT_EOF
             
             chmod +x /tmp/ollama_expect.sh
@@ -431,8 +428,9 @@ EXPECT_EOF
                 rm -f /tmp/ollama_install.sh /tmp/ollama_expect.sh
                 echo "❌ Ollama installation failed"
             fi
-        else
-            echo "❌ Failed to download Ollama installer"
+            else
+                echo "❌ Failed to download Ollama installer"
+            fi
         fi
     else
         echo "❌ Administrator password required for Ollama installation"

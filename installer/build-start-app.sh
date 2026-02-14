@@ -111,7 +111,7 @@ echo "=== Starting app kill at $(date) ===" >> "$LOG_FILE"
 SHOW_DETAILS=$(osascript <<-APPLESCRIPT 2>/dev/null
     tell application "System Events"
         activate
-        display dialog "Show detailed installation messages in Terminal?\n\nThis will open a Terminal window showing real-time server logs." buttons {"No", "Yes"} default button "No" with title "AIPrivateSearch" with icon note
+        display dialog "Show detailed installation messages in Terminal?\n\nThis will open a Terminal window showing real-time server logs." buttons {"No", "Yes"} default button "Yes" with title "AIPrivateSearch" with icon note
     end tell
     return button returned of result
 APPLESCRIPT
