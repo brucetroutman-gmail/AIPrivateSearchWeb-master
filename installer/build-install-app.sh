@@ -100,9 +100,9 @@ PROGRESS_LOG=""
 
 # Function to send notification
 notify() {
-    local title="\$1"
-    local message="\$2"
-    osascript -e "display notification \"\$message\" with title \"\$title\"" 2>/dev/null
+    local title="$1"
+    local message="$2"
+    osascript -e "display notification \"$message\" with title \"$title\"" 2>/dev/null
 }
 
 # Function to show progress dialog with cumulative messages

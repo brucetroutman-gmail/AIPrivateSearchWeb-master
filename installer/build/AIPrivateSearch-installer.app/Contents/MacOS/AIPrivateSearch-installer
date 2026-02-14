@@ -3,7 +3,7 @@
 # AIPrivateSearch Improved Installer
 APP_SUPPORT="/Users/Shared/AIPrivateSearch"
 LOG_FILE="$APP_SUPPORT/logs/install.log"
-INSTALLER_VERSION="4.2"
+INSTALLER_VERSION="4.3"
 
 # Detect if running from DMG (bundled resources available)
 DMG_RESOURCES=""
@@ -24,9 +24,9 @@ PROGRESS_LOG=""
 
 # Function to send notification
 notify() {
-    local title="$1"
-    local message="$2"
-    osascript -e "display notification \"$message\" with title \"$title\"" 2>/dev/null
+    local title=""
+    local message=""
+    osascript -e "display notification \"\" with title \"\"" 2>/dev/null
 }
 
 # Function to show progress dialog with cumulative messages
@@ -139,7 +139,7 @@ This password is only used during installation and not stored." \
         if [ -n "$ADMIN_PASSWORD" ]; then
             echo "✅ Administrator password provided"
             # Test password validity
-            TEMP_TEST_FILE="/tmp/aips_test_59913"
+            TEMP_TEST_FILE="/tmp/aips_test_65194"
             echo "$ADMIN_PASSWORD" > "$TEMP_TEST_FILE"
             if sudo -S -v < "$TEMP_TEST_FILE" 2>/dev/null; then
                 rm -f "$TEMP_TEST_FILE"
@@ -365,20 +365,20 @@ else
             # Create expect script to handle password prompt
             cat > /tmp/ollama_expect.sh << 'EXPECT_EOF'
 #!/bin/bash
-TEMP_PASS_FILE="/tmp/aips_pass_59913"
+TEMP_PASS_FILE="/tmp/aips_pass_65194"
 echo "" > ""
 
 # Run installer with password file
 export SUDO_ASKPASS=/tmp/aips_askpass.sh
 echo '#!/bin/bash' > /tmp/aips_askpass.sh
-echo 'cat /tmp/aips_pass_59913' >> /tmp/aips_askpass.sh
+echo 'cat /tmp/aips_pass_65194' >> /tmp/aips_askpass.sh
 chmod +x /tmp/aips_askpass.sh
 
 # Run installer with SUDO_ASKPASS
 /tmp/ollama_install.sh
 
 # Cleanup
-rm -f /tmp/aips_pass_59913 /tmp/aips_askpass.sh
+rm -f /tmp/aips_pass_65194 /tmp/aips_askpass.sh
 EXPECT_EOF
             
             chmod +x /tmp/ollama_expect.sh
