@@ -135,13 +135,21 @@ echo "🔍 Checking for running AIPrivateSearch processes..."
 RUNNING_PROCESSES=\$(pgrep -f "node server.mjs|npx serve" 2>/dev/null)
 
 if [ ! -z "\$RUNNING_PROCESSES" ]; then
-    show_dialog "Installation Blocked" \\
-        "AIPrivateSearch is currently running!
-
-Please close the running application before installing.
-
-Running processes: \$RUNNING_PROCESSES" \\
-        "stop"
+    echo ""
+    echo "❌ ══════════════════════════════════════════════════════════"
+    echo "❌ INSTALLATION BLOCKED"
+    echo "❌ ══════════════════════════════════════════════════════════"
+    echo ""
+    echo "AIPrivateSearch is currently running!"
+    echo ""
+    echo "Please close the running application before installing."
+    echo ""
+    echo "Running processes: \$RUNNING_PROCESSES"
+    echo ""
+    echo "❌ ══════════════════════════════════════════════════════════"
+    echo ""
+    
+    notify "Installation Blocked" "AIPrivateSearch is running. Please close it first."
     exit 1
 fi
 
