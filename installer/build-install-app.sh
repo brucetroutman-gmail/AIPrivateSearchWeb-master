@@ -105,6 +105,20 @@ notify() {
     osascript -e "display notification \"\$message\" with title \"\$title\"" 2>/dev/null
 }
 
+# Function to show dialog
+show_dialog() {
+    local title="\$1"
+    local message="\$2"
+    local type="\${3:-informational}"
+    
+    osascript <<-APPLESCRIPT 2>/dev/null || echo "\$message"
+        tell application "System Events"
+            activate
+            display dialog "\$message" with title "\$title" buttons {"OK"} default button "OK" with icon \$type
+        end tell
+APPLESCRIPT
+}
+
 # Function to show progress dialog with cumulative messages
 show_progress() {
     if [ "\$SHOW_DETAILS" = "Yes" ]; then
@@ -171,20 +185,6 @@ if [ "\$SHOW_DETAILS" = "Yes" ]; then
 APPLESCRIPT
     sleep 1
 fi
-
-# Function to show dialog
-show_dialog() {
-    local title="\$1"
-    local message="\$2"
-    local type="\${3:-informational}"
-    
-    osascript <<-APPLESCRIPT 2>/dev/null || echo "\$message"
-        tell application "System Events"
-            activate
-            display dialog "\$message" with title "\$title" buttons {"OK"} default button "OK" with icon \$type
-        end tell
-APPLESCRIPT
-}
 
 # Function to get admin password once and reuse
 get_admin_password() {
