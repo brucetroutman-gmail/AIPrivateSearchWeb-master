@@ -111,7 +111,8 @@ show_dialog() {
     local message="\$2"
     local type="\${3:-informational}"
     
-    osascript <<-APPLESCRIPT 2>/dev/null || echo "\$message"
+    echo "\$message"
+    osascript <<-APPLESCRIPT
         tell application "System Events"
             activate
             display dialog "\$message" with title "\$title" buttons {"OK"} default button "OK" with icon \$type
