@@ -154,6 +154,10 @@ fi
 
 echo "Mounted at: $MOUNT_DIR"
 
+# Wait for Finder to recognize the disk
+echo "⏳ Waiting for Finder..."
+sleep 3
+
 # Set icon size to 256px
 echo "🎨 Setting icon size to 256px..."
 osascript <<-APPLESCRIPT
