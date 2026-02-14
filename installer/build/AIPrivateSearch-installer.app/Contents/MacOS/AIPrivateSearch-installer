@@ -3,7 +3,7 @@
 # AIPrivateSearch Improved Installer
 APP_SUPPORT="/Users/Shared/AIPrivateSearch"
 LOG_FILE="$APP_SUPPORT/logs/install.log"
-INSTALLER_VERSION="3.4"
+INSTALLER_VERSION="3.5"
 
 # Detect if running from DMG (bundled resources available)
 DMG_RESOURCES=""
@@ -39,7 +39,7 @@ show_dialog() {
     osascript <<-APPLESCRIPT
         tell application "System Events"
             activate
-            display dialog "$message" with title "$title" buttons {"OK"} default button "OK" with icon $type
+            display dialog "$message" with title "$title" buttons {"OK"} default button "OK" with icon "$type"
         end tell
 APPLESCRIPT
 }
@@ -132,7 +132,7 @@ This password is only used during installation and not stored." \
         if [ -n "$ADMIN_PASSWORD" ]; then
             echo "✅ Administrator password provided"
             # Test password validity
-            TEMP_TEST_FILE="/tmp/aips_test_54848"
+            TEMP_TEST_FILE="/tmp/aips_test_55940"
             echo "$ADMIN_PASSWORD" > "$TEMP_TEST_FILE"
             if sudo -S -v < "$TEMP_TEST_FILE" 2>/dev/null; then
                 rm -f "$TEMP_TEST_FILE"
@@ -360,20 +360,20 @@ else
             # Create expect script to handle password prompt
             cat > /tmp/ollama_expect.sh << 'EXPECT_EOF'
 #!/bin/bash
-TEMP_PASS_FILE="/tmp/aips_pass_54848"
+TEMP_PASS_FILE="/tmp/aips_pass_55940"
 echo "" > ""
 
 # Run installer with password file
 export SUDO_ASKPASS=/tmp/aips_askpass.sh
 echo '#!/bin/bash' > /tmp/aips_askpass.sh
-echo 'cat /tmp/aips_pass_54848' >> /tmp/aips_askpass.sh
+echo 'cat /tmp/aips_pass_55940' >> /tmp/aips_askpass.sh
 chmod +x /tmp/aips_askpass.sh
 
 # Run installer with SUDO_ASKPASS
 /tmp/ollama_install.sh
 
 # Cleanup
-rm -f /tmp/aips_pass_54848 /tmp/aips_askpass.sh
+rm -f /tmp/aips_pass_55940 /tmp/aips_askpass.sh
 EXPECT_EOF
             
             chmod +x /tmp/ollama_expect.sh

@@ -115,7 +115,7 @@ show_dialog() {
     osascript <<-APPLESCRIPT
         tell application "System Events"
             activate
-            display dialog "\$message" with title "\$title" buttons {"OK"} default button "OK" with icon \$type
+            display dialog "\$message" with title "\$title" buttons {"OK"} default button "OK" with icon "\$type"
         end tell
 APPLESCRIPT
 }
