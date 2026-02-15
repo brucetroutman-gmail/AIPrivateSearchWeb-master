@@ -122,12 +122,37 @@ APPLESCRIPT
 # Create directories
 mkdir -p "\$APP_SUPPORT"/{logs,data,sources,config,repo}
 
-# Redirect output to log
+# Create log file first
+touch "\$LOG_FILE"
+
+# Ask user if they want detailed messages BEFORE starting logging
+SHOW_DETAILS=\$(osascript <<-APPLESCRIPT 2>/dev/null
+    tell application "System Events"
+        activate
+        display dialog "Show detailed installation messages in Terminal?\n\nThis will open a Terminal window showing real-time installation progress." buttons {"No", "Yes"} default button "Yes" with title "AIPrivateSearch Installer" with icon note
+    end tell
+    return button returned of result
+APPLESCRIPT
+)
+
+# Open Terminal immediately if user chose Yes
+if [ "\$SHOW_DETAILS" = "Yes" ]; then
+    osascript <<-APPLESCRIPT 2>/dev/null
+        tell application "Terminal"
+            do script "tail -f /Users/Shared/AIPrivateSearch/logs/install.log"
+            activate
+        end tell
+APPLESCRIPT
+    sleep 1
+fi
+
+# NOW redirect output to log
 exec 1> >(tee -a "\$LOG_FILE")
 exec 2>&1
 
 echo "=== AIPrivateSearch Installer Starting at \$(date) ==="
 echo "Installer Version: \$INSTALLER_VERSION"
+echo "User selected: \$SHOW_DETAILS"
 echo ""
 
 # Kill any existing processes
@@ -143,30 +168,6 @@ lsof -ti :56306 | xargs kill -9 2>/dev/null || true
 sleep 2
 echo "✅ Servers stopped"
 echo ""
-
-# Ask user if they want detailed messages
-SHOW_DETAILS=\$(osascript <<-APPLESCRIPT 2>/dev/null
-    tell application "System Events"
-        activate
-        display dialog "Show detailed installation messages in Terminal?\n\nThis will open a Terminal window showing real-time installation progress." buttons {"No", "Yes"} default button "Yes" with title "AIPrivateSearch Installer" with icon note
-    end tell
-    return button returned of result
-APPLESCRIPT
-)
-
-echo "User selected: \$SHOW_DETAILS"
-echo ""
-
-# Open Terminal immediately if user chose Yes
-if [ "\$SHOW_DETAILS" = "Yes" ]; then
-    osascript <<-APPLESCRIPT 2>/dev/null
-        tell application "Terminal"
-            do script "tail -f /Users/Shared/AIPrivateSearch/logs/install.log"
-            activate
-        end tell
-APPLESCRIPT
-    sleep 1
-fi
 
 # Function to show dialog
 show_dialog() {
@@ -709,7 +710,7 @@ echo "  📦 Step 6: Dependency Installation"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
-show_progress "6" "Starting dependency installation...\n\nInstalling required Node.js packages.\n\nThis may take several minutes."
+
 
 # Install dependencies using our installed Node.js
 echo "📦 Installing project dependencies..."
@@ -851,14 +852,22 @@ echo "📝 Available models:"
 "\$OLLAMA_CMD" list
 
 echo "✅ AI models downloaded!"
-show_progress "✓ Installation Complete!\n\nAll components installed:\n• Node.js\n• Ollama\n• Chrome\n• Repository\n• Dependencies\n• AI models\n\nRun aiprivatesearch-start.app to launch."
+show_progress "✓ Installation Complete!\n\nAll components installed:\n• Node.js\n• Ollama\n• Chrome\n• Repository\n• Dependencies\n• AI models\n\nLaunching servers..."
+
+# Launch start app
+if [ -f "$APP_SUPPORT/start-user-app.sh" ]; then
+    echo "🚀 Launching AIPrivateSearch servers..."
+    "$APP_SUPPORT/start-user-app.sh" &
+    sleep 2
+    echo "✅ Servers launched"
+fi
 
 show_dialog "Installation Complete" \\
     "AIPrivateSearch installed successfully!
 
 Log: \$LOG_FILE
 
-Run aiprivatesearch-start.app to launch the application." \\
+Servers are starting now..." \\
     "note"
 LAUNCHER_EOF
 
