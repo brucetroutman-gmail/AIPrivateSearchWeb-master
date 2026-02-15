@@ -5,11 +5,22 @@
 
 set -e
 
+# Auto-increment version
+VERSION_FILE="./manager-version.txt"
+if [ -f "$VERSION_FILE" ]; then
+    CURRENT_VERSION=$(cat "$VERSION_FILE")
+    NEW_VERSION=$(echo "$CURRENT_VERSION + 0.01" | bc)
+else
+    NEW_VERSION="1.46"
+fi
+echo "$NEW_VERSION" > "$VERSION_FILE"
+
 echo "🏗️  Building AIPrivateSearch Manager App"
+echo "Version: $NEW_VERSION"
 echo "=========================================="
 
 APP_NAME="AIPrivateSearch"
-VERSION="1.0.0"
+VERSION="$NEW_VERSION"
 BUNDLE_ID="com.aiprivatesearch.manager"
 BUILD_DIR="./build"
 APP_DIR="$BUILD_DIR/$APP_NAME.app"
@@ -45,9 +56,9 @@ cat > "$APP_DIR/Contents/Info.plist" << 'EOF'
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.0.0</string>
+    <string>$VERSION</string>
     <key>CFBundleVersion</key>
-    <string>1</string>
+    <string>$VERSION</string>
     <key>LSMinimumSystemVersion</key>
     <string>10.15</string>
     <key>NSHighResolutionCapable</key>
@@ -74,8 +85,8 @@ APP_SUPPORT="/Users/Shared/AIPrivateSearch"
 exec_install() {
 MANAGER_EOF
 
-# Append the install script content (lines 77-862 from build-install-app.sh)
-sed -n '77,862p' archive-25-02-14/build-install-app.sh >> "$APP_DIR/Contents/MacOS/$APP_NAME"
+# Append the install script content (lines 92-862 from build-install-app.sh, skip shebang and vars)
+sed -n '92,862p' archive-25-02-14/build-install-app.sh >> "$APP_DIR/Contents/MacOS/$APP_NAME"
 
 # Add closing brace for install function and start function header
 cat >> "$APP_DIR/Contents/MacOS/$APP_NAME" << 'MANAGER_EOF'
@@ -87,8 +98,8 @@ cat >> "$APP_DIR/Contents/MacOS/$APP_NAME" << 'MANAGER_EOF'
 exec_start() {
 MANAGER_EOF
 
-# Append the start script content (lines 68-253 from build-start-app.sh)
-sed -n '68,253p' archive-25-02-14/build-start-app.sh >> "$APP_DIR/Contents/MacOS/$APP_NAME"
+# Append the start script content (lines 75-253 from build-start-app.sh, skip shebang and vars)
+sed -n '75,253p' archive-25-02-14/build-start-app.sh >> "$APP_DIR/Contents/MacOS/$APP_NAME"
 
 # Add closing brace and menu logic
 cat >> "$APP_DIR/Contents/MacOS/$APP_NAME" << 'MANAGER_EOF'
