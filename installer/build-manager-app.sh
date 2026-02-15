@@ -83,10 +83,14 @@ APP_SUPPORT="/Users/Shared/AIPrivateSearch"
 # INSTALL FUNCTION
 # ============================================================================
 exec_install() {
-LOG_FILE="$APP_SUPPORT/logs/install.log"
-INSTALLER_VERSION="$VERSION"
-
 MANAGER_EOF
+
+cat >> "$APP_DIR/Contents/MacOS/$APP_NAME" << MANAGER_EOF2
+LOG_FILE="\$APP_SUPPORT/logs/install.log"
+INSTALLER_VERSION="$VERSION"
+set -euo pipefail
+
+MANAGER_EOF2
 
 # Append the install script content (lines 84-870 from build-install-app.sh, starts after variable definitions)
 # Note: Using quoted MANAGER_EOF above prevents variable expansion, so \$ becomes $ automatically
