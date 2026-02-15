@@ -21,6 +21,7 @@ echo "============================================="
 # Clean all builds
 echo "🧹 Cleaning all previous builds..."
 rm -rf ./build
+rm -f AIPrivateSearch.dmg AIPrivateSearch-temp.dmg
 
 # Build manager app
 echo ""

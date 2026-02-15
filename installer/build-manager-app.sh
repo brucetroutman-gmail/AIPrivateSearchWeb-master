@@ -179,9 +179,16 @@ if [ -f "uninstall-aiprivatesearch.sh" ]; then
     echo "✓ Uninstall script included"
 fi
 
-# Create placeholder icon
-echo "🎨 Creating placeholder icon..."
-touch "$APP_DIR/Contents/Resources/AppIcon.icns"
+# Copy app icon
+echo "🎨 Copying Sherlock icon..."
+ICON_SOURCE="../client/c01_client-marketing/assets/AppIcon.icns"
+if [ -f "$ICON_SOURCE" ]; then
+    cp "$ICON_SOURCE" "$APP_DIR/Contents/Resources/AppIcon.icns"
+    echo "✓ Sherlock icon included"
+else
+    touch "$APP_DIR/Contents/Resources/AppIcon.icns"
+    echo "⚠️  Icon not found, using placeholder"
+fi
 
 echo ""
 echo "✅ Manager app created successfully!"
