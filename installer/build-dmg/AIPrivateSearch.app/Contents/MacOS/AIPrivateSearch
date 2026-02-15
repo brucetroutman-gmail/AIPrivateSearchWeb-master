@@ -113,7 +113,7 @@ get_admin_password() {
     if [ -z "\$ADMIN_PASSWORD" ]; then
         echo "🔐 Requesting administrator password for installations..."
         
-        show_dialog "Administrator Access Required" \\
+        show_dialog "Administrator Access Required" \$
             "AIPrivateSearch installer needs administrator privileges to install:
 
 • Ollama (AI models)
@@ -121,7 +121,7 @@ get_admin_password() {
 • System components
 
 You will be prompted for your password once.
-This password is only used during installation and not stored." \\
+This password is only used during installation and not stored." \$
             "caution"
         
         ADMIN_PASSWORD=\$(osascript -e 'display dialog "Enter your administrator password:" default answer "" with hidden answer' -e 'text returned of result' 2>/dev/null)
@@ -714,13 +714,13 @@ else
     echo "🎉 AI model download completed!"
     echo "Next: Start servers"
     
-    show_dialog "Step 7 Complete" \\
+    show_dialog "Step 7 Complete" \$
         "AI model download completed!
 
 Check the log for details:
 \$LOG_FILE
 
-Next: Start servers" \\
+Next: Start servers" \$
         "note"
     exit 0
 fi
@@ -761,12 +761,12 @@ else
     echo "❌ Cannot proceed without model configuration"
     echo "❌ Installation failed - missing model-list.json"
     
-    show_dialog "Installation Error" \\
+    show_dialog "Installation Error" \$
         "Model configuration file missing!
 
 Required file: \$MODEL_LIST_FILE
 
-Installation cannot continue." \\
+Installation cannot continue." \$
         "stop"
     
     exit 1
@@ -779,12 +779,12 @@ echo "📝 Available models:"
 echo "✅ AI models downloaded!"
 show_progress "✓ Installation Complete!\n\nAll components installed:\n• Node.js\n• Ollama\n• Chrome\n• Repository\n• Dependencies\n• AI models\n\nRun aiprivatesearch-start.app to launch."
 
-show_dialog "Installation Complete" \\
+show_dialog "Installation Complete" \$
     "AIPrivateSearch installed successfully!
 
 Log: \$LOG_FILE
 
-Run aiprivatesearch-start.app to launch the application." \\
+Run aiprivatesearch-start.app to launch the application." \$
     "note"
 }
 
