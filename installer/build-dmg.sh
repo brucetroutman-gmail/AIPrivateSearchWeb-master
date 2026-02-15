@@ -10,7 +10,7 @@ echo "================================"
 
 APP_NAME="AIPrivateSearch-installer"
 VERSION="1.0.0"
-DMG_NAME="aiprivatesearch"
+DMG_NAME="AIPrivateSearch"
 BUILD_DIR="./build"
 DMG_DIR="./build-dmg"
 
