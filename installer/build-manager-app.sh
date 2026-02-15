@@ -83,11 +83,14 @@ APP_SUPPORT="/Users/Shared/AIPrivateSearch"
 # INSTALL FUNCTION
 # ============================================================================
 exec_install() {
+LOG_FILE="$APP_SUPPORT/logs/install.log"
+INSTALLER_VERSION="$VERSION"
+
 MANAGER_EOF
 
-# Append the install script content (lines 84-870 from build-install-app.sh, ends at final dialog)
+# Append the install script content (lines 84-870 from build-install-app.sh, starts after variable definitions)
 # Note: Using quoted MANAGER_EOF above prevents variable expansion, so \$ becomes $ automatically
-sed -n '84,870p' archive-25-02-14/build-install-app.sh | sed 's/\\\$/$/g' >> "$APP_DIR/Contents/MacOS/$APP_NAME"
+sed -n '84,870p' build-install-app.sh | sed 's/\\\$/$/g' >> "$APP_DIR/Contents/MacOS/$APP_NAME"
 
 # Add closing brace for install function and start function header
 cat >> "$APP_DIR/Contents/MacOS/$APP_NAME" << 'MANAGER_EOF'
@@ -100,7 +103,7 @@ exec_start() {
 MANAGER_EOF
 
 # Append the start script content (lines 75-253 from build-start-app.sh, skip shebang and vars)
-sed -n '75,253p' archive-25-02-14/build-start-app.sh >> "$APP_DIR/Contents/MacOS/$APP_NAME"
+sed -n '75,253p' build-start-app.sh >> "$APP_DIR/Contents/MacOS/$APP_NAME"
 
 # Add closing brace and menu logic
 cat >> "$APP_DIR/Contents/MacOS/$APP_NAME" << 'MANAGER_EOF'
