@@ -3,80 +3,6 @@
 # AIPrivateSearch Manager - Single app with all functionality
 APP_SUPPORT="/Users/Shared/AIPrivateSearch"
 
-# Check if installed and show appropriate menu
-if [ ! -d "$APP_SUPPORT" ]; then
-    # Not installed - only show Install option
-    CHOICE=$(osascript <<-APPLESCRIPT 2>/dev/null
-        tell application "System Events"
-            activate
-            set theChoice to button returned of (display dialog "AIPrivateSearch is not installed." & return & return & "Click Install to begin setup." buttons {"Install", "Cancel"} default button "Install" with title "AIPrivateSearch" with icon note)
-        end tell
-        return theChoice
-APPLESCRIPT
-    )
-    
-    if [ "$CHOICE" = "Cancel" ]; then
-        exit 0
-    fi
-    CHOICE="Install"
-else
-    # Already installed - show all options
-    CHOICE=$(osascript <<-APPLESCRIPT 2>/dev/null
-        tell application "System Events"
-            activate
-            set theChoice to button returned of (display dialog "AIPrivateSearch Management" & return & return & "Choose an action:" buttons {"Update", "Start Servers", "Open Browser", "Uninstall", "Cancel"} default button "Start Servers" with title "AIPrivateSearch" with icon note)
-        end tell
-        return theChoice
-APPLESCRIPT
-    )
-    
-    if [ "$CHOICE" = "Cancel" ]; then
-        exit 0
-    fi
-fi
-
-# Execute based on choice
-case "$CHOICE" in
-    "Install"|"Update")
-        # INSTALL FUNCTION - Embedded from build-install-app.sh
-        exec_install
-        ;;
-    "Start Servers")
-        # START FUNCTION - Embedded from build-start-app.sh
-        exec_start
-        ;;
-    "Open Browser")
-        # Read port from config
-        if [ -f "$APP_SUPPORT/repo/aiprivatesearch/client/c01_client-first-app/config/app.json" ]; then
-            export PATH="$APP_SUPPORT/node/bin:$PATH"
-            cd "$APP_SUPPORT/repo/aiprivatesearch"
-            FRONTEND_PORT=$(node -p "JSON.parse(require('fs').readFileSync('./client/c01_client-first-app/config/app.json', 'utf8')).ports.frontend" 2>/dev/null || echo "56305")
-        else
-            FRONTEND_PORT="56305"
-        fi
-        
-        # Open in Chrome app mode
-        if [ -d "/Applications/Google Chrome.app" ]; then
-            /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
-                --app=http://localhost:$FRONTEND_PORT \
-                --window-size=1400,900 \
-                --disable-features=TranslateUI &
-        else
-            open http://localhost:$FRONTEND_PORT
-        fi
-        ;;
-    "Uninstall")
-        # Run uninstall script
-        if [ -f "$APP_SUPPORT/uninstall-aiprivatesearch.sh" ]; then
-            "$APP_SUPPORT/uninstall-aiprivatesearch.sh"
-        else
-            osascript -e 'display dialog "Uninstall script not found!" buttons {"OK"} default button "OK" with icon stop'
-        fi
-        ;;
-esac
-
-exit 0
-
 # ============================================================================
 # INSTALL FUNCTION
 # ============================================================================
@@ -1060,3 +986,81 @@ exit 0
 LAUNCHER_EOF
 
 }
+
+# ============================================================================
+# MAIN MENU LOGIC
+# ============================================================================
+
+# Check if installed and show appropriate menu
+if [ ! -d "$APP_SUPPORT" ]; then
+    # Not installed - only show Install option
+    CHOICE=$(osascript <<-APPLESCRIPT 2>/dev/null
+        tell application "System Events"
+            activate
+            set theChoice to button returned of (display dialog "AIPrivateSearch is not installed." & return & return & "Click Install to begin setup." buttons {"Install", "Cancel"} default button "Install" with title "AIPrivateSearch" with icon note)
+        end tell
+        return theChoice
+APPLESCRIPT
+    )
+    
+    if [ "$CHOICE" = "Cancel" ]; then
+        exit 0
+    fi
+    CHOICE="Install"
+else
+    # Already installed - show all options
+    CHOICE=$(osascript <<-APPLESCRIPT 2>/dev/null
+        tell application "System Events"
+            activate
+            set theChoice to button returned of (display dialog "AIPrivateSearch Management" & return & return & "Choose an action:" buttons {"Update", "Start Servers", "Open Browser", "Uninstall", "Cancel"} default button "Start Servers" with title "AIPrivateSearch" with icon note)
+        end tell
+        return theChoice
+APPLESCRIPT
+    )
+    
+    if [ "$CHOICE" = "Cancel" ]; then
+        exit 0
+    fi
+fi
+
+# Execute based on choice
+case "$CHOICE" in
+    "Install"|"Update")
+        # INSTALL FUNCTION - Embedded from build-install-app.sh
+        exec_install
+        ;;
+    "Start Servers")
+        # START FUNCTION - Embedded from build-start-app.sh
+        exec_start
+        ;;
+    "Open Browser")
+        # Read port from config
+        if [ -f "$APP_SUPPORT/repo/aiprivatesearch/client/c01_client-first-app/config/app.json" ]; then
+            export PATH="$APP_SUPPORT/node/bin:$PATH"
+            cd "$APP_SUPPORT/repo/aiprivatesearch"
+            FRONTEND_PORT=$(node -p "JSON.parse(require('fs').readFileSync('./client/c01_client-first-app/config/app.json', 'utf8')).ports.frontend" 2>/dev/null || echo "56305")
+        else
+            FRONTEND_PORT="56305"
+        fi
+        
+        # Open in Chrome app mode
+        if [ -d "/Applications/Google Chrome.app" ]; then
+            /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
+                --app=http://localhost:$FRONTEND_PORT \
+                --window-size=1400,900 \
+                --disable-features=TranslateUI &
+        else
+            open http://localhost:$FRONTEND_PORT
+        fi
+        ;;
+    "Uninstall")
+        # Run uninstall script
+        if [ -f "$APP_SUPPORT/uninstall-aiprivatesearch.sh" ]; then
+            "$APP_SUPPORT/uninstall-aiprivatesearch.sh"
+        else
+            osascript -e 'display dialog "Uninstall script not found!" buttons {"OK"} default button "OK" with icon stop'
+        fi
+        ;;
+esac
+
+exit 0

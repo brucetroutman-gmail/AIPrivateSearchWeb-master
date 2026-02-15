@@ -68,6 +68,36 @@ cat > "$APP_DIR/Contents/MacOS/$APP_NAME" << 'MANAGER_EOF'
 # AIPrivateSearch Manager - Single app with all functionality
 APP_SUPPORT="/Users/Shared/AIPrivateSearch"
 
+# ============================================================================
+# INSTALL FUNCTION
+# ============================================================================
+exec_install() {
+MANAGER_EOF
+
+# Append the install script content (lines 77-862 from build-install-app.sh)
+sed -n '77,862p' archive-25-02-14/build-install-app.sh >> "$APP_DIR/Contents/MacOS/$APP_NAME"
+
+# Add closing brace for install function and start function header
+cat >> "$APP_DIR/Contents/MacOS/$APP_NAME" << 'MANAGER_EOF'
+}
+
+# ============================================================================
+# START FUNCTION
+# ============================================================================
+exec_start() {
+MANAGER_EOF
+
+# Append the start script content (lines 68-253 from build-start-app.sh)
+sed -n '68,253p' archive-25-02-14/build-start-app.sh >> "$APP_DIR/Contents/MacOS/$APP_NAME"
+
+# Add closing brace and menu logic
+cat >> "$APP_DIR/Contents/MacOS/$APP_NAME" << 'MANAGER_EOF'
+}
+
+# ============================================================================
+# MAIN MENU LOGIC
+# ============================================================================
+
 # Check if installed and show appropriate menu
 if [ ! -d "$APP_SUPPORT" ]; then
     # Not installed - only show Install option
@@ -141,32 +171,6 @@ case "$CHOICE" in
 esac
 
 exit 0
-
-# ============================================================================
-# INSTALL FUNCTION
-# ============================================================================
-exec_install() {
-MANAGER_EOF
-
-# Now append the install script content (lines 77-862 from build-install-app.sh)
-sed -n '77,862p' archive-25-02-14/build-install-app.sh >> "$APP_DIR/Contents/MacOS/$APP_NAME"
-
-# Add closing brace for install function and start function header
-cat >> "$APP_DIR/Contents/MacOS/$APP_NAME" << 'MANAGER_EOF'
-}
-
-# ============================================================================
-# START FUNCTION
-# ============================================================================
-exec_start() {
-MANAGER_EOF
-
-# Append the start script content (lines 68-253 from build-start-app.sh)
-sed -n '68,253p' archive-25-02-14/build-start-app.sh >> "$APP_DIR/Contents/MacOS/$APP_NAME"
-
-# Add closing brace for start function
-cat >> "$APP_DIR/Contents/MacOS/$APP_NAME" << 'MANAGER_EOF'
-}
 MANAGER_EOF
 
 chmod +x "$APP_DIR/Contents/MacOS/$APP_NAME"
