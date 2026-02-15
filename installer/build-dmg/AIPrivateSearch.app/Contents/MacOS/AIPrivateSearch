@@ -7,6 +7,14 @@ APP_SUPPORT="/Users/Shared/AIPrivateSearch"
 # INSTALL FUNCTION
 # ============================================================================
 exec_install() {
+# Detect if running from DMG (bundled resources available)
+DMG_RESOURCES=""
+APP_BUNDLE_RESOURCES="\$(dirname "\$0")/../Resources"
+
+if [ -d "\$APP_BUNDLE_RESOURCES" ] && [ -f "\$APP_BUNDLE_RESOURCES/manifest.txt" ]; then
+    DMG_RESOURCES="\$APP_BUNDLE_RESOURCES"
+    echo "✅ Bundled resources found in app bundle"
+elif [ -d "/Volumes/AIPrivateSearch/Resources" ]; then
     DMG_RESOURCES="/Volumes/AIPrivateSearch/Resources"
     echo "✅ Running from DMG - bundled resources available"
 else

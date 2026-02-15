@@ -85,8 +85,8 @@ APP_SUPPORT="/Users/Shared/AIPrivateSearch"
 exec_install() {
 MANAGER_EOF
 
-# Append the install script content (lines 92-862 from build-install-app.sh, skip shebang and vars)
-sed -n '92,862p' archive-25-02-14/build-install-app.sh >> "$APP_DIR/Contents/MacOS/$APP_NAME"
+# Append the install script content (lines 84-862 from build-install-app.sh, start from DMG detection)
+sed -n '84,862p' archive-25-02-14/build-install-app.sh >> "$APP_DIR/Contents/MacOS/$APP_NAME"
 
 # Add closing brace for install function and start function header
 cat >> "$APP_DIR/Contents/MacOS/$APP_NAME" << 'MANAGER_EOF'
