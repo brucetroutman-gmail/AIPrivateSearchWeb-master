@@ -86,7 +86,8 @@ exec_install() {
 MANAGER_EOF
 
 # Append the install script content (lines 84-862 from build-install-app.sh, start from DMG detection)
-sed -n '84,862p' archive-25-02-14/build-install-app.sh | sed 's/\\$/$/g' >> "$APP_DIR/Contents/MacOS/$APP_NAME"
+# Note: Using quoted MANAGER_EOF above prevents variable expansion, so \$ becomes $ automatically
+sed -n '84,862p' archive-25-02-14/build-install-app.sh | sed 's/\\\$/$/g' >> "$APP_DIR/Contents/MacOS/$APP_NAME"
 
 # Add closing brace for install function and start function header
 cat >> "$APP_DIR/Contents/MacOS/$APP_NAME" << 'MANAGER_EOF'
