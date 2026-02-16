@@ -21,7 +21,7 @@ echo "=============================================================="
 
 APP_NAME="AIPrivateSearch"
 VERSION="1.0.0"
-BUNDLE_ID="com.aiprivatesearch.app"
+BUNDLE_ID="com.aiprivatesearch.installer"
 BUILD_DIR="./build"
 APP_DIR="$BUILD_DIR/$APP_NAME.app"
 
@@ -44,15 +44,15 @@ cat > "$APP_DIR/Contents/Info.plist" << 'EOF'
     <key>CFBundleDevelopmentRegion</key>
     <string>en</string>
     <key>CFBundleExecutable</key>
-    <string>AIPrivateSearch-installer</string>
+    <string>AIPrivateSearch</string>
     <key>CFBundleIconFile</key>
     <string>AppIcon</string>
     <key>CFBundleIdentifier</key>
-    <string>com.aiprivatesearch.app</string>
+    <string>com.aiprivatesearch.installer</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
-    <string>AIPrivateSearch-installer</string>
+    <string>AIPrivateSearch</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
