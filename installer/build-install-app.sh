@@ -81,10 +81,61 @@ APP_SUPPORT="/Users/Shared/AIPrivateSearch"
 LOG_FILE="\$APP_SUPPORT/logs/install.log"
 INSTALLER_VERSION="$NEW_VERSION"
 
-# Check if already installed - minimal test
+# Check if already installed and show appropriate menu
 if [ -d "\$APP_SUPPORT/repo/aiprivatesearch" ]; then
-    osascript -e 'tell app "System Events" to display dialog "Already installed! This is a test." buttons {"OK"}'
-    exit 0
+    # Already installed - show management menu
+    CHOICE=\$(osascript <<-APPLESCRIPT 2>/dev/null
+        tell application "System Events"
+            activate
+            set choice to button returned of (display dialog "AIPrivateSearch is already installed.\n\nWhat would you like to do?" buttons {"Update", "Start Servers", "Open Browser", "Uninstall", "Cancel"} default button "Start Servers" with title "AIPrivateSearch Manager" with icon note)
+        end tell
+        return choice
+APPLESCRIPT
+    )
+    
+    case "\$CHOICE" in
+        "Update")
+            echo "Update selected - not implemented yet"
+            osascript -e 'display dialog "Update feature coming soon!" buttons {"OK"}'
+            exit 0
+            ;;
+        "Start Servers")
+            echo "Start Servers selected - not implemented yet"
+            osascript -e 'display dialog "Start Servers feature coming soon!" buttons {"OK"}'
+            exit 0
+            ;;
+        "Open Browser")
+            echo "Open Browser selected - not implemented yet"
+            osascript -e 'display dialog "Open Browser feature coming soon!" buttons {"OK"}'
+            exit 0
+            ;;
+        "Uninstall")
+            echo "Uninstall selected - not implemented yet"
+            osascript -e 'display dialog "Uninstall feature coming soon!" buttons {"OK"}'
+            exit 0
+            ;;
+        *)
+            echo "Cancelled"
+            exit 0
+            ;;
+    esac
+else
+    # Not installed - show install menu
+    CHOICE=\$(osascript <<-APPLESCRIPT 2>/dev/null
+        tell application "System Events"
+            activate
+            set choice to button returned of (display dialog "AIPrivateSearch is not installed.\n\nWould you like to install it now?" buttons {"Cancel", "Install"} default button "Install" with title "AIPrivateSearch Installer" with icon note)
+        end tell
+        return choice
+APPLESCRIPT
+    )
+    
+    if [ "\$CHOICE" != "Install" ]; then
+        echo "Installation cancelled"
+        exit 0
+    fi
+    
+    echo "Install selected - continuing with installation..."
 fi
 
 # Detect if running from DMG (bundled resources available)
