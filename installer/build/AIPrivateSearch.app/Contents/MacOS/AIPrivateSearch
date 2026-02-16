@@ -8,7 +8,7 @@ APP_SUPPORT="/Users/Shared/AIPrivateSearch"
 # ============================================================================
 exec_install() {
 LOG_FILE="$APP_SUPPORT/logs/install.log"
-INSTALLER_VERSION="1.71"
+INSTALLER_VERSION="1.72"
 set -euo pipefail
 
 # Create directories
