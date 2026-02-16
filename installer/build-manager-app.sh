@@ -90,11 +90,17 @@ LOG_FILE="\$APP_SUPPORT/logs/install.log"
 INSTALLER_VERSION="$VERSION"
 set -euo pipefail
 
+# Create directories
+mkdir -p "\$APP_SUPPORT"/{logs,data,sources,config,repo}
+
+# Create log file first
+touch "\$LOG_FILE"
+
 MANAGER_EOF2
 
-# Append the install script content (lines 84-870 from build-install-app.sh, starts after variable definitions)
+# Append the install script content (lines 127-870 from build-install-app.sh, skip directory creation)
 # Note: Using quoted MANAGER_EOF above prevents variable expansion, so \$ becomes $ automatically
-sed -n '84,870p' build-install-app.sh | sed 's/\\\$/$/g' >> "$APP_DIR/Contents/MacOS/$APP_NAME"
+sed -n '127,870p' build-install-app.sh | sed 's/\\\$/$/g' >> "$APP_DIR/Contents/MacOS/$APP_NAME"
 
 # Add closing brace for install function and start function header
 cat >> "$APP_DIR/Contents/MacOS/$APP_NAME" << 'MANAGER_EOF'

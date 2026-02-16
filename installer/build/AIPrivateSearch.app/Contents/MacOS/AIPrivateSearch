@@ -8,52 +8,15 @@ APP_SUPPORT="/Users/Shared/AIPrivateSearch"
 # ============================================================================
 exec_install() {
 LOG_FILE="$APP_SUPPORT/logs/install.log"
-INSTALLER_VERSION="1.69"
+INSTALLER_VERSION="1.71"
 set -euo pipefail
-
-# Detect if running from DMG (bundled resources available)
-DMG_RESOURCES=""
-APP_BUNDLE_RESOURCES="$(dirname "$0")/../Resources"
-
-if [ -d "$APP_BUNDLE_RESOURCES" ] && [ -f "$APP_BUNDLE_RESOURCES/manifest.txt" ]; then
-    DMG_RESOURCES="$APP_BUNDLE_RESOURCES"
-    echo "✅ Bundled resources found in app bundle"
-elif [ -d "/Volumes/AIPrivateSearch/Resources" ]; then
-    DMG_RESOURCES="/Volumes/AIPrivateSearch/Resources"
-    echo "✅ Running from DMG - bundled resources available"
-else
-    echo "⚠️  No bundled resources found - will download"
-fi
-
-# Progress tracking
-PROGRESS_LOG=""
-
-# Function to send notification
-notify() {
-    local title="$1"
-    local message="$2"
-    osascript -e "display notification \"$message\" with title \"$title\"" 2>/dev/null
-}
-
-# Function to show progress dialog with cumulative messages
-show_progress() {
-    if [ "$SHOW_DETAILS" = "Yes" ]; then
-        local message="$1"
-        PROGRESS_LOG="${PROGRESS_LOG}${message}\\n\\n"
-        osascript <<-APPLESCRIPT 2>/dev/null
-            tell application "System Events"
-                activate
-                display dialog "$PROGRESS_LOG" with title "AIPrivateSearch Installer" buttons {"Continue"} default button "Continue" with icon note
-            end tell
-APPLESCRIPT
-    fi
-}
 
 # Create directories
 mkdir -p "$APP_SUPPORT"/{logs,data,sources,config,repo}
 
 # Create log file first
 touch "$LOG_FILE"
+
 
 # Ask user if they want detailed messages BEFORE starting logging
 SHOW_DETAILS=$(osascript <<-APPLESCRIPT 2>/dev/null
