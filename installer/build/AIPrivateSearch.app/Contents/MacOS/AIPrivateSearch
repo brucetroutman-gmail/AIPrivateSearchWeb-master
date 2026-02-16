@@ -8,7 +8,7 @@ APP_SUPPORT="/Users/Shared/AIPrivateSearch"
 # ============================================================================
 exec_install() {
 LOG_FILE="$APP_SUPPORT/logs/install.log"
-INSTALLER_VERSION="1.68"
+INSTALLER_VERSION="1.69"
 set -euo pipefail
 
 # Detect if running from DMG (bundled resources available)
