@@ -3,18 +3,18 @@
 # AIPrivateSearch Manager - Single app with all functionality
 APP_SUPPORT="/Users/Shared/AIPrivateSearch"
 
+# Create directories first (before any function runs)
+mkdir -p "$APP_SUPPORT"/{logs,data,sources,config,repo}
+
 # ============================================================================
 # INSTALL FUNCTION
 # ============================================================================
 exec_install() {
 LOG_FILE="$APP_SUPPORT/logs/install.log"
-INSTALLER_VERSION="1.72"
+INSTALLER_VERSION="1.73"
 set -euo pipefail
 
-# Create directories
-mkdir -p "$APP_SUPPORT"/{logs,data,sources,config,repo}
-
-# Create log file first
+# Create log file
 touch "$LOG_FILE"
 
 

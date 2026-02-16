@@ -79,6 +79,9 @@ cat > "$APP_DIR/Contents/MacOS/$APP_NAME" << 'MANAGER_EOF'
 # AIPrivateSearch Manager - Single app with all functionality
 APP_SUPPORT="/Users/Shared/AIPrivateSearch"
 
+# Create directories first (before any function runs)
+mkdir -p "$APP_SUPPORT"/{logs,data,sources,config,repo}
+
 # ============================================================================
 # INSTALL FUNCTION
 # ============================================================================
@@ -90,10 +93,7 @@ LOG_FILE="\$APP_SUPPORT/logs/install.log"
 INSTALLER_VERSION="$VERSION"
 set -euo pipefail
 
-# Create directories
-mkdir -p "\$APP_SUPPORT"/{logs,data,sources,config,repo}
-
-# Create log file first
+# Create log file
 touch "\$LOG_FILE"
 
 MANAGER_EOF2
