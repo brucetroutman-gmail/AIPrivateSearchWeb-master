@@ -8,7 +8,7 @@ set -e
 echo "💿 Building AIPrivateSearch DMG"
 echo "================================"
 
-APP_NAME="AIPrivateSearch-mgr"
+APP_NAME="AIPrivateSearch-installer"
 VERSION="1.0.0"
 DMG_NAME="AIPrivateSearch"
 BUILD_DIR="./build"
@@ -30,7 +30,7 @@ if [ -d "$BUILD_DIR/$APP_NAME.app" ]; then
     cp -R "$BUILD_DIR/$APP_NAME.app" "$DMG_DIR/"
 else
     echo "❌ Error: $APP_NAME.app not found in $BUILD_DIR"
-    echo "Please run build-mgr-app.sh first"
+    echo "Please run build-install-app.sh first"
     exit 1
 fi
 
@@ -164,7 +164,7 @@ tell application "Finder"
         set icon size of opts to 128
         
         -- Position items
-        set position of item "AIPrivateSearch-mgr.app" to {150, 150}
+        set position of item "AIPrivateSearch-installer.app" to {150, 150}
         set position of item "Applications" to {450, 150}
         
         update without registering applications
