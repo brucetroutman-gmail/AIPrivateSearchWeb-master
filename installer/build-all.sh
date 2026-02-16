@@ -23,19 +23,19 @@ echo "🧹 Cleaning all previous builds..."
 rm -rf ./build
 rm -f AIPrivateSearch.dmg AIPrivateSearch-temp.dmg
 
-# Build manager app
+# Build install app
 echo ""
-echo "📦 Building manager app..."
-./build-manager-app.sh
+echo "📦 Building install app..."
+./build-install-app.sh
 
-# Build DMG with manager app
+# Build DMG with install app
 echo ""
-echo "📦 Building DMG with manager app..."
+echo "📦 Building DMG with install app..."
 ./build-dmg.sh
 
 echo ""
 echo "✅ Complete package built successfully!"
 echo "📁 Contents:"
-echo "   - AIPrivateSearch.app (unified manager)"
+echo "   - AIPrivateSearch-installer.app"
 echo "   - AIPrivateSearch.dmg (DMG package)"
 echo ""
