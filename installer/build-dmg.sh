@@ -8,7 +8,7 @@ set -e
 echo "💿 Building AIPrivateSearch DMG"
 echo "================================"
 
-APP_NAME="AIPrivateSearch-installer"
+APP_NAME="AIPrivateSearch"
 VERSION="1.0.0"
 DMG_NAME="AIPrivateSearch"
 BUILD_DIR="./build"
@@ -164,7 +164,7 @@ tell application "Finder"
         set icon size of opts to 128
         
         -- Position items
-        set position of item "AIPrivateSearch-installer.app" to {150, 150}
+        set position of item "AIPrivateSearch.app" to {150, 150}
         set position of item "Applications" to {450, 150}
         
         update without registering applications

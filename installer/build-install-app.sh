@@ -19,7 +19,7 @@ echo "🏗️  Building AIPrivateSearch.app Bundle (Auto-Install Version)"
 echo "Version: $NEW_VERSION"
 echo "=============================================================="
 
-APP_NAME="AIPrivateSearch-installer"
+APP_NAME="AIPrivateSearch"
 VERSION="1.0.0"
 BUNDLE_ID="com.aiprivatesearch.app"
 BUILD_DIR="./build"
