@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # AIPrivateSearch Manager App Builder
-# Simple wrapper that calls install and start scripts
+# Embeds full installer with menu logic
 
 set -e
 
@@ -51,57 +51,70 @@ cat > "$APP_DIR/Contents/Info.plist" << EOF
 </plist>
 EOF
 
-echo "📝 Creating manager script..."
+echo "📝 Creating manager script with embedded installer..."
 cat > "$APP_DIR/Contents/MacOS/$APP_NAME" << 'MANAGER_EOF'
 #!/bin/bash
 
+# AIPrivateSearch Manager with embedded installer
 APP_SUPPORT="/Users/Shared/AIPrivateSearch"
-INSTALLER_APP="$APP_SUPPORT/repo/aiprivatesearchweb/installer/build/AIPrivateSearch-installer.app/Contents/MacOS/AIPrivateSearch-installer"
-START_SCRIPT="$APP_SUPPORT/start-user-app.sh"
 
 # Create directories first
 mkdir -p "$APP_SUPPORT"/{logs,data,sources,config,repo}
 
 # Check if installed
 if [ ! -d "$APP_SUPPORT/repo/aiprivatesearch" ]; then
-    INSTALLED=false
-else
-    INSTALLED=true
-fi
-
-# Show menu
-if [ "$INSTALLED" = false ]; then
+    # Not installed - show Install dialog
     CHOICE=$(osascript -e 'tell app "System Events" to display dialog "AIPrivateSearch not installed.\n\nClick Install to begin." buttons {"Cancel", "Install"} default button "Install"' -e 'button returned of result' 2>/dev/null)
     [ "$CHOICE" != "Install" ] && exit 0
-    
-    # Run installer
-    if [ -f "$INSTALLER_APP" ]; then
-        "$INSTALLER_APP"
-    else
-        osascript -e 'tell app "System Events" to display dialog "Installer not found!" buttons {"OK"}'
-    fi
+    ACTION="install"
 else
-    CHOICE=$(osascript -e 'tell app "System Events" to display dialog "AIPrivateSearch Manager" buttons {"Cancel", "Update", "Start"} default button "Start"' -e 'button returned of result' 2>/dev/null)
+    # Installed - show full menu
+    CHOICE=$(osascript -e 'tell app "System Events" to display dialog "AIPrivateSearch Manager" buttons {"Cancel", "Update", "Start", "Browser"} default button "Start"' -e 'button returned of result' 2>/dev/null)
     [ "$CHOICE" = "Cancel" ] && exit 0
     
     case "$CHOICE" in
-        "Update")
-            if [ -f "$INSTALLER_APP" ]; then
-                "$INSTALLER_APP"
-            else
-                osascript -e 'tell app "System Events" to display dialog "Installer not found!" buttons {"OK"}'
-            fi
-            ;;
-        "Start")
-            if [ -f "$START_SCRIPT" ]; then
-                "$START_SCRIPT"
-            else
-                osascript -e 'tell app "System Events" to display dialog "Start script not found!" buttons {"OK"}'
-            fi
-            ;;
+        "Update") ACTION="install" ;;
+        "Start") ACTION="start" ;;
+        "Browser") ACTION="browser" ;;
     esac
 fi
+
+# Handle actions
+if [ "$ACTION" = "start" ]; then
+    # Start servers
+    export PATH="$APP_SUPPORT/node/bin:$PATH"
+    cd "$APP_SUPPORT/repo/aiprivatesearch"
+    
+    # Start Ollama
+    if ! pgrep -f "ollama serve" > /dev/null; then
+        nohup ollama serve > "$APP_SUPPORT/logs/ollama.log" 2>&1 &
+    fi
+    
+    # Start servers
+    nohup npx serve -l 56305 ./client/c01_client-first-app > "$APP_SUPPORT/logs/frontend.log" 2>&1 &
+    nohup node ./server/s01_server-first-app/server.mjs > "$APP_SUPPORT/logs/backend.log" 2>&1 &
+    
+    sleep 2
+    osascript -e 'tell app "System Events" to display dialog "Servers started!" buttons {"OK"}'
+    exit 0
+fi
+
+if [ "$ACTION" = "browser" ]; then
+    # Open browser
+    FRONTEND_PORT=56305
+    if [ -d "/Applications/Google Chrome.app" ]; then
+        /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --app=http://localhost:$FRONTEND_PORT &
+    else
+        open http://localhost:$FRONTEND_PORT
+    fi
+    exit 0
+fi
+
+# If ACTION=install, continue with full installer below
 MANAGER_EOF
+
+# Append the full installer content (lines 76-894 from build-install-app.sh)
+sed -n '76,894p' build-install-app.sh >> "$APP_DIR/Contents/MacOS/$APP_NAME"
 
 chmod +x "$APP_DIR/Contents/MacOS/$APP_NAME"
 
