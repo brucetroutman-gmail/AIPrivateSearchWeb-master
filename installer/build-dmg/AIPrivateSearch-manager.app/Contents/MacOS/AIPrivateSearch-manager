@@ -1,0 +1,48 @@
+#!/bin/bash
+
+APP_SUPPORT="/Users/Shared/AIPrivateSearch"
+INSTALLER_APP="$APP_SUPPORT/repo/aiprivatesearchweb/installer/build/AIPrivateSearch-installer.app/Contents/MacOS/AIPrivateSearch-installer"
+START_SCRIPT="$APP_SUPPORT/start-user-app.sh"
+
+# Create directories first
+mkdir -p "$APP_SUPPORT"/{logs,data,sources,config,repo}
+
+# Check if installed
+if [ ! -d "$APP_SUPPORT/repo/aiprivatesearch" ]; then
+    INSTALLED=false
+else
+    INSTALLED=true
+fi
+
+# Show menu
+if [ "$INSTALLED" = false ]; then
+    CHOICE=$(osascript -e 'tell app "System Events" to display dialog "AIPrivateSearch not installed.\n\nClick Install to begin." buttons {"Cancel", "Install"} default button "Install"' -e 'button returned of result' 2>/dev/null)
+    [ "$CHOICE" != "Install" ] && exit 0
+    
+    # Run installer
+    if [ -f "$INSTALLER_APP" ]; then
+        "$INSTALLER_APP"
+    else
+        osascript -e 'tell app "System Events" to display dialog "Installer not found!" buttons {"OK"}'
+    fi
+else
+    CHOICE=$(osascript -e 'tell app "System Events" to display dialog "AIPrivateSearch Manager" buttons {"Cancel", "Update", "Start"} default button "Start"' -e 'button returned of result' 2>/dev/null)
+    [ "$CHOICE" = "Cancel" ] && exit 0
+    
+    case "$CHOICE" in
+        "Update")
+            if [ -f "$INSTALLER_APP" ]; then
+                "$INSTALLER_APP"
+            else
+                osascript -e 'tell app "System Events" to display dialog "Installer not found!" buttons {"OK"}'
+            fi
+            ;;
+        "Start")
+            if [ -f "$START_SCRIPT" ]; then
+                "$START_SCRIPT"
+            else
+                osascript -e 'tell app "System Events" to display dialog "Start script not found!" buttons {"OK"}'
+            fi
+            ;;
+    esac
+fi
