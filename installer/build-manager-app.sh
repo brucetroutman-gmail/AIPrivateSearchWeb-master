@@ -48,11 +48,11 @@ cat > "$APP_DIR/Contents/Info.plist" << 'EOF'
     <key>CFBundleIconFile</key>
     <string>AppIcon</string>
     <key>CFBundleIdentifier</key>
-    <string>com.aiprivatesearch.app</string>
+    <string>com.aiprivatesearch.manager</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
-    <string>AIPrivateSearch-installer</string>
+    <string>AIPrivateSearch-manager</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
