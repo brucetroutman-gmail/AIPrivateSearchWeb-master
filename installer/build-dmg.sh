@@ -141,10 +141,20 @@ fi
 
 echo "Mounted at: $MOUNT_DIR"
 
+# Set custom volume icon
+echo "🎨 Setting DMG volume icon..."
+if [ -f "../client/c01_client-marketing/assets/AppIcon.icns" ]; then
+    cp "../client/c01_client-marketing/assets/AppIcon.icns" "$MOUNT_DIR/.VolumeIcon.icns"
+    SetFile -c icnC "$MOUNT_DIR/.VolumeIcon.icns" 2>/dev/null || true
+    SetFile -a C "$MOUNT_DIR" 2>/dev/null || true
+    echo "✓ Volume icon set"
+fi
+
 # Hide Resources folder and README
 echo "🎨 Hiding Resources folder..."
 chflags hidden "$MOUNT_DIR/Resources" 2>/dev/null || true
 chflags hidden "$MOUNT_DIR/README.txt" 2>/dev/null || true
+chflags hidden "$MOUNT_DIR/.background.txt" 2>/dev/null || true
 
 # Configure view with AppleScript
 echo "🎨 Configuring DMG view..."
@@ -206,7 +216,7 @@ echo "📦 Location: $DMG_NAME.dmg"
 echo "📏 Size: $(du -h "$DMG_NAME.dmg" | awk '{print $1}')"
 
 # Copy to marketing website downloads
-MARKETING_DOWNLOADS="/Users/Shared/AIPrivateSearch/repo/aiprivatesearchweb/client/c01_client-marketing/downloads"
+MARKETING_DOWNLOADS="/Users/Shared/repos/AIPrivateSearch/repo/aiprivatesearchweb/client/c01_client-marketing/downloads"
 if [ -d "$MARKETING_DOWNLOADS" ]; then
     echo ""
     echo "📋 Copying DMG to marketing website..."

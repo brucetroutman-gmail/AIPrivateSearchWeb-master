@@ -84,10 +84,10 @@ INSTALLER_VERSION="$NEW_VERSION"
 # Check if already installed and show appropriate menu
 if [ -d "\$APP_SUPPORT/repo/aiprivatesearch" ]; then
     # Already installed - show management menu
-    CHOICE=\$(osascript <<-APPLESCRIPT 2>/dev/null
+    CHOICE=\$(osascript <<-APPLESCRIPT
     tell application "System Events"
         activate
-        set choice to button returned of (display dialog "AIPrivateSearch is already installed.\n\nWhat would you like to do?" buttons {"Update", "Start Servers", "Open Browser", "Uninstall", "Cancel"} default button "Start Servers" with title "AIPrivateSearch Manager" with icon note)
+        set choice to button returned of (display dialog "AIPrivateSearch is already installed.\n\nWhat would you like to do?" buttons {"Cancel", "Update", "Start App"} default button "Start App" with title "AIPrivateSearch Manager" with icon note)
     end tell
     return choice
 APPLESCRIPT
@@ -95,23 +95,35 @@ APPLESCRIPT
     
     case "\$CHOICE" in
         "Update")
-            echo "Update selected - not implemented yet"
-            osascript -e 'display dialog "Update feature coming soon!" buttons {"OK"}'
-            exit 0
+            echo "Update menu selected"
+            UPDATE_CHOICE=\$(osascript <<-APPLESCRIPT
+            tell application "System Events"
+                activate
+                set choice to button returned of (display dialog "Update Options" buttons {"Cancel", "Update", "Uninstall"} default button "Update" with title "AIPrivateSearch Manager" with icon note)
+            end tell
+            return choice
+APPLESCRIPT
+            )
+            case "\$UPDATE_CHOICE" in
+                "Update")
+                    echo "Update selected - not implemented yet"
+                    osascript -e 'display dialog "Update feature coming soon!" buttons {"OK"}'
+                    exit 0
+                    ;;
+                "Uninstall")
+                    echo "Uninstall selected - not implemented yet"
+                    osascript -e 'display dialog "Uninstall feature coming soon!" buttons {"OK"}'
+                    exit 0
+                    ;;
+                *)
+                    echo "Cancelled"
+                    exit 0
+                    ;;
+            esac
             ;;
-        "Start Servers")
-            echo "Start Servers selected - not implemented yet"
-            osascript -e 'display dialog "Start Servers feature coming soon!" buttons {"OK"}'
-            exit 0
-            ;;
-        "Open Browser")
-            echo "Open Browser selected - not implemented yet"
-            osascript -e 'display dialog "Open Browser feature coming soon!" buttons {"OK"}'
-            exit 0
-            ;;
-        "Uninstall")
-            echo "Uninstall selected - not implemented yet"
-            osascript -e 'display dialog "Uninstall feature coming soon!" buttons {"OK"}'
+        "Start App")
+            echo "Start App selected - not implemented yet"
+            osascript -e 'display dialog "Start App feature coming soon!" buttons {"OK"}'
             exit 0
             ;;
         *)
@@ -939,8 +951,15 @@ if [ -f "uninstall-aiprivatesearch.sh" ]; then
 fi
 
 # Create placeholder icon
-echo "🎨 Creating placeholder icon..."
-touch "$APP_DIR/Contents/Resources/AppIcon.icns"
+echo "🎨 Creating app icon..."
+ICON_SOURCE="../client/c01_client-marketing/assets/AppIcon.icns"
+if [ -f "$ICON_SOURCE" ]; then
+    cp "$ICON_SOURCE" "$APP_DIR/Contents/Resources/AppIcon.icns"
+    echo "✓ Sherlock icon added"
+else
+    touch "$APP_DIR/Contents/Resources/AppIcon.icns"
+    echo "⚠️  Icon not found, using placeholder"
+fi
 
 echo ""
 echo "✅ App bundle created successfully!"
