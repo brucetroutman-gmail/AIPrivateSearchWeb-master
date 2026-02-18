@@ -80,6 +80,7 @@ cat > "$APP_DIR/Contents/MacOS/$APP_NAME" << LAUNCHER_EOF
 APP_SUPPORT="/Users/Shared/AIPrivateSearch"
 LOG_FILE="\$APP_SUPPORT/logs/install.log"
 INSTALLER_VERSION="$NEW_VERSION"
+UPDATE_MODE="false"
 
 # Check if already installed and show appropriate menu
 if [ -d "\$APP_SUPPORT/repo/aiprivatesearch" ]; then
@@ -106,9 +107,10 @@ APPLESCRIPT
             )
             case "\$UPDATE_CHOICE" in
                 "Update")
-                    echo "Update selected - not implemented yet"
-                    osascript -e 'display dialog "Update feature coming soon!" buttons {"OK"}'
-                    exit 0
+                    echo "Update selected - starting update process"
+                    # Set flag to skip user data operations
+                    UPDATE_MODE="true"
+                    # Fall through to installation logic
                     ;;
                 "Uninstall")
                     echo "Uninstall selected - not implemented yet"
@@ -120,17 +122,8 @@ APPLESCRIPT
                     exit 0
                     ;;
             esac
+            # Continue to installation below
             ;;
-        "Start App")
-            echo "Start App selected - not implemented yet"
-            osascript -e 'display dialog "Start App feature coming soon!" buttons {"OK"}'
-            exit 0
-            ;;
-        *)
-            echo "Cancelled"
-            exit 0
-            ;;
-    esac
 else
     # Not installed - show install menu
     CHOICE=\$(osascript <<-APPLESCRIPT 2>/dev/null
@@ -722,8 +715,9 @@ fi
     fi
 
 # Create .env-aips file
-echo "📝 Creating .env-aips configuration..."
-cat > "\$APP_SUPPORT/.env-aips" << 'ENVEOF'
+if [ "\$UPDATE_MODE" != "true" ]; then
+    echo "📝 Creating .env-aips configuration..."
+    cat > "\$APP_SUPPORT/.env-aips" << 'ENVEOF'
 # AI Private Search Application Environment Variables
 
 # API Keys
@@ -742,37 +736,53 @@ DB_DATABASE=iodd2
 DB_USERNAME=iodd-api
 DB_PASSWORD=IODD@Api
 ENVEOF
-echo "✅ .env-aips created"
+    echo "✅ .env-aips created"
+else
+    echo "⏭️  Skipping .env-aips (preserving existing)"
+fi
 
 # Copy config files
-if [ ! -f "\$APP_SUPPORT/config/app.json" ]; then
+if [ "\$UPDATE_MODE" != "true" ] && [ ! -f "\$APP_SUPPORT/config/app.json" ]; then
     if [ -f "\$APP_SUPPORT/repo/aiprivatesearch/client/c01_client-first-app/config/app.json" ]; then
         echo "📁 Copying config files..."
         cp -r "\$APP_SUPPORT/repo/aiprivatesearch/client/c01_client-first-app/config/"* "\$APP_SUPPORT/config/"
         echo "✅ Config files copied"
     fi
+else
+    echo "⏭️  Skipping config files (preserving existing)"
 fi
 
 # Copy data files
-if [ ! -f "\$APP_SUPPORT/data/users.json" ]; then
+if [ "\$UPDATE_MODE" != "true" ] && [ ! -f "\$APP_SUPPORT/data/users.json" ]; then
     if [ -f "\$APP_SUPPORT/repo/aiprivatesearch/data/users.json" ]; then
         echo "📁 Copying data files..."
         cp "\$APP_SUPPORT/repo/aiprivatesearch/data/"*.json "\$APP_SUPPORT/data/"
         echo "✅ Data files copied"
     fi
+else
+    echo "⏭️  Skipping data files (preserving existing)"
 fi
 
 # Copy sample documents
-if [ ! -d "\$APP_SUPPORT/sources/local-documents" ]; then
+if [ "\$UPDATE_MODE" != "true" ] && [ ! -d "\$APP_SUPPORT/sources/local-documents" ]; then
     if [ -d "\$APP_SUPPORT/repo/aiprivatesearch/sources/local-documents" ]; then
         echo "📁 Copying sample documents..."
         cp -r "\$APP_SUPPORT/repo/aiprivatesearch/sources/local-documents" "\$APP_SUPPORT/sources/"
         echo "✅ Sample documents copied"
     fi
+else
+    echo "⏭️  Skipping sample documents (preserving existing)"
 fi
 
 echo "✅ Step 5 completed!"
-show_progress "✓ Repository downloaded\n✓ Config files copied\n✓ Data files copied\nInstalling dependencies..."
+echo "[TEST] UPDATE_MODE value is: \$UPDATE_MODE"
+if [ "\$UPDATE_MODE" = "true" ]; then
+    echo "[TEST] Showing TRUE dialog"
+    osascript -e 'display dialog "Config files preserved\nData files preserved" with title "UPDATE_MODE=TRUE" buttons {"Continue"} default button "Continue"' || true
+else
+    echo "[TEST] Showing EMPTY dialog"
+    osascript -e 'display dialog "Config files copied\nData files copied" with title "UPDATE_MODE=EMPTY" buttons {"Continue"} default button "Continue"' || true
+fi
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  📦 Step 6: Dependency Installation"
@@ -932,7 +942,7 @@ if [ -f "$APP_SUPPORT/start-user-app.sh" ]; then
 fi
 
 show_dialog "Installation Complete" \\
-    "AIPrivateSearch installed successfully!
+    "AIPrivateSearch \$([ "\$UPDATE_MODE" = "true" ] && echo "updated" || echo "installed") successfully!
 
 Log: \$LOG_FILE
 

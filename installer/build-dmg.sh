@@ -112,7 +112,7 @@ echo "Attempting to mount: $DMG_NAME-temp.dmg"
 MOUNT_OUTPUT=$(hdiutil attach -readwrite -noverify -noautoopen "$DMG_NAME-temp.dmg" 2>&1)
 echo "Mount output: $MOUNT_OUTPUT"
 
-MOUNT_DIR=$(echo "$MOUNT_OUTPUT" | grep "/Volumes" | awk '{print $3}' | head -1)
+MOUNT_DIR=$(echo "$MOUNT_OUTPUT" | grep "/Volumes" | sed 's/.*\(\/Volumes\/[^ ]*\).*/\1/' | head -1)
 echo "Detected mount directory: '$MOUNT_DIR'"
 
 if [ -z "$MOUNT_DIR" ]; then
