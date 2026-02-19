@@ -8,6 +8,19 @@ set -e
 echo "💿 Building AIPrivateSearch DMG"
 echo "================================"
 
+# Force unmount any existing AIPrivateSearch volumes
+echo "🔓 Checking for mounted volumes..."
+if hdiutil info | grep -q "/Volumes/AIPrivateSearch"; then
+    echo "⚠️  AIPrivateSearch volume is mounted, unmounting..."
+    hdiutil info | grep "/Volumes/AIPrivateSearch" | awk '{print $1}' | while read disk; do
+        hdiutil detach "$disk" -force 2>/dev/null || true
+    done
+    sleep 2
+    echo "✓ Volume unmounted"
+else
+    echo "✓ No volumes to unmount"
+fi
+
 APP_NAME="AIPrivateSearch"
 VERSION="1.0.0"
 DMG_NAME="AIPrivateSearch"
@@ -144,10 +157,15 @@ echo "Mounted at: $MOUNT_DIR"
 # Set custom volume icon
 echo "🎨 Setting DMG volume icon..."
 if [ -f "../client/c01_client-marketing/assets/AppIcon.icns" ]; then
-    cp "../client/c01_client-marketing/assets/AppIcon.icns" "$MOUNT_DIR/.VolumeIcon.icns"
-    SetFile -c icnC "$MOUNT_DIR/.VolumeIcon.icns" 2>/dev/null || true
-    SetFile -a C "$MOUNT_DIR" 2>/dev/null || true
-    echo "✓ Volume icon set"
+    if cp "../client/c01_client-marketing/assets/AppIcon.icns" "$MOUNT_DIR/.VolumeIcon.icns" 2>/dev/null; then
+        SetFile -c icnC "$MOUNT_DIR/.VolumeIcon.icns" 2>/dev/null || true
+        SetFile -a C "$MOUNT_DIR" 2>/dev/null || true
+        echo "✓ Volume icon set"
+    else
+        echo "❌ ERROR: Failed to copy volume icon to $MOUNT_DIR/.VolumeIcon.icns"
+        echo "   Reason: Volume is read-only or permission denied"
+        echo "   This is non-critical, continuing build..."
+    fi
 fi
 
 # Hide Resources folder and README
@@ -200,11 +218,26 @@ fi
 
 # Convert to compressed, read-only DMG
 echo "🗜️  Compressing DMG..."
-hdiutil convert \
+if hdiutil convert \
     "$DMG_NAME-temp.dmg" \
     -format UDZO \
     -imagekey zlib-level=9 \
-    -o "$DMG_NAME.dmg"
+    -o "$DMG_NAME.dmg" 2>&1; then
+    echo "✓ DMG compressed successfully"
+else
+    echo "❌ ERROR: Failed to compress DMG"
+    echo "   Reason: Resource temporarily unavailable (volume may still be mounted)"
+    echo "   Attempting to force unmount and retry..."
+    hdiutil detach /Volumes/AIPrivateSearch -force 2>/dev/null || true
+    sleep 2
+    if hdiutil convert "$DMG_NAME-temp.dmg" -format UDZO -imagekey zlib-level=9 -o "$DMG_NAME.dmg" 2>&1; then
+        echo "✓ DMG compressed successfully on retry"
+    else
+        echo "❌ ERROR: DMG compression failed after retry"
+        echo "   Manual fix: Run 'hdiutil detach /Volumes/AIPrivateSearch -force' then rebuild"
+        exit 1
+    fi
+fi
 
 # Clean up
 echo "🧹 Cleaning up..."

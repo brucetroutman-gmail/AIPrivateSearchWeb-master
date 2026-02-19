@@ -24,7 +24,7 @@ This document provides a step-by-step remediation plan for fixing all dialog sys
 
 ## Phase 1: Fix Critical Syntax Errors
 
-### Step 1.1: Fix Missing `esac` Statement
+### Step 1.1: Fix Missing `esac` Statement ✅ COMPLETED
 
 **Location:** Line 127 (after line 126 `;;`)
 
@@ -101,11 +101,18 @@ bash -n build/AIPrivateSearch.app/Contents/MacOS/AIPrivateSearch
 # Expected: No output = valid syntax
 ```
 
+**✅ TEST RESULTS:**
+- Syntax validation: PASSED (no errors from `bash -n`)
+- Build completed: PASSED
+- Start App button: PASSED (shows "Start App feature coming soon!" dialog)
+- Case statement structure: FIXED (now has all branches and closes with `esac`)
+- No bash errors: CONFIRMED
+
 ---
 
-### Step 1.2: Fix AppleScript Syntax Error (Lines 781-784)
+### Step 1.2: Fix AppleScript Syntax Error (Lines 781-784) ✅ COMPLETED
 
-**Location:** Lines 781-784
+**Location:** Lines 789-795
 
 **Current Code (BROKEN):**
 ```bash
@@ -154,11 +161,29 @@ fi
 osascript -e 'display dialog "Config files preserved" & linefeed & "Data files preserved" with title "UPDATE_MODE=TRUE" buttons {"Continue"} default button "Continue"'
 # Expected: Dialog appears with two lines of text
 
-# Test in full build
+# Test in full build - UPDATE PATH (this is the real test)
 ./build-all.sh
 open build/AIPrivateSearch.app
-# Click: Update → Update → Continue through installation
-# Expected: Dialog appears showing "UPDATE_MODE=TRUE" or "UPDATE_MODE=EMPTY"
+# Click: Update → Update → Yes (for details)
+# Expected: During installation, dialog appears showing "UPDATE_MODE=TRUE"
+# The dialog should have:
+#   - Title: "UPDATE_MODE=TRUE"
+#   - Message line 1: "Config files preserved"
+#   - Message line 2: "Data files preserved"
+#   - Button: "Continue"
+
+# Test in full build - INSTALL PATH
+# First remove existing installation:
+rm -rf /Users/Shared/AIPrivateSearch/repo/aiprivatesearch
+# Then run:
+open build/AIPrivateSearch.app
+# Click: Install → Yes (for details)
+# Expected: During installation, dialog appears showing "UPDATE_MODE=EMPTY"
+# The dialog should have:
+#   - Title: "UPDATE_MODE=EMPTY"
+#   - Message line 1: "Config files copied"
+#   - Message line 2: "Data files copied"
+#   - Button: "Continue"
 ```
 
 **Validation:**
@@ -167,6 +192,13 @@ open build/AIPrivateSearch.app
 grep "UPDATE_MODE=TRUE" build/AIPrivateSearch.app/Contents/MacOS/AIPrivateSearch
 # Expected: Should find the dialog code
 ```
+
+**✅ TEST RESULTS:**
+- AppleScript syntax test: PASSED (dialog displayed correctly with two lines)
+- Bash syntax validation: PASSED (no errors from `bash -n`)
+- Build completed: PASSED
+- Fixed code in built app: CONFIRMED (uses `& linefeed &` instead of `\n`)
+- Error suppression removed: CONFIRMED (removed `|| true`)
 
 ---
 

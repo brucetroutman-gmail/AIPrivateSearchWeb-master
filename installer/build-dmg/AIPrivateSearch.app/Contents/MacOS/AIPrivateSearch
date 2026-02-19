@@ -3,7 +3,7 @@
 # AIPrivateSearch Improved Installer
 APP_SUPPORT="/Users/Shared/AIPrivateSearch"
 LOG_FILE="$APP_SUPPORT/logs/install.log"
-INSTALLER_VERSION="7.1"
+INSTALLER_VERSION="8.5"
 UPDATE_MODE="false"
 
 # Check if already installed and show appropriate menu
@@ -48,6 +48,16 @@ APPLESCRIPT
             esac
             # Continue to installation below
             ;;
+        "Start App")
+            echo "Start App selected - not implemented yet"
+            osascript -e 'display dialog "Start App feature coming soon!" buttons {"OK"} with icon note'
+            exit 0
+            ;;
+        *)
+            echo "Cancelled"
+            exit 0
+            ;;
+    esac
 else
     # Not installed - show install menu
     CHOICE=$(osascript <<-APPLESCRIPT 2>/dev/null
@@ -190,7 +200,7 @@ This password is only used during installation and not stored." \
         if [ -n "$ADMIN_PASSWORD" ]; then
             echo "✅ Administrator password provided"
             # Test password validity
-            TEMP_TEST_FILE="/tmp/aips_test_74639"
+            TEMP_TEST_FILE="/tmp/aips_test_51360"
             echo "$ADMIN_PASSWORD" > "$TEMP_TEST_FILE"
             if sudo -S -v < "$TEMP_TEST_FILE" 2>/dev/null; then
                 rm -f "$TEMP_TEST_FILE"
@@ -416,20 +426,20 @@ else
             # Create expect script to handle password prompt
             cat > /tmp/ollama_expect.sh << 'EXPECT_EOF'
 #!/bin/bash
-TEMP_PASS_FILE="/tmp/aips_pass_74639"
+TEMP_PASS_FILE="/tmp/aips_pass_51360"
 echo "" > ""
 
 # Run installer with password file
 export SUDO_ASKPASS=/tmp/aips_askpass.sh
 echo '#!/bin/bash' > /tmp/aips_askpass.sh
-echo 'cat /tmp/aips_pass_74639' >> /tmp/aips_askpass.sh
+echo 'cat /tmp/aips_pass_51360' >> /tmp/aips_askpass.sh
 chmod +x /tmp/aips_askpass.sh
 
 # Run installer with SUDO_ASKPASS
 /tmp/ollama_install.sh
 
 # Cleanup
-rm -f /tmp/aips_pass_74639 /tmp/aips_askpass.sh
+rm -f /tmp/aips_pass_51360 /tmp/aips_askpass.sh
 EXPECT_EOF
             
             chmod +x /tmp/ollama_expect.sh
@@ -699,14 +709,13 @@ else
 fi
 
 echo "✅ Step 5 completed!"
-echo "[TEST] UPDATE_MODE value is: $UPDATE_MODE"
+
 if [ "$UPDATE_MODE" = "true" ]; then
-    echo "[TEST] Showing TRUE dialog"
-    osascript -e 'display dialog "Config files preserved\nData files preserved" with title "UPDATE_MODE=TRUE" buttons {"Continue"} default button "Continue"' || true
+    show_progress "✓ Repository downloaded\n✓ Config files preserved\n✓ Data files preserved\nInstalling dependencies..."
 else
-    echo "[TEST] Showing EMPTY dialog"
-    osascript -e 'display dialog "Config files copied\nData files copied" with title "UPDATE_MODE=EMPTY" buttons {"Continue"} default button "Continue"' || true
+    show_progress "✓ Repository downloaded\n✓ Config files copied\n✓ Data files copied\nInstalling dependencies..."
 fi
+
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  📦 Step 6: Dependency Installation"

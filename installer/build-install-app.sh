@@ -124,6 +124,16 @@ APPLESCRIPT
             esac
             # Continue to installation below
             ;;
+        "Start App")
+            echo "Start App selected - not implemented yet"
+            osascript -e 'display dialog "Start App feature coming soon!" buttons {"OK"} with icon note'
+            exit 0
+            ;;
+        *)
+            echo "Cancelled"
+            exit 0
+            ;;
+    esac
 else
     # Not installed - show install menu
     CHOICE=\$(osascript <<-APPLESCRIPT 2>/dev/null
@@ -775,14 +785,13 @@ else
 fi
 
 echo "✅ Step 5 completed!"
-echo "[TEST] UPDATE_MODE value is: \$UPDATE_MODE"
+
 if [ "\$UPDATE_MODE" = "true" ]; then
-    echo "[TEST] Showing TRUE dialog"
-    osascript -e 'display dialog "Config files preserved\nData files preserved" with title "UPDATE_MODE=TRUE" buttons {"Continue"} default button "Continue"' || true
+    show_progress "✓ Repository downloaded\n✓ Config files preserved\n✓ Data files preserved\nInstalling dependencies..."
 else
-    echo "[TEST] Showing EMPTY dialog"
-    osascript -e 'display dialog "Config files copied\nData files copied" with title "UPDATE_MODE=EMPTY" buttons {"Continue"} default button "Continue"' || true
+    show_progress "✓ Repository downloaded\n✓ Config files copied\n✓ Data files copied\nInstalling dependencies..."
 fi
+
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  📦 Step 6: Dependency Installation"
