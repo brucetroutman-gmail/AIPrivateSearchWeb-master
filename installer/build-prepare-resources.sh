@@ -42,17 +42,28 @@ else
     exit 1
 fi
 
-# Download Ollama
+# Copy Ollama binary from installer folder
 echo ""
-echo "📥 Downloading Ollama..."
-OLLAMA_URL="https://ollama.com/download/ollama-darwin"
-echo "🌐 URL: $OLLAMA_URL"
-
-if curl -L -o "$RESOURCES_DIR/ollama" "$OLLAMA_URL"; then
+echo "📥 Copying Ollama binary..."
+if [ -f "./ollama-binary" ]; then
+    cp "./ollama-binary" "$RESOURCES_DIR/ollama"
     chmod +x "$RESOURCES_DIR/ollama"
-    echo "✅ Ollama downloaded"
+    echo "✅ Ollama binary copied from installer folder"
 else
-    echo "❌ Failed to download Ollama"
+    echo "❌ ollama-binary not found in installer folder"
+    echo "❌ Run: cp /Applications/Ollama.app/Contents/Resources/ollama ./ollama-binary"
+    exit 1
+fi
+
+# Copy start-app.sh
+echo ""
+echo "📥 Copying start-app.sh..."
+if [ -f "./start-app.sh" ]; then
+    cp "./start-app.sh" "$RESOURCES_DIR/start-app.sh"
+    chmod +x "$RESOURCES_DIR/start-app.sh"
+    echo "✅ start-app.sh copied"
+else
+    echo "❌ start-app.sh not found in installer folder"
     exit 1
 fi
 
