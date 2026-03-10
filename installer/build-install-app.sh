@@ -917,9 +917,9 @@ echo "📝 Available models:"
 echo "✅ AI models downloaded!"
 
 # Launch start app BEFORE showing completion dialog
-if [ -f "$APP_SUPPORT/start-app.sh" ]; then
+if [ -f "\$APP_SUPPORT/start-app.sh" ]; then
     echo "🚀 Launching AIPrivateSearch servers..."
-    nohup "$APP_SUPPORT/start-app.sh" > "$APP_SUPPORT/logs/app-startup.log" 2>&1 &
+    nohup "\$APP_SUPPORT/start-app.sh" > "\$APP_SUPPORT/logs/app-startup.log" 2>&1 &
     sleep 3
     echo "✅ Servers launched in background"
 fi

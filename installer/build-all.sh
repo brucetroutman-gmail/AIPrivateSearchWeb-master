@@ -16,6 +16,7 @@ echo "============================================="
 # Clean all builds
 echo "🧹 Cleaning all previous builds..."
 rm -rf ./build
+rm -rf ./build-dmg
 rm -f AIPrivateSearch.dmg AIPrivateSearch-temp.dmg
 
 # Build install app

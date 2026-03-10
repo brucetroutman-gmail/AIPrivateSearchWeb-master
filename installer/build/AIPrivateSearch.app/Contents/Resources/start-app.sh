@@ -27,14 +27,17 @@ if [ -z "$FRONTEND_PORT" ] || [ -z "$BACKEND_PORT" ]; then
 fi
 
 # Kill any existing AIPrivateSearch server processes to free up ports
+echo "🗑️ Stopping any existing servers..."
 # Kill processes by port to ensure clean shutdown
 lsof -ti :$BACKEND_PORT | xargs kill -9 2>/dev/null || true
 lsof -ti :$FRONTEND_PORT | xargs kill -9 2>/dev/null || true
-# Kill only AIPrivateSearch specific processes (avoid killing custmgr)
-pkill -f "npx serve" 2>/dev/null || true
-sleep 2
-pkill -f "npx serve" 2>/dev/null || true
-sleep 1
+# Kill all AIPrivateSearch node processes
+pkill -9 -f "server.mjs" 2>/dev/null || true
+pkill -9 -f "npx serve" 2>/dev/null || true
+pkill -9 -f "npm start" 2>/dev/null || true
+# Wait for processes to fully terminate
+sleep 5
+echo "✅ Existing servers stopped"
 
 # Ensure Ollama service is running
 echo "🔍 Checking Ollama service..."
@@ -180,10 +183,6 @@ echo "✅ Backend server started"
 
 # Start frontend client
 cd ../../client/c01_client-first-app
-
-# Kill any existing serve processes
-pkill -f "npx serve" 2>/dev/null || true
-sleep 1
 
 # Start frontend with the working command
 echo "🔧 Starting frontend server..."

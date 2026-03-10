@@ -3,7 +3,7 @@
 # AIPrivateSearch Improved Installer
 APP_SUPPORT="/Users/Shared/AIPrivateSearch"
 LOG_FILE="$APP_SUPPORT/logs/install.log"
-INSTALLER_VERSION="11.1"
+INSTALLER_VERSION="11.8"
 UPDATE_MODE="false"
 
 # Check if already installed and show appropriate menu
@@ -82,7 +82,7 @@ APPLESCRIPT
                         exec 1> >(tee -a "")
                         exec 2>&1
                         
-                        echo "=== AIPrivateSearch Uninstall Starting at Mon Mar  9 12:35:21 EDT 2026 ==="
+                        echo "=== AIPrivateSearch Uninstall Starting at Tue Mar 10 12:22:19 EDT 2026 ==="
                         
                         # Stop processes
                         echo "Stopping processes..."
@@ -109,7 +109,7 @@ APPLESCRIPT
                             echo "✅ Cleaned ~/.bash_profile"
                         fi
                         
-                        echo "=== Uninstall Complete at Mon Mar  9 12:35:21 EDT 2026 ==="
+                        echo "=== Uninstall Complete at Tue Mar 10 12:22:19 EDT 2026 ==="
                         
                         osascript -e 'display dialog "AIPrivateSearch has been uninstalled successfully.\n\nRestart Terminal to complete the process." buttons {"OK"} with icon note'
                         echo "Uninstall complete"
@@ -307,7 +307,7 @@ This password is only used during installation and not stored." \
         if [ -n "$ADMIN_PASSWORD" ]; then
             echo "✅ Administrator password provided"
             # Test password validity
-            TEMP_TEST_FILE="/tmp/aips_test_24202"
+            TEMP_TEST_FILE="/tmp/aips_test_57867"
             echo "$ADMIN_PASSWORD" > "$TEMP_TEST_FILE"
             if sudo -S -v < "$TEMP_TEST_FILE" 2>/dev/null; then
                 rm -f "$TEMP_TEST_FILE"
@@ -839,20 +839,21 @@ echo "📝 Available models:"
 "$OLLAMA_CMD" list
 
 echo "✅ AI models downloaded!"
-show_progress "✓ Installation Complete!\n\nAll components installed:\n• Node.js\n• Ollama\n• Repository\n• Dependencies\n• AI models\n\nLaunching servers..."
 
-# Launch start app
-if [ -f "/start-app.sh" ]; then
+# Launch start app BEFORE showing completion dialog
+if [ -f "$APP_SUPPORT/start-app.sh" ]; then
     echo "🚀 Launching AIPrivateSearch servers..."
-    "/start-app.sh" &
-    sleep 2
-    echo "✅ Servers launched"
+    nohup "$APP_SUPPORT/start-app.sh" > "$APP_SUPPORT/logs/app-startup.log" 2>&1 &
+    sleep 3
+    echo "✅ Servers launched in background"
 fi
+
+show_progress "✓ Installation Complete!\n\nAll components installed:\n• Node.js\n• Ollama\n• Repository\n• Dependencies\n• AI models\n\nServers starting..."
 
 show_dialog "Installation Complete" \
     "AIPrivateSearch $([ "$UPDATE_MODE" = "true" ] && echo "updated" || echo "installed") successfully!
 
 Log: $LOG_FILE
 
-Servers are starting now..." \
+Servers are starting in background..." \
     "note"
