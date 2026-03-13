@@ -3,7 +3,7 @@
 # AIPrivateSearch Improved Installer
 APP_SUPPORT="/Users/Shared/AIPrivateSearch"
 LOG_FILE="$APP_SUPPORT/logs/install.log"
-INSTALLER_VERSION="11.8"
+INSTALLER_VERSION="11.9"
 UPDATE_MODE="false"
 
 # Check if already installed and show appropriate menu
@@ -82,7 +82,7 @@ APPLESCRIPT
                         exec 1> >(tee -a "")
                         exec 2>&1
                         
-                        echo "=== AIPrivateSearch Uninstall Starting at Tue Mar 10 12:22:19 EDT 2026 ==="
+                        echo "=== AIPrivateSearch Uninstall Starting at Fri Mar 13 10:49:04 EDT 2026 ==="
                         
                         # Stop processes
                         echo "Stopping processes..."
@@ -109,7 +109,7 @@ APPLESCRIPT
                             echo "✅ Cleaned ~/.bash_profile"
                         fi
                         
-                        echo "=== Uninstall Complete at Tue Mar 10 12:22:19 EDT 2026 ==="
+                        echo "=== Uninstall Complete at Fri Mar 13 10:49:04 EDT 2026 ==="
                         
                         osascript -e 'display dialog "AIPrivateSearch has been uninstalled successfully.\n\nRestart Terminal to complete the process." buttons {"OK"} with icon note'
                         echo "Uninstall complete"
@@ -307,7 +307,7 @@ This password is only used during installation and not stored." \
         if [ -n "$ADMIN_PASSWORD" ]; then
             echo "✅ Administrator password provided"
             # Test password validity
-            TEMP_TEST_FILE="/tmp/aips_test_57867"
+            TEMP_TEST_FILE="/tmp/aips_test_50878"
             echo "$ADMIN_PASSWORD" > "$TEMP_TEST_FILE"
             if sudo -S -v < "$TEMP_TEST_FILE" 2>/dev/null; then
                 rm -f "$TEMP_TEST_FILE"
@@ -674,25 +674,43 @@ else
     echo "⏭️  Skipping sample documents (preserving existing)"
 fi
 
-# Copy start-app.sh to shared location
+# Copy start-app.sh to shared location (CRITICAL - always required)
 echo "📋 Copying start-app.sh to shared location..."
 echo "🔍 Debug: DMG_RESOURCES='$DMG_RESOURCES'"
 echo "🔍 Debug: Checking $DMG_RESOURCES/start-app.sh"
+
+START_APP_COPIED=false
+
 if [ -n "$DMG_RESOURCES" ] && [ -f "$DMG_RESOURCES/start-app.sh" ]; then
     echo "📦 Found start-app.sh in bundle"
     cp "$DMG_RESOURCES/start-app.sh" "$APP_SUPPORT/start-app.sh"
     chmod +x "$APP_SUPPORT/start-app.sh"
     echo "✅ start-app.sh copied from bundle"
+    START_APP_COPIED=true
 elif [ -f "$APP_SUPPORT/repo/aiprivatesearch/installer/start-app.sh" ]; then
     echo "📦 Found start-app.sh in repo"
     cp "$APP_SUPPORT/repo/aiprivatesearch/installer/start-app.sh" "$APP_SUPPORT/start-app.sh"
     chmod +x "$APP_SUPPORT/start-app.sh"
     echo "✅ start-app.sh copied from repo"
+    START_APP_COPIED=true
 else
-    echo "⚠️  start-app.sh not found in bundle or repo"
+    echo "❌ CRITICAL ERROR: start-app.sh not found!"
     echo "🔍 Debug: ls $DMG_RESOURCES/"
     ls -la "$DMG_RESOURCES/" 2>&1 || echo "Directory not accessible"
+    echo "🔍 Debug: ls $APP_SUPPORT/repo/aiprivatesearch/installer/"
+    ls -la "$APP_SUPPORT/repo/aiprivatesearch/installer/" 2>&1 || echo "Directory not accessible"
 fi
+
+# Verify start-app.sh was copied successfully
+if [ "$START_APP_COPIED" = "false" ] || [ ! -f "$APP_SUPPORT/start-app.sh" ]; then
+    echo "❌ CRITICAL ERROR: start-app.sh installation failed"
+    show_dialog "Installation Failed" \
+        "start-app.sh could not be installed!\n\nThis file is required to launch AIPrivateSearch.\n\nPlease check the log:\n$LOG_FILE" \
+        "stop"
+    exit 1
+fi
+
+echo "✅ start-app.sh verified at $APP_SUPPORT/start-app.sh"
 
 echo "✅ Step 4 completed!"
 

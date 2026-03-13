@@ -750,25 +750,43 @@ else
     echo "⏭️  Skipping sample documents (preserving existing)"
 fi
 
-# Copy start-app.sh to shared location
+# Copy start-app.sh to shared location (CRITICAL - always required)
 echo "📋 Copying start-app.sh to shared location..."
 echo "🔍 Debug: DMG_RESOURCES='\$DMG_RESOURCES'"
 echo "🔍 Debug: Checking \$DMG_RESOURCES/start-app.sh"
+
+START_APP_COPIED=false
+
 if [ -n "\$DMG_RESOURCES" ] && [ -f "\$DMG_RESOURCES/start-app.sh" ]; then
     echo "📦 Found start-app.sh in bundle"
     cp "\$DMG_RESOURCES/start-app.sh" "\$APP_SUPPORT/start-app.sh"
     chmod +x "\$APP_SUPPORT/start-app.sh"
     echo "✅ start-app.sh copied from bundle"
+    START_APP_COPIED=true
 elif [ -f "\$APP_SUPPORT/repo/aiprivatesearch/installer/start-app.sh" ]; then
     echo "📦 Found start-app.sh in repo"
     cp "\$APP_SUPPORT/repo/aiprivatesearch/installer/start-app.sh" "\$APP_SUPPORT/start-app.sh"
     chmod +x "\$APP_SUPPORT/start-app.sh"
     echo "✅ start-app.sh copied from repo"
+    START_APP_COPIED=true
 else
-    echo "⚠️  start-app.sh not found in bundle or repo"
+    echo "❌ CRITICAL ERROR: start-app.sh not found!"
     echo "🔍 Debug: ls \$DMG_RESOURCES/"
     ls -la "\$DMG_RESOURCES/" 2>&1 || echo "Directory not accessible"
+    echo "🔍 Debug: ls \$APP_SUPPORT/repo/aiprivatesearch/installer/"
+    ls -la "\$APP_SUPPORT/repo/aiprivatesearch/installer/" 2>&1 || echo "Directory not accessible"
 fi
+
+# Verify start-app.sh was copied successfully
+if [ "\$START_APP_COPIED" = "false" ] || [ ! -f "\$APP_SUPPORT/start-app.sh" ]; then
+    echo "❌ CRITICAL ERROR: start-app.sh installation failed"
+    show_dialog "Installation Failed" \\
+        "start-app.sh could not be installed!\n\nThis file is required to launch AIPrivateSearch.\n\nPlease check the log:\n\$LOG_FILE" \\
+        "stop"
+    exit 1
+fi
+
+echo "✅ start-app.sh verified at \$APP_SUPPORT/start-app.sh"
 
 echo "✅ Step 4 completed!"
 
