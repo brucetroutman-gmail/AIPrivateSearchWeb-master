@@ -15,17 +15,11 @@ echo "🧹 Cleaning resources directory..."
 rm -rf "$RESOURCES_DIR"
 mkdir -p "$RESOURCES_DIR"
 
-# Detect architecture
-ARCH=$(uname -m)
-if [ "$ARCH" = "arm64" ]; then
-    NODE_ARCH="arm64"
-    OLLAMA_ARCH="arm64"
-else
-    NODE_ARCH="x64"
-    OLLAMA_ARCH="amd64"
-fi
+# Default to arm64 (Apple Silicon) for new Macs
+NODE_ARCH="arm64"
+OLLAMA_ARCH="arm64"
 
-echo "🖥️  Architecture: $ARCH"
+echo "🖥️  Architecture: arm64 (Apple Silicon default)"
 
 # Download Node.js
 echo ""

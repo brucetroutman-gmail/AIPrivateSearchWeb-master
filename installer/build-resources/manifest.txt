@@ -1,6 +1,6 @@
 AIPrivateSearch Resources
 =========================
-Architecture: x86_64
-Node.js: v20.11.0 (x64)
+Architecture: 
+Node.js: v20.11.0 (arm64)
 Ollama: darwin (universal)
-Downloaded: Fri Mar 13 12:11:13 EDT 2026
+Downloaded: Wed Mar 25 10:36:29 EDT 2026
