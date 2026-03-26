@@ -67,6 +67,11 @@ cat > "$APP_DIR/Contents/Info.plist" << 'EOF'
     <string>AIPrivateSearch needs to control Safari browser for search functionality.</string>
     <key>NSPrincipalClass</key>
     <string>NSApplication</string>
+    <key>LSArchitecturePriority</key>
+    <array>
+        <string>arm64</string>
+        <string>x86_64</string>
+    </array>
 </dict>
 </plist>
 EOF
