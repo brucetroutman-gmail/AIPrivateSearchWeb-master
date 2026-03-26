@@ -90,26 +90,12 @@ UPDATE_MODE="false"
 # Check if already installed and show appropriate menu
 if [ -d "\$APP_SUPPORT/repo/aiprivatesearch" ]; then
     # Already installed - show management menu
-    CHOICE=\$(osascript <<-APPLESCRIPT
-    tell application "System Events"
-        activate
-        set choice to button returned of (display dialog "AIPrivateSearch is already installed.\n\nWhat would you like to do?" buttons {"Cancel", "Update", "Start App"} default button "Start App" with title "AIPrivateSearch Manager" with icon note)
-    end tell
-    return choice
-APPLESCRIPT
-    )
+    CHOICE=\$(osascript -e 'display dialog "AIPrivateSearch is already installed.\n\nWhat would you like to do?" buttons {"Cancel", "Update", "Start App"} default button "Start App" with title "AIPrivateSearch Manager" with icon note' -e 'button returned of result')
     
     case "\$CHOICE" in
         "Update")
             echo "Update menu selected"
-            UPDATE_CHOICE=\$(osascript <<-APPLESCRIPT
-            tell application "System Events"
-                activate
-                set choice to button returned of (display dialog "Update Options" buttons {"Cancel", "Update", "Uninstall"} default button "Update" with title "AIPrivateSearch Manager" with icon note)
-            end tell
-            return choice
-APPLESCRIPT
-            )
+            UPDATE_CHOICE=\$(osascript -e 'display dialog "Update Options" buttons {"Cancel", "Update", "Uninstall"} default button "Update" with title "AIPrivateSearch Manager" with icon note' -e 'button returned of result')
             case "\$UPDATE_CHOICE" in
                 "Update")
                     echo "Update selected - starting update process"
@@ -121,27 +107,13 @@ APPLESCRIPT
                     echo "Uninstall selected - starting uninstall process"
                     
                     # Confirm uninstall
-                    CONFIRM=\$(osascript <<-APPLESCRIPT
-                    tell application "System Events"
-                        activate
-                        set choice to button returned of (display dialog "Are you sure you want to uninstall AIPrivateSearch?\n\nThis will remove:\n• All application files\n• Node.js\n• Ollama\n• Configuration and data\n\nThis cannot be undone." buttons {"Cancel", "Uninstall"} default button "Cancel" with title "Confirm Uninstall" with icon caution)
-                    end tell
-                    return choice
-APPLESCRIPT
-                    )
+                    CONFIRM=\$(osascript -e 'display dialog "Are you sure you want to uninstall AIPrivateSearch?\n\nThis will remove:\n• All application files\n• Node.js\n• Ollama\n• Configuration and data\n\nThis cannot be undone." buttons {"Cancel", "Uninstall"} default button "Cancel" with title "Confirm Uninstall" with icon caution' -e 'button returned of result')
                     
                     if [ "\$CONFIRM" = "Uninstall" ]; then
                         echo "Uninstall confirmed - proceeding..."
                         
                         # Ask if user wants to see details
-                        SHOW_DETAILS=\$(osascript <<-APPLESCRIPT
-                        tell application "System Events"
-                            activate
-                            display dialog "Show detailed uninstall messages in Terminal?\n\nThis will open a Terminal window showing real-time uninstall progress." buttons {"No", "Yes"} default button "Yes" with title "AIPrivateSearch Uninstaller" with icon note
-                        end tell
-                        return button returned of result
-APPLESCRIPT
-                        )
+                        SHOW_DETAILS=\$(osascript -e 'display dialog "Show detailed uninstall messages in Terminal?\n\nThis will open a Terminal window showing real-time uninstall progress." buttons {"No", "Yes"} default button "Yes" with title "AIPrivateSearch Uninstaller" with icon note' -e 'button returned of result')
                         
                         # Create uninstall log
                         UNINSTALL_LOG="\$APP_SUPPORT/logs/uninstall.log"
@@ -150,12 +122,9 @@ APPLESCRIPT
                         
                         # Open Terminal if user chose Yes
                         if [ "\$SHOW_DETAILS" = "Yes" ]; then
-                            osascript <<-APPLESCRIPT
-                                tell application "Terminal"
-                                    do script "tail -f /Users/Shared/AIPrivateSearch/logs/uninstall.log"
-                                    activate
-                                end tell
-APPLESCRIPT
+                            echo "tail -f /Users/Shared/AIPrivateSearch/logs/uninstall.log" > /tmp/aips-uninstall-log.command
+                            chmod +x /tmp/aips-uninstall-log.command
+                            open /tmp/aips-uninstall-log.command
                             sleep 1
                         fi
                         
@@ -210,14 +179,7 @@ APPLESCRIPT
             echo "Start App selected - launching servers..."
             
             # Ask if user wants to see details
-            SHOW_DETAILS=\$(osascript <<-APPLESCRIPT
-            tell application "System Events"
-                activate
-                display dialog "Show detailed startup messages in Terminal?\n\nThis will open a Terminal window showing real-time server startup." buttons {"No", "Yes"} default button "Yes" with title "AIPrivateSearch Startup" with icon note
-            end tell
-            return button returned of result
-APPLESCRIPT
-            )
+            SHOW_DETAILS=\$(osascript -e 'display dialog "Show detailed startup messages in Terminal?\n\nThis will open a Terminal window showing real-time server startup." buttons {"No", "Yes"} default button "Yes" with title "AIPrivateSearch Startup" with icon note' -e 'button returned of result')
             
             # Create startup log
             STARTUP_LOG="\$APP_SUPPORT/logs/startup.log"
@@ -226,12 +188,9 @@ APPLESCRIPT
             
             # Open Terminal if user chose Yes
             if [ "\$SHOW_DETAILS" = "Yes" ]; then
-                osascript <<-APPLESCRIPT
-                    tell application "Terminal"
-                        do script "tail -f /Users/Shared/AIPrivateSearch/logs/startup.log"
-                        activate
-                    end tell
-APPLESCRIPT
+                echo "tail -f /Users/Shared/AIPrivateSearch/logs/startup.log" > /tmp/aips-startup-log.command
+                chmod +x /tmp/aips-startup-log.command
+                open /tmp/aips-startup-log.command
                 sleep 1
             fi
             
@@ -249,14 +208,7 @@ APPLESCRIPT
     esac
 else
     # Not installed - show install menu
-    CHOICE=\$(osascript <<-APPLESCRIPT 2>/dev/null
-    tell application "System Events"
-        activate
-        set choice to button returned of (display dialog "AIPrivateSearch is not installed.\n\nWould you like to install it now?" buttons {"Cancel", "Install"} default button "Install" with title "AIPrivateSearch Installer" with icon note)
-    end tell
-    return choice
-APPLESCRIPT
-    )
+    CHOICE=\$(osascript -e 'display dialog "AIPrivateSearch is not installed.\n\nWould you like to install it now?" buttons {"Cancel", "Install"} default button "Install" with title "AIPrivateSearch Installer" with icon note' -e 'button returned of result' 2>/dev/null)
     
     if [ "\$CHOICE" != "Install" ]; then
         echo "Installation cancelled"
@@ -295,12 +247,7 @@ show_progress() {
     if [ "\$SHOW_DETAILS" = "Yes" ]; then
         local message="\$1"
         PROGRESS_LOG="\${PROGRESS_LOG}\${message}\\n\\n"
-        osascript <<-APPLESCRIPT 2>/dev/null
-            tell application "System Events"
-                activate
-                display dialog "\$PROGRESS_LOG" with title "AIPrivateSearch Installer" buttons {"Continue"} default button "Continue" with icon note
-            end tell
-APPLESCRIPT
+        osascript -e "display dialog \"\$PROGRESS_LOG\" with title \"AIPrivateSearch Installer\" buttons {\"Continue\"} default button \"Continue\" with icon note" 2>/dev/null
     fi
 }
 
@@ -311,23 +258,13 @@ mkdir -p "\$APP_SUPPORT"/{logs,data,sources,config,repo}
 touch "\$LOG_FILE"
 
 # Ask user if they want detailed messages BEFORE starting logging
-SHOW_DETAILS=\$(osascript <<-APPLESCRIPT 2>/dev/null
-    tell application "System Events"
-        activate
-        display dialog "Show detailed installation messages in Terminal?\n\nThis will open a Terminal window showing real-time installation progress." buttons {"No", "Yes"} default button "Yes" with title "AIPrivateSearch Installer" with icon note
-    end tell
-    return button returned of result
-APPLESCRIPT
-)
+SHOW_DETAILS=\$(osascript -e 'display dialog "Show detailed installation messages in Terminal?\n\nThis will open a Terminal window showing real-time installation progress." buttons {"No", "Yes"} default button "Yes" with title "AIPrivateSearch Installer" with icon note' -e 'button returned of result' 2>/dev/null)
 
 # Open Terminal immediately if user chose Yes
 if [ "\$SHOW_DETAILS" = "Yes" ]; then
-    osascript <<-APPLESCRIPT 2>/dev/null
-        tell application "Terminal"
-            do script "tail -f /Users/Shared/AIPrivateSearch/logs/install.log"
-            activate
-        end tell
-APPLESCRIPT
+    echo "tail -f /Users/Shared/AIPrivateSearch/logs/install.log" > /tmp/aips-install-log.command
+    chmod +x /tmp/aips-install-log.command
+    open /tmp/aips-install-log.command
     sleep 1
 fi
 
@@ -358,14 +295,8 @@ echo ""
 show_dialog() {
     local title="\$1"
     local message="\$2"
-    local type="\${3:-informational}"
-    
-    osascript <<-APPLESCRIPT 2>/dev/null || echo "\$message"
-        tell application "System Events"
-            activate
-            display dialog "\$message" with title "\$title" buttons {"OK"} default button "OK" with icon \$type
-        end tell
-APPLESCRIPT
+    local type="\${3:-note}"
+    osascript -e "display dialog \"\$message\" with title \"\$title\" buttons {\"OK\"} default button \"OK\" with icon \$type" 2>/dev/null || echo "\$message"
 }
 
 # Function to get admin password once and reuse
