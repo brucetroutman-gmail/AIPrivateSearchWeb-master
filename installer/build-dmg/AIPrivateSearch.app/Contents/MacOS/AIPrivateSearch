@@ -3,7 +3,7 @@
 # AIPrivateSearch Improved Installer
 APP_SUPPORT="/Users/Shared/AIPrivateSearch"
 LOG_FILE="$APP_SUPPORT/logs/install.log"
-INSTALLER_VERSION="12.3"
+INSTALLER_VERSION="12.4"
 UPDATE_MODE="false"
 
 # Check if already installed and show appropriate menu
@@ -51,7 +51,7 @@ if [ -d "$APP_SUPPORT/repo/aiprivatesearch" ]; then
                         exec 1> >(tee -a "")
                         exec 2>&1
                         
-                        echo "=== AIPrivateSearch Uninstall Starting at Thu Mar 26 11:58:12 EDT 2026 ==="
+                        echo "=== AIPrivateSearch Uninstall Starting at Thu Mar 26 12:07:45 EDT 2026 ==="
                         
                         # Stop processes
                         echo "Stopping processes..."
@@ -78,7 +78,7 @@ if [ -d "$APP_SUPPORT/repo/aiprivatesearch" ]; then
                             echo "✅ Cleaned ~/.bash_profile"
                         fi
                         
-                        echo "=== Uninstall Complete at Thu Mar 26 11:58:12 EDT 2026 ==="
+                        echo "=== Uninstall Complete at Thu Mar 26 12:07:45 EDT 2026 ==="
                         
                         osascript -e 'display dialog "AIPrivateSearch has been uninstalled successfully.\n\nRestart Terminal to complete the process." buttons {"OK"} with icon note'
                         echo "Uninstall complete"
@@ -238,7 +238,7 @@ This password is only used during installation and not stored." \
         if [ -n "$ADMIN_PASSWORD" ]; then
             echo "✅ Administrator password provided"
             # Test password validity
-            TEMP_TEST_FILE="/tmp/aips_test_50450"
+            TEMP_TEST_FILE="/tmp/aips_test_52312"
             echo "$ADMIN_PASSWORD" > "$TEMP_TEST_FILE"
             if sudo -S -v < "$TEMP_TEST_FILE" 2>/dev/null; then
                 rm -f "$TEMP_TEST_FILE"
@@ -792,9 +792,11 @@ echo "✅ AI models downloaded!"
 # Launch start app BEFORE showing completion dialog
 if [ -f "$APP_SUPPORT/start-app.sh" ]; then
     echo "🚀 Launching AIPrivateSearch servers..."
-    nohup "$APP_SUPPORT/start-app.sh" > "$APP_SUPPORT/logs/app-startup.log" 2>&1 &
+    echo "bash /Users/Shared/AIPrivateSearch/start-app.sh" > /tmp/aips-start.command
+    chmod +x /tmp/aips-start.command
+    open /tmp/aips-start.command
     sleep 3
-    echo "✅ Servers launched in background"
+    echo "✅ Servers launched in Terminal"
 fi
 
 show_progress "✓ Installation Complete!\n\nAll components installed:\n• Node.js\n• Ollama\n• Repository\n• Dependencies\n• AI models\n\nServers starting..."

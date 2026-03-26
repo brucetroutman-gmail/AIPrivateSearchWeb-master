@@ -873,9 +873,11 @@ echo "✅ AI models downloaded!"
 # Launch start app BEFORE showing completion dialog
 if [ -f "\$APP_SUPPORT/start-app.sh" ]; then
     echo "🚀 Launching AIPrivateSearch servers..."
-    nohup "\$APP_SUPPORT/start-app.sh" > "\$APP_SUPPORT/logs/app-startup.log" 2>&1 &
+    echo "bash /Users/Shared/AIPrivateSearch/start-app.sh" > /tmp/aips-start.command
+    chmod +x /tmp/aips-start.command
+    open /tmp/aips-start.command
     sleep 3
-    echo "✅ Servers launched in background"
+    echo "✅ Servers launched in Terminal"
 fi
 
 show_progress "✓ Installation Complete!\n\nAll components installed:\n• Node.js\n• Ollama\n• Repository\n• Dependencies\n• AI models\n\nServers starting..."
