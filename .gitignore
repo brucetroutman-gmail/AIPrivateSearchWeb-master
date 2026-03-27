@@ -1,0 +1,12 @@
+# Dependencies
+node_modules/
+
+# Build artifacts
+installer/build/
+installer/build-dmg/
+installer/build-resources/
+installer/AIPrivateSearch.dmg
+installer/installer-version.txt
+
+# macOS
+.DS_Store
