@@ -6,6 +6,15 @@ echo "🚀 Starting AIPrivateSearch..."
 export PATH="/Users/Shared/AIPrivateSearch/node/bin:$PATH"
 export PATH="/Users/Shared/AIPrivateSearch:$PATH"
 
+# Resolve ollama command
+if [ -f "/Applications/Ollama.app/Contents/Resources/ollama" ]; then
+    OLLAMA_CMD="/Applications/Ollama.app/Contents/Resources/ollama"
+elif [ -f "/Users/Shared/AIPrivateSearch/ollama" ]; then
+    OLLAMA_CMD="/Users/Shared/AIPrivateSearch/ollama"
+else
+    OLLAMA_CMD="ollama"
+fi
+
 # Change to repository directory
 cd /Users/Shared/AIPrivateSearch/repo/aiprivatesearch || {
     echo "❌ Repository not found at /Users/Shared/AIPrivateSearch/repo/aiprivatesearch"
@@ -44,7 +53,7 @@ echo "🔍 Checking Ollama service..."
 if ! curl -s http://localhost:11434/api/tags >/dev/null 2>&1; then
     echo "🚀 Starting Ollama service..."
     if ! pgrep -f "ollama serve" > /dev/null; then
-        ollama serve >/dev/null 2>&1 &
+        "$OLLAMA_CMD" serve >/dev/null 2>&1 &
         sleep 3
     fi
     
@@ -66,45 +75,27 @@ else
     echo "✅ Ollama is running"
 fi
 
-# Simplified and reliable model management
-echo "Checking model status..."
-
-# Function to safely pull a model with retries
-pull_model_safe() {
-    local model="$1"
-    echo "📥 Pulling $model..."
-    
-    if ollama pull "$model" >/dev/null 2>&1; then
-        echo "✅ $model ready"
-        MODELS_UPDATED=true
-        return 0
-    else
-        echo "⚠️  Failed to pull $model - you can update it later via Models page"
-        return 1
-    fi
-}
-
-# Get all models from models-list.json
-if [ -f "client/c01_client-first-app/config/models-list.json" ]; then
-    REQUIRED_MODELS=$(grep '"modelName"' client/c01_client-first-app/config/models-list.json | cut -d'"' -f4 | sort -u)
-else
-    echo "⚠️  models-list.json not found, using fallback models"
-    REQUIRED_MODELS="qwen2:0.5b gemma2:2b qwen2.5:3b"
-fi
-
-echo "🔍 Checking required models..."
-for model in $REQUIRED_MODELS; do
-    if ! ollama list 2>/dev/null | grep -q "^${model}"; then
-        pull_model_safe "$model"
-        sleep 2  # Brief pause between models
-    fi
-done
-
-# Track if we updated any models
-MODELS_UPDATED=false
-
 # Start backend server in background
 echo "🔧 Starting servers..."
+
+# Cleanup function - defined before trap
+cleanup() {
+    echo "Stopping servers..."
+    kill $BACKEND_PID $FRONTEND_PID 2>/dev/null || true
+    sleep 1
+    lsof -ti :$BACKEND_PORT | xargs kill -9 2>/dev/null || true
+    lsof -ti :$FRONTEND_PORT | xargs kill -9 2>/dev/null || true
+    pkill -f 'npx serve' 2>/dev/null || true
+    if [[ $(uname -m) == "arm64" ]]; then
+        unset HISTFILE
+        set +o history
+        exec /bin/bash --norc --noprofile -c "exit 0" < /dev/null
+    fi
+    exit 0
+}
+
+# Set trap here - AFTER the kill-existing-servers block above
+trap cleanup INT TERM EXIT
 cd server/s01_server-first-app
 
 # Check for .env-aips file in /Users/Shared/AIPrivateSearch
@@ -203,28 +194,6 @@ if [[ $(uname -m) == "arm64" ]]; then
     echo "   This is a known macOS Terminal.app issue on M1/M4 Macs."
     echo ""
 fi
-
-# Cleanup function
-cleanup() {
-    echo "Stopping servers..."
-    kill $BACKEND_PID $FRONTEND_PID 2>/dev/null || true
-    sleep 1
-    lsof -ti :$BACKEND_PORT | xargs kill -9 2>/dev/null || true
-    lsof -ti :$FRONTEND_PORT | xargs kill -9 2>/dev/null || true
-    pkill -f 'npx serve' 2>/dev/null || true
-    # Only kill AIPrivateSearch specific processes (avoid killing custmgr)
-    
-    # Disable history saving on Apple Silicon Macs to prevent terminal lockup
-    if [[ $(uname -m) == "arm64" ]]; then
-        unset HISTFILE
-        set +o history
-        exec /bin/bash --norc --noprofile -c "exit 0" < /dev/null
-    fi
-    exit 0
-}
-
-# Set trap for cleanup
-trap cleanup INT TERM EXIT
 
 # Keep both servers running
 while kill -0 $BACKEND_PID 2>/dev/null && kill -0 $FRONTEND_PID 2>/dev/null; do

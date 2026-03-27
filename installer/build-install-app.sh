@@ -790,7 +790,11 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 
 # Download AI models from model-list.json
-echo "🤖 Downloading AI models from configuration..."
+if [ "\$UPDATE_MODE" = "true" ]; then
+    echo "🔄 Refreshing AI models (pulling updates if available)..."
+else
+    echo "🤖 Downloading AI models from configuration..."
+fi
 
 # Verify Ollama is available
 if [ -f "/Applications/Ollama.app/Contents/Resources/ollama" ]; then
@@ -834,14 +838,18 @@ if [ -f "\$MODEL_LIST_FILE" ]; then
             echo "  - \$model"
         done
         
-        # Download each model
+        # Download/refresh each model
         echo "\$MODELS" | while read -r model; do
             if [ -n "\$model" ]; then
-                echo "📥 Downloading \$model..."
-                if "\$OLLAMA_CMD" pull "\$model"; then
-                    echo "✅ \$model downloaded successfully"
+                if [ "\$UPDATE_MODE" = "true" ]; then
+                    echo "🔄 Checking \$model for updates..."
                 else
-                    echo "❌ \$model download failed"
+                    echo "📥 Downloading \$model..."
+                fi
+                if "\$OLLAMA_CMD" pull "\$model"; then
+                    echo "✅ \$model ready"
+                else
+                    echo "❌ \$model failed"
                 fi
             fi
         done
