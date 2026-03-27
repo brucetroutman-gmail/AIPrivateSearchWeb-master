@@ -7,20 +7,21 @@ set -e
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
-# Step 1: Check for uncommitted changes and commit+push them first
+# Step 1: Always ask for a commit message
 echo ""
+COMMIT_MSG=$(osascript -e 'display dialog "Enter commit message:" default answer "" with title "AIPrivateSearch Build" with icon note' -e 'text returned of result' 2>/dev/null)
+if [ -z "$COMMIT_MSG" ]; then
+    echo "❌ No commit message provided - aborting"
+    exit 1
+fi
+
+# Commit and push any source changes
 echo "🔍 Checking for uncommitted source changes..."
 cd "$REPO_ROOT"
 
 if ! git diff --quiet || ! git diff --cached --quiet; then
     echo "📝 Uncommitted changes detected:"
     git status --short
-    echo ""
-    COMMIT_MSG=$(osascript -e 'display dialog "Enter commit message for source changes:" default answer "" with title "AIPrivateSearch Build" with icon note' -e 'text returned of result' 2>/dev/null)
-    if [ -z "$COMMIT_MSG" ]; then
-        echo "❌ No commit message provided - aborting"
-        exit 1
-    fi
     git add -A
     git commit -m "$COMMIT_MSG"
     git push
@@ -60,7 +61,7 @@ echo ""
 echo "📤 Committing and pushing new DMG..."
 cd "$REPO_ROOT"
 git add client/c01_client-marketing/downloads/AIPrivateSearch.dmg
-git commit -m "build: updated DMG"
+git commit -m "$COMMIT_MSG"
 git push
 echo "✅ DMG committed and pushed"
 
