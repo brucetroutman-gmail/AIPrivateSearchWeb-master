@@ -3,7 +3,7 @@
 # AIPrivateSearch Improved Installer
 APP_SUPPORT="/Users/Shared/AIPrivateSearch"
 LOG_FILE="$APP_SUPPORT/logs/install.log"
-INSTALLER_VERSION="12.5"
+INSTALLER_VERSION="12.6"
 UPDATE_MODE="false"
 
 # Check if already installed and show appropriate menu
@@ -51,7 +51,7 @@ if [ -d "$APP_SUPPORT/repo/aiprivatesearch" ]; then
                         exec 1> >(tee -a "")
                         exec 2>&1
                         
-                        echo "=== AIPrivateSearch Uninstall Starting at Fri Mar 27 10:49:24 EDT 2026 ==="
+                        echo "=== AIPrivateSearch Uninstall Starting at Fri Mar 27 10:59:28 EDT 2026 ==="
                         
                         # Stop processes
                         echo "Stopping processes..."
@@ -78,7 +78,7 @@ if [ -d "$APP_SUPPORT/repo/aiprivatesearch" ]; then
                             echo "✅ Cleaned ~/.bash_profile"
                         fi
                         
-                        echo "=== Uninstall Complete at Fri Mar 27 10:49:24 EDT 2026 ==="
+                        echo "=== Uninstall Complete at Fri Mar 27 10:59:28 EDT 2026 ==="
                         
                         osascript -e 'display dialog "AIPrivateSearch has been uninstalled successfully.\n\nRestart Terminal to complete the process." buttons {"OK"} with icon note'
                         echo "Uninstall complete"
@@ -238,7 +238,7 @@ This password is only used during installation and not stored." \
         if [ -n "$ADMIN_PASSWORD" ]; then
             echo "✅ Administrator password provided"
             # Test password validity
-            TEMP_TEST_FILE="/tmp/aips_test_65619"
+            TEMP_TEST_FILE="/tmp/aips_test_67553"
             echo "$ADMIN_PASSWORD" > "$TEMP_TEST_FILE"
             if sudo -S -v < "$TEMP_TEST_FILE" 2>/dev/null; then
                 rm -f "$TEMP_TEST_FILE"
