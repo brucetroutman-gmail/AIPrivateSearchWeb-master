@@ -36,5 +36,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`AIPrivateSearch Marketing Client running on http://localhost:${PORT}`);
+  // Marketing server started
 });

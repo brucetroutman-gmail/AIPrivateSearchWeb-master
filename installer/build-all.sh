@@ -9,7 +9,8 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 # Step 1: Always ask for a commit message
 echo ""
-COMMIT_MSG=$(osascript -e 'display dialog "Enter commit message:" default answer "" with title "AIPrivateSearch Build" with icon note' -e 'text returned of result' 2>/dev/null)
+LAST_MSG=$(git -C "$REPO_ROOT" log -1 --pretty=%s 2>/dev/null || echo "")
+COMMIT_MSG=$(osascript -e "display dialog \"Enter commit message:\" default answer \"$LAST_MSG\" with title \"AIPrivateSearch Build\" with icon note" -e 'text returned of result' 2>/dev/null)
 if [ -z "$COMMIT_MSG" ]; then
     echo "❌ No commit message provided - aborting"
     exit 1

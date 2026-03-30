@@ -183,8 +183,8 @@ echo "✅ Application started successfully!"
 echo "🔗 Frontend: http://localhost:$FRONTEND_PORT"
 echo "🔗 Backend API: http://localhost:$BACKEND_PORT"
 echo ""
-echo "🌐 Opening Chrome browser..."
-open -a "Google Chrome" http://localhost:$FRONTEND_PORT 2>/dev/null || open http://localhost:$FRONTEND_PORT
+echo "🌐 Opening browser..."
+open http://localhost:$FRONTEND_PORT
 echo ""
 echo "Press Ctrl+C to stop both servers"
 echo ""

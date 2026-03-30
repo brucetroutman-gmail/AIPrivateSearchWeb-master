@@ -207,6 +207,7 @@ async function loadHeader() {
       }
     }
   } catch (error) {
+    /* eslint-disable-next-line no-console */
     console.error('Failed to load header:', error);
   }
 }
@@ -228,6 +229,7 @@ async function loadFooter() {
       }
     }
   } catch (error) {
+    /* eslint-disable-next-line no-console */
     console.error('Failed to load footer:', error);
   }
 }
@@ -272,15 +274,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 // Analytics and tracking
 function trackPageView() {
-    const page = window.location.pathname;
-    const referrer = document.referrer;
-    
-    console.log('Page view:', {
-        page: page,
-        referrer: referrer,
-        timestamp: new Date().toISOString(),
-        userAgent: navigator.userAgent
-    });
+    // Page view tracking placeholder
 }
 
 function setupAnalytics() {
@@ -288,14 +282,7 @@ function setupAnalytics() {
     const buttons = document.querySelectorAll('.btn');
     buttons.forEach(button => {
         button.addEventListener('click', function() {
-            const action = this.textContent.trim();
-            const href = this.getAttribute('href');
-            
-            console.log('Button click:', {
-                action: action,
-                href: href,
-                timestamp: new Date().toISOString()
-            });
+            // Button click tracking placeholder
         });
     });
 
@@ -303,12 +290,7 @@ function setupAnalytics() {
     const forms = document.querySelectorAll('form');
     forms.forEach(form => {
         form.addEventListener('submit', function() {
-            const formId = this.id || 'unknown';
-            
-            console.log('Form submission:', {
-                formId: formId,
-                timestamp: new Date().toISOString()
-            });
+            // Form submission tracking placeholder
         });
     });
 }
@@ -351,6 +333,7 @@ export async function submitSignup(userData) {
         
         return await response.json();
     } catch (error) {
+        /* eslint-disable-next-line no-console */
         console.error('Signup error:', error);
         return { success: false, message: 'Network error. Please try again.' };
     }
@@ -368,6 +351,7 @@ export async function submitContact(contactData) {
         
         return await response.json();
     } catch (error) {
+        /* eslint-disable-next-line no-console */
         console.error('Contact error:', error);
         return { success: false, message: 'Network error. Please try again.' };
     }

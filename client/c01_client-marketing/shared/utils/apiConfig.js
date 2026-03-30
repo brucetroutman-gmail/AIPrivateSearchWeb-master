@@ -13,18 +13,14 @@
     
     if (xhr.status === 200) {
       const config = JSON.parse(xhr.responseText);
-      console.log('Loaded config:', config);
-      
       if (config.ports && config.ports.backend) {
         API_BASE_URL = `http://localhost:${config.ports.backend}`;
-        console.log('Set API_BASE_URL to:', API_BASE_URL);
       }
     }
-  } catch (error) {
-    console.warn('Failed to load app.json, using default API_BASE_URL:', error);
+  } catch (_error) { // eslint-disable-line no-unused-vars
+    // Use default API_BASE_URL if config load fails
   }
   
   // Set global API_BASE_URL
   window.API_BASE_URL = API_BASE_URL;
-  console.log('Final API_BASE_URL:', window.API_BASE_URL);
 })();
