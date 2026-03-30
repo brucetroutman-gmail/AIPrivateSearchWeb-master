@@ -688,34 +688,23 @@ fi
 
 # Copy start-app.sh to shared location (CRITICAL - always required)
 echo "📋 Copying start-app.sh to shared location..."
-echo "🔍 Debug: DMG_RESOURCES='\$DMG_RESOURCES'"
-echo "🔍 Debug: Checking \$DMG_RESOURCES/start-app.sh"
 
+# App bundle Resources is always available whether running from DMG or installed
+APP_RESOURCES="\$(dirname "\$0")/../Resources"
 START_APP_COPIED=false
 
-if [ -n "\$DMG_RESOURCES" ] && [ -f "\$DMG_RESOURCES/start-app.sh" ]; then
-    echo "📦 Found start-app.sh in bundle"
+if [ -f "\$APP_RESOURCES/start-app.sh" ]; then
+    cp "\$APP_RESOURCES/start-app.sh" "\$APP_SUPPORT/start-app.sh"
+    chmod +x "\$APP_SUPPORT/start-app.sh"
+    echo "✅ start-app.sh copied from app bundle"
+    START_APP_COPIED=true
+elif [ -n "\$DMG_RESOURCES" ] && [ -f "\$DMG_RESOURCES/start-app.sh" ]; then
     cp "\$DMG_RESOURCES/start-app.sh" "\$APP_SUPPORT/start-app.sh"
     chmod +x "\$APP_SUPPORT/start-app.sh"
-    echo "✅ start-app.sh copied from bundle"
-    START_APP_COPIED=true
-elif [ -f "\$APP_SUPPORT/repo/aiprivatesearch/installer/start-app.sh" ]; then
-    echo "📦 Found start-app.sh in repo"
-    cp "\$APP_SUPPORT/repo/aiprivatesearch/installer/start-app.sh" "\$APP_SUPPORT/start-app.sh"
-    chmod +x "\$APP_SUPPORT/start-app.sh"
-    echo "✅ start-app.sh copied from repo"
+    echo "✅ start-app.sh copied from DMG resources"
     START_APP_COPIED=true
 else
     echo "❌ CRITICAL ERROR: start-app.sh not found!"
-    echo "🔍 Debug: ls \$DMG_RESOURCES/"
-    ls -la "\$DMG_RESOURCES/" 2>&1 || echo "Directory not accessible"
-    echo "🔍 Debug: ls \$APP_SUPPORT/repo/aiprivatesearch/installer/"
-    ls -la "\$APP_SUPPORT/repo/aiprivatesearch/installer/" 2>&1 || echo "Directory not accessible"
-fi
-
-# Verify start-app.sh was copied successfully
-if [ "\$START_APP_COPIED" = "false" ] || [ ! -f "\$APP_SUPPORT/start-app.sh" ]; then
-    echo "❌ CRITICAL ERROR: start-app.sh installation failed"
     show_dialog "Installation Failed" \\
         "start-app.sh could not be installed!\n\nThis file is required to launch AIPrivateSearch.\n\nPlease check the log:\n\$LOG_FILE" \\
         "stop"
@@ -907,6 +896,17 @@ if [ -f "uninstall-aiprivatesearch.sh" ]; then
     cp uninstall-aiprivatesearch.sh "$APP_DIR/Contents/Resources/"
     chmod +x "$APP_DIR/Contents/Resources/uninstall-aiprivatesearch.sh"
     echo "✓ Uninstall script included"
+fi
+
+# Copy start-app.sh to app bundle Resources (always available during install and update)
+echo "📋 Copying start-app.sh to app bundle..."
+if [ -f "start-app.sh" ]; then
+    cp start-app.sh "$APP_DIR/Contents/Resources/start-app.sh"
+    chmod +x "$APP_DIR/Contents/Resources/start-app.sh"
+    echo "✓ start-app.sh included in app bundle"
+else
+    echo "❌ start-app.sh not found in installer folder"
+    exit 1
 fi
 
 # Create placeholder icon
