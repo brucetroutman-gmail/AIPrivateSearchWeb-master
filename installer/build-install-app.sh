@@ -892,7 +892,10 @@ chmod +x "$APP_DIR/Contents/Resources/launcher.sh"
 
 # Compile Swift launcher stub into MacOS binary
 echo "🔨 Compiling Swift launcher stub..."
-if swiftc "$(dirname "$0")/launcher/main.swift" -o "$APP_DIR/Contents/MacOS/$APP_NAME" -target arm64-apple-macos11; then
+if swiftc "$(dirname "$0")/launcher/main.swift" -o /tmp/aips-arm64 -target arm64-apple-macos11 && \
+   swiftc "$(dirname "$0")/launcher/main.swift" -o /tmp/aips-x86_64 -target x86_64-apple-macos10.15 && \
+   lipo -create /tmp/aips-arm64 /tmp/aips-x86_64 -output "$APP_DIR/Contents/MacOS/$APP_NAME" && \
+   rm /tmp/aips-arm64 /tmp/aips-x86_64; then
     echo "✅ Swift launcher compiled successfully"
 else
     echo "❌ Swift compilation failed"
