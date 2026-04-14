@@ -79,7 +79,7 @@ fi
 echo "🔧 Starting servers..."
 
 # Cleanup function - defined before trap
-cleanup() {`
+cleanup() {
     echo "Stopping servers..."
     kill $BACKEND_PID $FRONTEND_PID 2>/dev/null || true
     sleep 1
