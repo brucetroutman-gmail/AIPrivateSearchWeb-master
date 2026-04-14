@@ -76,9 +76,9 @@ cat > "$APP_DIR/Contents/Info.plist" << 'EOF'
 </plist>
 EOF
 
-# Create main launcher script - simplified
-echo "📝 Creating simplified launcher script..."
-cat > "$APP_DIR/Contents/MacOS/$APP_NAME" << LAUNCHER_EOF
+# Create launcher shell script in Resources
+echo "📝 Creating launcher shell script..."
+cat > "$APP_DIR/Contents/Resources/launcher.sh" << LAUNCHER_EOF
 #!/bin/bash
 
 # AIPrivateSearch Improved Installer
@@ -888,7 +888,16 @@ Servers are starting in background..." \\
     "note"
 LAUNCHER_EOF
 
-chmod +x "$APP_DIR/Contents/MacOS/$APP_NAME"
+chmod +x "$APP_DIR/Contents/Resources/launcher.sh"
+
+# Compile Swift launcher stub into MacOS binary
+echo "🔨 Compiling Swift launcher stub..."
+if swiftc "$(dirname "$0")/launcher/main.swift" -o "$APP_DIR/Contents/MacOS/$APP_NAME" -target arm64-apple-macos11; then
+    echo "✅ Swift launcher compiled successfully"
+else
+    echo "❌ Swift compilation failed"
+    exit 1
+fi
 
 # Copy uninstall script to app
 echo "📋 Copying uninstall script..."

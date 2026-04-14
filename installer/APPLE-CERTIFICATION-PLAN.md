@@ -111,28 +111,61 @@ chmod 600 /Users/Shared/AIPrivateSearch/signing-credentials.sh
 Apple's notarization requires a compiled binary as the app executable.
 The current shell script launcher must be wrapped in a Swift stub.
 
-Create `installer/launcher/main.swift`:
+**Purpose:** Replace shell script in `Contents/MacOS/` with a compiled binary.
+All existing installer logic moves to `Contents/Resources/launcher.sh` unchanged.
+
+**Current structure:**
+```
+AIPrivateSearch.app/
+  Contents/
+    MacOS/
+      AIPrivateSearch          ← shell script (rejected by notarization)
+    Resources/
+      start-app.sh
+      uninstall-aiprivatesearch.sh
+```
+
+**After Swift stub:**
+```
+AIPrivateSearch.app/
+  Contents/
+    MacOS/
+      AIPrivateSearch          ← compiled Swift binary (notarization approved)
+    Resources/
+      launcher.sh              ← existing installer shell script (moved here)
+      start-app.sh
+      uninstall-aiprivatesearch.sh
+```
+
+**Step 1: Create `installer/launcher/main.swift`:**
 ```swift
 import Foundation
 
-let script = Bundle.main.resourceURL!
-    .appendingPathComponent("launcher.sh")
-    .path
+let resourcesURL = Bundle.main.resourceURL!
+let scriptURL = resourcesURL.appendingPathComponent("launcher.sh")
 
 let process = Process()
 process.executableURL = URL(fileURLWithPath: "/bin/bash")
-process.arguments = [script]
+process.arguments = [scriptURL.path]
 try? process.run()
 process.waitUntilExit()
 ```
 
-Build the stub:
+**Step 2: Compile the Swift stub:**
 ```bash
-swiftc installer/launcher/main.swift -o installer/build/AIPrivateSearch
+mkdir -p installer/launcher
+swiftc installer/launcher/main.swift -o installer/build/AIPrivateSearch.app/Contents/MacOS/AIPrivateSearch
 ```
 
-This compiled binary replaces the shell script in `Contents/MacOS/`.
-The actual installer logic moves to `Contents/Resources/launcher.sh`.
+**Step 3: Update `build-install-app.sh`:**
+- Write all installer logic to `Contents/Resources/launcher.sh` instead of `Contents/MacOS/AIPrivateSearch`
+- Compile Swift stub into `Contents/MacOS/AIPrivateSearch` after writing launcher.sh
+- Ensure `launcher.sh` is chmod +x
+
+**Step 4: Test the app opens and runs correctly before signing:**
+```bash
+open installer/build/AIPrivateSearch.app
+```
 
 ### 3.2 Create Entitlements File
 
