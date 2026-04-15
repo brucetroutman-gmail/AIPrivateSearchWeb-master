@@ -10,3 +10,7 @@ installer/installer-version.txt
 
 # macOS
 .DS_Store
+
+# Signing (keep local only)
+installer/entitlements.plist
+/Users/Shared/AIPrivateSearch/signing-credentials.sh

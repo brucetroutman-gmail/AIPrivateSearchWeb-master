@@ -106,7 +106,13 @@ chmod 600 /Users/Shared/AIPrivateSearch/signing-credentials.sh
 
 ## Phase 3: App Preparation for Notarization
 
-### 3.1 Create Swift Launcher Stub
+### 3.1 Create Swift Launcher Stub ✅ COMPLETE
+
+**Notes from implementation:**
+- Swift stub compiles as universal binary (arm64 + x86_64) using `lipo`
+- Shell script moved to `Contents/Resources/launcher.sh`
+- Stray backtick bug found and fixed in `start-app.sh`
+- Tested: Update, Start App, Uninstall, Install all working on Apple Silicon
 
 Apple's notarization requires a compiled binary as the app executable.
 The current shell script launcher must be wrapped in a Swift stub.
@@ -359,7 +365,7 @@ spctl --assess --verbose \
 |-------|-------------|--------|
 | 1 | Prerequisites (Xcode, app working) | ✅ Complete |
 | 2 | Apple Developer account + certificates | ✅ Complete |
-| 3 | Swift launcher stub + entitlements | ⬜ Not started |
+| 3 | Swift launcher stub + entitlements | ✅ Complete |
 | 4 | Signing + notarization in build-all.sh | ⬜ Not started |
 | 5 | Testing on clean Mac | ⬜ Not started |
 | 6 | Ongoing maintenance process | ⬜ Not started |
