@@ -116,7 +116,7 @@ else
 
     # Gatekeeper check
     echo "🛡️  Verifying Gatekeeper acceptance..."
-    spctl --assess --verbose \
+    spctl --assess --verbose --type open \
         "$REPO_ROOT/client/c01_client-marketing/downloads/AIPrivateSearch.dmg"
     echo "✅ Gatekeeper accepted"
 fi
