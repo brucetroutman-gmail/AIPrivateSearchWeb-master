@@ -74,6 +74,7 @@ warnings, Gatekeeper blocks, or Rosetta prompts.
    ```
    Expected: `Developer ID Application: CHARLES TROUTMAN (5YY6H9M6Q3)`
 10. Keep `AIPrivateSearch.key` backed up securely — required if certificate needs reinstalling
+11. **Keychain password**: `aips123` — used when macOS prompts during `codesign`
 
 ### 2.2 Find Your Team ID ✅ COMPLETE
 
@@ -222,6 +223,11 @@ installer/entitlements.plist  # keep local only
 ## Phase 4: Signing and Notarization
 
 ### 4.1 Update build-all.sh for Signing
+
+**Note**: If you see "timestamps differ" error during signing, sync your system clock first:
+```bash
+sudo sntp -sS time.apple.com
+```
 
 Add signing steps after DMG is built:
 
