@@ -44,10 +44,10 @@ warnings, Gatekeeper blocks, or Rosetta prompts.
 2. Click **+** → Select **Developer ID Application** → Select **G2 Sub-CA** → Continue
 3. Generate CSR via command line (macOS Tahoe removed Certificate Assistant):
    ```bash
-   openssl genrsa -out ~/Desktop/AIPrivateSearch.key 2048
+   openssl genrsa -out installer/AIPrivateSearch.key 2048
    openssl req -new \
-     -key ~/Desktop/AIPrivateSearch.key \
-     -out ~/Desktop/AIPrivateSearch.csr \
+     -key installer/AIPrivateSearch.key \
+     -out installer/AIPrivateSearch.csr \
      -subj "/emailAddress=your@email.com/CN=Your Name/C=US"
    ```
 4. Upload `AIPrivateSearch.csr` to Apple Developer portal
@@ -63,8 +63,8 @@ warnings, Gatekeeper blocks, or Rosetta prompts.
    ```
 8. Import key, certificate, and intermediate CA into signing keychain:
    ```bash
-   security import ~/Desktop/AIPrivateSearch.key -k ~/Library/Keychains/aips-signing.keychain-db -T /usr/bin/codesign
-   security import ~/Desktop/developerID_application.cer -k ~/Library/Keychains/aips-signing.keychain-db
+   security import installer/AIPrivateSearch.key -k ~/Library/Keychains/aips-signing.keychain-db -T /usr/bin/codesign
+   security import installer/developerID_application.cer -k ~/Library/Keychains/aips-signing.keychain-db
    security import DeveloperIDG2CA.cer -k ~/Library/Keychains/aips-signing.keychain-db
    security unlock-keychain -p "aips123" ~/Library/Keychains/aips-signing.keychain-db
    ```
@@ -75,6 +75,12 @@ warnings, Gatekeeper blocks, or Rosetta prompts.
    Expected: `Developer ID Application: CHARLES TROUTMAN (5YY6H9M6Q3)`
 10. Keep `AIPrivateSearch.key` backed up securely — required if certificate needs reinstalling
 11. **Keychain password**: `aips123` — used when macOS prompts during `codesign`
+
+**File locations** (moved from Desktop to installer folder, gitignored):
+- `installer/AIPrivateSearch.key`
+- `installer/AIPrivateSearch.csr`
+- `installer/developerID_application.cer`
+- `installer/DeveloperIDG2CA.cer`
 
 ### 2.2 Find Your Team ID ✅ COMPLETE
 
