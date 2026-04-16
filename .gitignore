@@ -13,4 +13,9 @@ installer/installer-version.txt
 
 # Signing (keep local only)
 installer/entitlements.plist
+installer/AIPrivateSearch.key
+installer/AIPrivateSearch.csr
+installer/AIPrivateSearch.certSigningRequest
+installer/developerID_application.cer
+installer/DeveloperIDG2CA.cer
 /Users/Shared/AIPrivateSearch/signing-credentials.sh

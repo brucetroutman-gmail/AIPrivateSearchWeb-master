@@ -13,10 +13,10 @@ warnings, Gatekeeper blocks, or Rosetta prompts.
 ## Phase 1: Prerequisites ✅ COMPLETE
 
 ### 1.1 Apple Developer Account
-- [ ] Enroll at https://developer.apple.com/programs/enroll/
-- [ ] Pay $99/year fee
-- [ ] Wait for approval email (24-48 hours)
-- [ ] Log in and confirm membership is active
+- [x] Enroll at https://developer.apple.com/programs/enroll/
+- [x] Pay $99/year fee
+- [x] Wait for approval email (24-48 hours)
+- [x] Log in and confirm membership is active
 
 ### 1.2 Xcode
 - [x] Install full Xcode from Mac App Store (not just CLT)
@@ -80,27 +80,23 @@ warnings, Gatekeeper blocks, or Rosetta prompts.
 
 - Team ID: `5YY6H9M6Q3`
 
-### 2.3 Create App-Specific Password
+### 2.3 Create App-Specific Password ✅ COMPLETE
 
 1. Go to https://appleid.apple.com/
-2. Sign in → **Security** → **App-Specific Passwords**
+2. Sign in → **Sign-In and Security** → **App-Specific Passwords**
 3. Click **Generate Password**
 4. Label: `AIPrivateSearch Notarization`
 5. Copy password (format: `xxxx-xxxx-xxxx-xxxx`)
 6. Save securely — cannot be viewed again
 
-### 2.4 Store Credentials Locally
+### 2.4 Store Credentials Locally ✅ COMPLETE
 
-Create a secure local file (NOT committed to git):
+Credentials stored at `/Users/Shared/AIPrivateSearch/signing-credentials.sh` (chmod 600, not committed to git):
 ```bash
-# Create credentials file (gitignored)
-cat > /Users/Shared/AIPrivateSearch/signing-credentials.sh << 'EOF'
-export APPLE_ID="your@email.com"
-export APPLE_TEAM_ID="ABC123XYZ1"
+export APPLE_ID="bruce.troutman@gmail.com"
+export APPLE_TEAM_ID="5YY6H9M6Q3"
 export APPLE_APP_PASSWORD="xxxx-xxxx-xxxx-xxxx"
-export SIGNING_IDENTITY="Developer ID Application: Your Name (ABC123XYZ1)"
-EOF
-chmod 600 /Users/Shared/AIPrivateSearch/signing-credentials.sh
+export SIGNING_IDENTITY="Developer ID Application: CHARLES TROUTMAN (5YY6H9M6Q3)"
 ```
 
 ---
@@ -222,14 +218,15 @@ installer/entitlements.plist  # keep local only
 
 ## Phase 4: Signing and Notarization
 
-### 4.1 Update build-all.sh for Signing
+### 4.1 Update build-all.sh for Signing ✅ COMPLETE
 
-**Note**: If you see "timestamps differ" error during signing, sync your system clock first:
-```bash
-sudo sntp -sS time.apple.com
-```
-
-Add signing steps after DMG is built:
+**Notes from implementation:**
+- Clock sync required before signing: `sudo sntp -sS time.apple.com`
+- `spctl --assess --type open` is correct for DMG files (not default type)
+- `spctl` shows "Insufficient Context" locally — this is normal, real test is downloading on another Mac
+- Notarization status: `Accepted` ✓
+- Staple validation: `The validate action worked!` ✓
+- DMG URL: https://aiprivatesearch.com/downloads/AIPrivateSearch.dmg
 
 ```bash
 # Load credentials
@@ -372,9 +369,9 @@ spctl --assess --verbose \
 | 1 | Prerequisites (Xcode, app working) | ✅ Complete |
 | 2 | Apple Developer account + certificates | ✅ Complete |
 | 3 | Swift launcher stub + entitlements | ✅ Complete |
-| 4 | Signing + notarization in build-all.sh | ⬜ Not started |
-| 5 | Testing on clean Mac | ⬜ Not started |
-| 6 | Ongoing maintenance process | ⬜ Not started |
+| 4 | Signing + notarization in build-all.sh | ✅ Complete |
+| 5 | Testing on clean Mac | ✅ Complete |
+| 6 | Ongoing maintenance process | ✅ Complete |
 
 ---
 
@@ -404,5 +401,5 @@ spctl --assess --verbose App.dmg
 
 ---
 
-**Current Status**: Apple Developer account approved. Phase 2 in progress.
-**Next Action**: Create Developer ID Application certificate, get Team ID, create app-specific password.
+**Current Status**: ✅ All phases complete. AIPrivateSearch is signed, notarized, and verified on Apple Silicon.
+**Next Action**: Ongoing maintenance — re-sign and notarize with each new DMG release via `bash build-all.sh`.
