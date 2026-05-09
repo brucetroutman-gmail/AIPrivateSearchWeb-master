@@ -247,7 +247,8 @@ show_progress() {
     if [ "\$SHOW_DETAILS" = "Yes" ]; then
         local message="\$1"
         PROGRESS_LOG="\${PROGRESS_LOG}\${message}\\n\\n"
-        osascript -e "display dialog \"\$PROGRESS_LOG\" with title \"AIPrivateSearch Installer\" buttons {\"Continue\"} default button \"Continue\" with icon note" 2>/dev/null
+        osascript -e "display notification \"\$message\" with title \"AIPrivateSearch Installer\"" 2>/dev/null
+        sleep 3
     fi
 }
 
