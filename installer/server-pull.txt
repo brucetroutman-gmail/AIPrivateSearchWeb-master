@@ -1,0 +1,3 @@
+cd /webs/AIPrivateSearch/repo/aiprivatesearchweb
+git pull
+git lfs pull

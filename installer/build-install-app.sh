@@ -113,7 +113,7 @@ if [ -d "\$APP_SUPPORT/repo/aiprivatesearch" ]; then
                         echo "Uninstall confirmed - proceeding..."
                         
                         # Ask if user wants to see details
-                        SHOW_DETAILS=\$(osascript -e 'display dialog "Show detailed uninstall messages in Terminal?\n\nThis will open a Terminal window showing real-time uninstall progress." buttons {"No", "Yes"} default button "Yes" with title "AIPrivateSearch Uninstaller" with icon note' -e 'button returned of result')
+                        SHOW_DETAILS=\$(osascript -e 'display dialog "Show detailed uninstall messages in Terminal?\n\nThis will open a Terminal window showing real-time uninstall progress." buttons {"No", "Yes"} default button "No" with title "AIPrivateSearch Uninstaller" with icon note' -e 'button returned of result')
                         
                         # Create uninstall log
                         UNINSTALL_LOG="\$APP_SUPPORT/logs/uninstall.log"
@@ -179,38 +179,19 @@ if [ -d "\$APP_SUPPORT/repo/aiprivatesearch" ]; then
             echo "Start App selected - launching servers..."
             
             # Ask if user wants to see details
-            SHOW_DETAILS=\$(osascript -e 'display dialog "Show detailed startup messages in Terminal?\n\nThis will open a Terminal window showing real-time server startup." buttons {"No", "Yes"} default button "Yes" with title "AIPrivateSearch Startup" with icon note' -e 'button returned of result')
+            SHOW_DETAILS=\$(osascript -e 'display dialog "Show detailed startup messages in Terminal?\n\nThis will open a Terminal window showing real-time server startup." buttons {"No", "Yes"} default button "No" with title "AIPrivateSearch Startup" with icon note' -e 'button returned of result')
             
             # Create startup log
             STARTUP_LOG="\$APP_SUPPORT/logs/startup.log"
             mkdir -p "\$APP_SUPPORT/logs"
             echo "=== AIPrivateSearch Startup at \$(date) ===" > "\$STARTUP_LOG"
             
-            # Open Terminal if Yes, otherwise show notifications
+            # Open Terminal if Yes
             if [ "\$SHOW_DETAILS" = "Yes" ]; then
                 echo "tail -f /Users/Shared/AIPrivateSearch/logs/startup.log" > /tmp/aips-startup-log.command
                 chmod +x /tmp/aips-startup-log.command
                 open /tmp/aips-startup-log.command
                 sleep 1
-            else
-                osascript << 'PROGRESS_SCRIPT' &
-                set logFile to "/Users/Shared/AIPrivateSearch/logs/startup.log"
-                set prevLines to 0
-                repeat 60 times
-                    try
-                        set lineCount to do shell script "wc -l < " & logFile
-                        if lineCount as integer > prevLines then
-                            set prevLines to lineCount as integer
-                            set lastLine to do shell script "tail -1 " & logFile
-                            if lastLine is not "" then
-                                display notification lastLine with title "AIPrivateSearch Startup"
-                            end if
-                        end if
-                        if lastLine contains "successfully" or lastLine contains "failed" then exit repeat
-                    end try
-                    delay 2
-                end repeat
-PROGRESS_SCRIPT
             fi
             
             # Launch start-app.sh with logging
@@ -259,8 +240,8 @@ echo "" > "\$PROGRESS_FILE"
 show_progress() {
     local message="\$1"
     echo "\$message" >> "\$PROGRESS_FILE"
-    if [ "\$SHOW_DETAILS" = "Yes" ]; then
-        : # Terminal log handles it
+    if [ "\$SHOW_DETAILS" = "No" ]; then
+        osascript -e "display dialog \"\$message\" with title \"AIPrivateSearch Installer\" buttons {\"OK\"} giving up after 3" 2>/dev/null &
     fi
 }
 
@@ -271,31 +252,14 @@ mkdir -p "\$APP_SUPPORT"/{logs,data,sources,config,repo}
 touch "\$LOG_FILE"
 
 # Ask user if they want detailed messages BEFORE starting logging
-SHOW_DETAILS=\$(osascript -e 'display dialog "Show detailed installation messages in Terminal?\n\nThis will open a Terminal window showing real-time installation progress." buttons {"No", "Yes"} default button "Yes" with title "AIPrivateSearch Installer" with icon note' -e 'button returned of result' 2>/dev/null)
+SHOW_DETAILS=\$(osascript -e 'display dialog "Show detailed installation messages in Terminal?\n\nThis will open a Terminal window showing real-time installation progress." buttons {"No", "Yes"} default button "No" with title "AIPrivateSearch Installer" with icon note' -e 'button returned of result' 2>/dev/null)
 
-# Open Terminal if user chose Yes, otherwise show progress window
+# Open Terminal if user chose Yes
 if [ "\$SHOW_DETAILS" = "Yes" ]; then
     echo "tail -f /Users/Shared/AIPrivateSearch/logs/install.log" > /tmp/aips-install-log.command
     chmod +x /tmp/aips-install-log.command
     open /tmp/aips-install-log.command
     sleep 1
-else
-    # Launch background progress window that polls progress file
-    osascript << 'PROGRESS_SCRIPT' &
-    set progressFile to "/tmp/aips-progress.txt"
-    set prevContent to ""
-    repeat 60 times
-        try
-            set fileContent to do shell script "cat " & progressFile
-            if fileContent is not prevContent then
-                set prevContent to fileContent
-                display notification fileContent with title "AIPrivateSearch Installer"
-            end if
-            if fileContent contains "Complete" then exit repeat
-        end try
-        delay 2
-    end repeat
-PROGRESS_SCRIPT
 fi
 
 # NOW redirect output to log
