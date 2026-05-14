@@ -113,7 +113,7 @@ if [ -d "\$APP_SUPPORT/repo/aiprivatesearch" ]; then
                         echo "Uninstall confirmed - proceeding..."
                         
                         # Ask if user wants to see details
-                        SHOW_DETAILS=\$(osascript -e 'display dialog "Show detailed uninstall messages in Terminal?\n\nThis will open a Terminal window showing real-time uninstall progress." buttons {"No", "Yes"} default button "No" with title "AIPrivateSearch Uninstaller" with icon note' -e 'button returned of result')
+                        SHOW_DETAILS=\$(osascript -e 'display dialog "Show detailed uninstall messages in Terminal?\n\nThis will open a Terminal window showing real-time uninstall progress." buttons {"Yes", "No"} default button "No" with title "AIPrivateSearch Uninstaller" with icon note' -e 'button returned of result')
                         
                         # Create uninstall log
                         UNINSTALL_LOG="\$APP_SUPPORT/logs/uninstall.log"
@@ -179,7 +179,7 @@ if [ -d "\$APP_SUPPORT/repo/aiprivatesearch" ]; then
             echo "Start App selected - launching servers..."
             
             # Ask if user wants to see details
-            SHOW_DETAILS=\$(osascript -e 'display dialog "Show detailed startup messages in Terminal?\n\nThis will open a Terminal window showing real-time server startup." buttons {"No", "Yes"} default button "No" with title "AIPrivateSearch Startup" with icon note' -e 'button returned of result')
+            SHOW_DETAILS=\$(osascript -e 'display dialog "Show detailed startup messages in Terminal?\n\nThis will open a Terminal window showing real-time server startup." buttons {"Yes", "No"} default button "No" with title "AIPrivateSearch Startup" with icon note' -e 'button returned of result')
             
             # Create startup log
             STARTUP_LOG="\$APP_SUPPORT/logs/startup.log"
@@ -257,7 +257,7 @@ mkdir -p "\$APP_SUPPORT"/{logs,data,sources,config,repo}
 touch "\$LOG_FILE"
 
 # Ask user if they want detailed messages BEFORE starting logging
-SHOW_DETAILS=\$(osascript -e 'display dialog "Show detailed installation messages in Terminal?\n\nThis will open a Terminal window showing real-time installation progress." buttons {"No", "Yes"} default button "No" with title "AIPrivateSearch Installer" with icon note' -e 'button returned of result' 2>/dev/null)
+SHOW_DETAILS=\$(osascript -e 'display dialog "Show detailed installation messages in Terminal?\n\nThis will open a Terminal window showing real-time installation progress." buttons {"Yes", "No"} default button "No" with title "AIPrivateSearch Installer" with icon note' -e 'button returned of result' 2>/dev/null)
 
 # Open Terminal if user chose Yes
 if [ "\$SHOW_DETAILS" = "Yes" ]; then
