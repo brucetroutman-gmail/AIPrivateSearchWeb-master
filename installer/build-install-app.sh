@@ -195,8 +195,13 @@ if [ -d "\$APP_SUPPORT/repo/aiprivatesearch" ]; then
             fi
             
             # Launch start-app.sh with logging
-            cd "\$APP_SUPPORT/repo/aiprivatesearch"
-            bash "\$APP_SUPPORT/start-app.sh" >> "\$STARTUP_LOG" 2>&1 &
+            if [ "\$SHOW_DETAILS" = "Yes" ]; then
+                echo "bash /Users/Shared/AIPrivateSearch/start-app.sh" > /tmp/aips-start.command
+                chmod +x /tmp/aips-start.command
+                open /tmp/aips-start.command
+            else
+                nohup bash "\$APP_SUPPORT/start-app.sh" >> "\$STARTUP_LOG" 2>&1 &
+            fi
             
             echo "✅ Servers launched" >> "\$STARTUP_LOG"
             exit 0
@@ -864,11 +869,17 @@ echo "✅ AI models downloaded!"
 # Launch start app BEFORE showing completion dialog
 if [ -f "\$APP_SUPPORT/start-app.sh" ]; then
     echo "🚀 Launching AIPrivateSearch servers..."
-    echo "bash /Users/Shared/AIPrivateSearch/start-app.sh" > /tmp/aips-start.command
-    chmod +x /tmp/aips-start.command
-    open /tmp/aips-start.command
-    sleep 3
-    echo "✅ Servers launched in Terminal"
+    if [ "\$SHOW_DETAILS" = "Yes" ]; then
+        echo "bash /Users/Shared/AIPrivateSearch/start-app.sh" > /tmp/aips-start.command
+        chmod +x /tmp/aips-start.command
+        open /tmp/aips-start.command
+        sleep 3
+        echo "✅ Servers launched in Terminal"
+    else
+        nohup bash "\$APP_SUPPORT/start-app.sh" > "\$APP_SUPPORT/logs/app-startup.log" 2>&1 &
+        sleep 3
+        echo "✅ Servers launched in background"
+    fi
 fi
 
 show_progress "✓ Installation Complete!\n\nAll components installed:\n• Node.js\n• Ollama\n• Repository\n• Dependencies\n• AI models\n\nServers starting..."
