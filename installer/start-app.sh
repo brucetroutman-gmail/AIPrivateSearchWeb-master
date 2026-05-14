@@ -77,6 +77,7 @@ fi
 
 # Start backend server in background
 echo "🔧 Starting servers..."
+osascript -e 'display dialog "Starting AIPrivateSearch servers..." with title "AIPrivateSearch" buttons {"OK"} giving up after 3' 2>/dev/null &
 
 # Cleanup function - defined before trap
 cleanup() {
@@ -161,6 +162,7 @@ if ! kill -0 $BACKEND_PID 2>/dev/null; then
     exit 1
 fi
 echo "✅ Backend server started"
+osascript -e 'display dialog "✅ Backend server started" with title "AIPrivateSearch" buttons {"OK"} giving up after 3' 2>/dev/null &
 
 # Start frontend client
 cd ../../client/c01_client-first-app
@@ -184,6 +186,7 @@ echo "🔗 Frontend: http://localhost:$FRONTEND_PORT"
 echo "🔗 Backend API: http://localhost:$BACKEND_PORT"
 echo ""
 echo "🌐 Opening browser..."
+osascript -e 'display dialog "✅ AIPrivateSearch is ready! Opening browser..." with title "AIPrivateSearch" buttons {"OK"} giving up after 3' 2>/dev/null &
 open http://localhost:$FRONTEND_PORT
 echo ""
 echo "Press Ctrl+C to stop both servers"
