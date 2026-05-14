@@ -186,12 +186,31 @@ if [ -d "\$APP_SUPPORT/repo/aiprivatesearch" ]; then
             mkdir -p "\$APP_SUPPORT/logs"
             echo "=== AIPrivateSearch Startup at \$(date) ===" > "\$STARTUP_LOG"
             
-            # Open Terminal if user chose Yes
+            # Open Terminal if Yes, otherwise show notifications
             if [ "\$SHOW_DETAILS" = "Yes" ]; then
                 echo "tail -f /Users/Shared/AIPrivateSearch/logs/startup.log" > /tmp/aips-startup-log.command
                 chmod +x /tmp/aips-startup-log.command
                 open /tmp/aips-startup-log.command
                 sleep 1
+            else
+                osascript << 'PROGRESS_SCRIPT' &
+                set logFile to "/Users/Shared/AIPrivateSearch/logs/startup.log"
+                set prevLines to 0
+                repeat 60 times
+                    try
+                        set lineCount to do shell script "wc -l < " & logFile
+                        if lineCount as integer > prevLines then
+                            set prevLines to lineCount as integer
+                            set lastLine to do shell script "tail -1 " & logFile
+                            if lastLine is not "" then
+                                display notification lastLine with title "AIPrivateSearch Startup"
+                            end if
+                        end if
+                        if lastLine contains "successfully" or lastLine contains "failed" then exit repeat
+                    end try
+                    delay 2
+                end repeat
+PROGRESS_SCRIPT
             fi
             
             # Launch start-app.sh with logging
@@ -233,22 +252,15 @@ else
 fi
 
 # Progress tracking
-PROGRESS_LOG=""
+PROGRESS_FILE="/tmp/aips-progress.txt"
+echo "" > "\$PROGRESS_FILE"
 
-# Function to send notification
-notify() {
-    local title="$1"
-    local message="$2"
-    osascript -e "display notification \"$message\" with title \"$title\"" 2>/dev/null
-}
-
-# Function to show progress dialog with cumulative messages
+# Function to show progress
 show_progress() {
+    local message="\$1"
+    echo "\$message" >> "\$PROGRESS_FILE"
     if [ "\$SHOW_DETAILS" = "Yes" ]; then
-        local message="\$1"
-        PROGRESS_LOG="\${PROGRESS_LOG}\${message}\\n\\n"
-        osascript -e "display notification \"\$message\" with title \"AIPrivateSearch Installer\"" 2>/dev/null
-        sleep 3
+        : # Terminal log handles it
     fi
 }
 
@@ -261,12 +273,29 @@ touch "\$LOG_FILE"
 # Ask user if they want detailed messages BEFORE starting logging
 SHOW_DETAILS=\$(osascript -e 'display dialog "Show detailed installation messages in Terminal?\n\nThis will open a Terminal window showing real-time installation progress." buttons {"No", "Yes"} default button "Yes" with title "AIPrivateSearch Installer" with icon note' -e 'button returned of result' 2>/dev/null)
 
-# Open Terminal immediately if user chose Yes
+# Open Terminal if user chose Yes, otherwise show progress window
 if [ "\$SHOW_DETAILS" = "Yes" ]; then
     echo "tail -f /Users/Shared/AIPrivateSearch/logs/install.log" > /tmp/aips-install-log.command
     chmod +x /tmp/aips-install-log.command
     open /tmp/aips-install-log.command
     sleep 1
+else
+    # Launch background progress window that polls progress file
+    osascript << 'PROGRESS_SCRIPT' &
+    set progressFile to "/tmp/aips-progress.txt"
+    set prevContent to ""
+    repeat 60 times
+        try
+            set fileContent to do shell script "cat " & progressFile
+            if fileContent is not prevContent then
+                set prevContent to fileContent
+                display notification fileContent with title "AIPrivateSearch Installer"
+            end if
+            if fileContent contains "Complete" then exit repeat
+        end try
+        delay 2
+    end repeat
+PROGRESS_SCRIPT
 fi
 
 # NOW redirect output to log
@@ -879,14 +908,6 @@ if [ -f "\$APP_SUPPORT/start-app.sh" ]; then
 fi
 
 show_progress "✓ Installation Complete!\n\nAll components installed:\n• Node.js\n• Ollama\n• Repository\n• Dependencies\n• AI models\n\nServers starting..."
-
-show_dialog "Installation Complete" \\
-    "AIPrivateSearch \$([ "\$UPDATE_MODE" = "true" ] && echo "updated" || echo "installed") successfully!
-
-Log: \$LOG_FILE
-
-Servers are starting in background..." \\
-    "note"
 LAUNCHER_EOF
 
 chmod +x "$APP_DIR/Contents/Resources/launcher.sh"
