@@ -544,3 +544,8 @@ label {
     grid-template-columns: 1fr;
   }
 }
+
+.app-version {
+  font-size: 0.8rem;
+  opacity: 0.6;
+}

@@ -5,15 +5,8 @@
 
 set -e
 
-# Auto-increment version
-VERSION_FILE="./installer-version.txt"
-if [ -f "$VERSION_FILE" ]; then
-    CURRENT_VERSION=$(cat "$VERSION_FILE")
-    NEW_VERSION=$(echo "$CURRENT_VERSION + 0.1" | bc)
-else
-    NEW_VERSION="2.9"
-fi
-echo "$NEW_VERSION" > "$VERSION_FILE"
+# Read version from package.json
+NEW_VERSION=$(node -p "require('../package.json').version" 2>/dev/null || echo "1.00")
 
 echo "🏗️  Building AIPrivateSearch.app Bundle (Auto-Install Version)"
 echo "Version: $NEW_VERSION"
