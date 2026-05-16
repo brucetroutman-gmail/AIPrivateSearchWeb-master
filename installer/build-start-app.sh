@@ -185,6 +185,14 @@ export PATH="$APP_SUPPORT/node/bin:$PATH"
 # Change to repository directory
 cd "$REPO_DIR"
 
+# Pull latest code from GitHub
+echo "Pulling latest code from GitHub..." >> "$LOG_FILE"
+git pull --quiet >> "$LOG_FILE" 2>&1 && echo "Code updated" >> "$LOG_FILE" || echo "Git pull failed - running existing version" >> "$LOG_FILE"
+
+# Sync config from repo to parent folder
+cp -r "$REPO_DIR/client/c01_client-first-app/config/." "$APP_SUPPORT/config/"
+echo "Config synced" >> "$LOG_FILE"
+
 # Read ports from config
 FRONTEND_PORT=$(node -p "JSON.parse(require('fs').readFileSync('./client/c01_client-first-app/config/app.json', 'utf8')).ports.frontend")
 BACKEND_PORT=$(node -p "JSON.parse(require('fs').readFileSync('./client/c01_client-first-app/config/app.json', 'utf8')).ports.backend")
