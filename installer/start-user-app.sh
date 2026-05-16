@@ -13,6 +13,17 @@ APPLESCRIPT
 
 echo "🚀 Starting AIPrivateSearch..."
 
+# Pull latest code from GitHub
+echo "📥 Updating from GitHub..."
+if [ -d "/Users/Shared/AIPrivateSearch/repo/aiprivatesearch/.git" ]; then
+    cd /Users/Shared/AIPrivateSearch/repo/aiprivatesearch
+    git pull --quiet && echo "✅ Code updated" || echo "⚠️  Git pull failed - running existing version"
+fi
+
+# Sync config from repo to parent folder
+cp -r "/Users/Shared/AIPrivateSearch/repo/aiprivatesearch/client/c01_client-first-app/config/." "/Users/Shared/AIPrivateSearch/config/"
+echo "✅ Config synced"
+
 # Kill any existing processes FIRST (before reading ports)
 echo "🧹 Cleaning up existing processes..."
 pkill -9 -f "npx serve" 2>/dev/null || true
