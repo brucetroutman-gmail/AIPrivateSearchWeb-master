@@ -186,7 +186,6 @@ echo "🔗 Frontend: http://localhost:$FRONTEND_PORT"
 echo "🔗 Backend API: http://localhost:$BACKEND_PORT"
 echo ""
 echo "🌐 Opening browser..."
-osascript -e 'display dialog "✅ AIPrivateSearch is ready! Opening browser..." with title "AIPrivateSearch" buttons {"OK"} giving up after 3' 2>/dev/null &
 open http://localhost:$FRONTEND_PORT
 echo ""
 echo "Press Ctrl+C to stop both servers"
