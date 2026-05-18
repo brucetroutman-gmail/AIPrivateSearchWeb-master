@@ -182,7 +182,7 @@ show_progress "✓ Ollama models checked\nPreparing configuration..."
 # Add Node.js to PATH
 export PATH="$APP_SUPPORT/node/bin:$PATH"
 
-# Sync config from repo to parent folder
+# Sync config: repo → APP_SUPPORT (server reads from here)
 echo "Syncing config..." >> "$LOG_FILE"
 cp -r "$REPO_DIR/client/c01_client-first-app/config/." "$APP_SUPPORT/config/"
 echo "Config synced" >> "$LOG_FILE"
