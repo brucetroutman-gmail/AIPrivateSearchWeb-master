@@ -340,7 +340,7 @@ This password is only used during installation and not stored." \\
 }
 
 echo "🚀 Starting installation..."
-show_progress "✅ Installation started"
+show_progress "✅ Installation started\n⏳ Installing Node.js... Be patient!"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  🔄 Step 1: Mac Info Detection"
@@ -389,7 +389,7 @@ echo "📦 Node.js target: \$NODE_TAR"
 echo "🌐 Download URL: \$NODE_URL"
 
 echo "✅ Mac info detection completed successfully"
-show_progress "✅ Architecture detected: \$NODE_ARCH"
+show_progress "✅ Architecture detected: \$NODE_ARCH\n⏳ Installing Node.js... Be patient!"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  📦 Step 2: Node.js Installation"
@@ -474,7 +474,7 @@ else
 fi
 
 echo "✅ Node.js installation completed!"
-show_progress "✅ Node.js installed"
+show_progress "✅ Node.js installed\n⏳ Installing Ollama... Be patient!"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  🤖 Step 3: Ollama Installation"
@@ -545,7 +545,7 @@ else
 fi
 
 echo "✅ Ollama installation completed!"
-show_progress "✅ Ollama installed"
+show_progress "✅ Ollama installed\n⏳ Downloading repository... Be patient!"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  📦 Step 4: Repository Setup"
@@ -771,7 +771,7 @@ else
 fi
 
 echo "✅ Dependencies installation completed!"
-show_progress "✅ Dependencies installed"
+show_progress "✅ Dependencies installed\n⏳ Loading AI models... Be patient!"
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
