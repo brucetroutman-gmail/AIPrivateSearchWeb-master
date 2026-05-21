@@ -233,13 +233,22 @@ fi
 # Progress tracking
 PROGRESS_FILE="/tmp/aips-progress.txt"
 echo "" > "\$PROGRESS_FILE"
+COMPLETED_STEPS=""
+PROGRESS_PID=""
 
 # Function to show progress
 show_progress() {
     local message="\$1"
     echo "\$message" >> "\$PROGRESS_FILE"
     if [ "\$SHOW_DETAILS" = "No" ]; then
-        osascript -e "display dialog \"\$message\" with title \"AIPrivateSearch Installer\" buttons {\"OK\"} giving up after 3" 2>/dev/null &
+        COMPLETED_STEPS="\${COMPLETED_STEPS}\${message}\n"
+        # Close previous dialog if open
+        if [ -n "\$PROGRESS_PID" ]; then
+            kill "\$PROGRESS_PID" 2>/dev/null || true
+        fi
+        # Open new dialog in background and save PID
+        osascript -e "display dialog \"\${COMPLETED_STEPS}\" with title \"AIPrivateSearch Installer\" buttons {\"OK\"} giving up after 300" 2>/dev/null &
+        PROGRESS_PID=\$!
     fi
 }
 
@@ -331,7 +340,7 @@ This password is only used during installation and not stored." \\
 }
 
 echo "🚀 Starting installation..."
-show_progress "✓ Installation started\nDetecting Mac architecture..."
+show_progress "✅ Installation started"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  🔄 Step 1: Mac Info Detection"
@@ -380,7 +389,7 @@ echo "📦 Node.js target: \$NODE_TAR"
 echo "🌐 Download URL: \$NODE_URL"
 
 echo "✅ Mac info detection completed successfully"
-show_progress "✓ Architecture detected: \$NODE_ARCH\nInstalling Node.js..."
+show_progress "✅ Architecture detected: \$NODE_ARCH"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  📦 Step 2: Node.js Installation"
@@ -465,7 +474,7 @@ else
 fi
 
 echo "✅ Node.js installation completed!"
-show_progress "✓ Node.js installed\nInstalling Ollama..."
+show_progress "✅ Node.js installed"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  🤖 Step 3: Ollama Installation"
@@ -536,7 +545,7 @@ else
 fi
 
 echo "✅ Ollama installation completed!"
-show_progress "✓ Ollama installed\nDownloading repository..."
+show_progress "✅ Ollama installed"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  📦 Step 4: Repository Setup"
@@ -708,9 +717,9 @@ echo "✅ start-app.sh verified at \$APP_SUPPORT/start-app.sh"
 echo "✅ Step 4 completed!"
 
 if [ "\$UPDATE_MODE" = "true" ]; then
-    show_progress "✓ Repository downloaded\n✓ Config files preserved\n✓ Data files preserved\nInstalling dependencies..."
+    show_progress "✅ Repository downloaded\n✅ Config files preserved\n✅ Data files preserved"
 else
-    show_progress "✓ Repository downloaded\n✓ Config files copied\n✓ Data files copied\nInstalling dependencies..."
+    show_progress "✅ Repository downloaded\n✅ Config files copied\n✅ Data files copied"
 fi
 
 echo ""
@@ -762,7 +771,7 @@ else
 fi
 
 echo "✅ Dependencies installation completed!"
-show_progress "✓ Dependencies installed\nDownloading AI models..."
+show_progress "✅ Dependencies installed"
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -875,7 +884,13 @@ if [ -f "\$APP_SUPPORT/start-app.sh" ]; then
     fi
 fi
 
-show_progress "✓ Installation Complete!\n\nAll components installed:\n• Node.js\n• Ollama\n• Repository\n• Dependencies\n• AI models\n\nServers starting..."
+show_progress "✅ AI models ready\n✅ Servers starting..."
+
+# Close progress dialog when done
+if [ -n "\$PROGRESS_PID" ]; then
+    sleep 3
+    kill "\$PROGRESS_PID" 2>/dev/null || true
+fi
 LAUNCHER_EOF
 
 chmod +x "$APP_DIR/Contents/Resources/launcher.sh"
