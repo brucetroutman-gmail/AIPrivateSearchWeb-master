@@ -198,7 +198,7 @@ fi
 echo ""
 echo "✅ Application started successfully!"
 show_start_progress "✅ Application started successfully!\n🌐 Opening browser..."
-sleep 2
+sleep 3
 if [ -n "$START_PID" ]; then kill "$START_PID" 2>/dev/null || true; fi
 echo "🔗 Frontend: http://localhost:$FRONTEND_PORT"
 echo "🔗 Backend API: http://localhost:$BACKEND_PORT"
