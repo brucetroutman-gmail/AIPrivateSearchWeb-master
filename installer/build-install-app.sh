@@ -829,17 +829,21 @@ if [ -f "\$MODEL_LIST_FILE" ]; then
         done
         
         # Download/refresh each model
-        echo "\$MODELS" | while read -r model; do
+        for model in \$MODELS; do
             if [ -n "\$model" ]; then
                 if [ "\$UPDATE_MODE" = "true" ]; then
                     echo "🔄 Checking \$model for updates..."
+                    show_progress "⏳ Updating model: \$model... Be patient!"
                 else
                     echo "📥 Downloading \$model..."
+                    show_progress "⏳ Downloading model: \$model... Be patient!"
                 fi
                 if "\$OLLAMA_CMD" pull "\$model"; then
                     echo "✅ \$model ready"
+                    show_progress "✅ Model ready: \$model"
                 else
                     echo "❌ \$model failed"
+                    show_progress "❌ Model failed: \$model"
                 fi
             fi
         done

@@ -75,9 +75,23 @@ else
     echo "✅ Ollama is running"
 fi
 
+# Progress tracking for No option
+START_STEPS=""
+START_PID=""
+
+show_start_progress() {
+    local message="$1"
+    START_STEPS="${START_STEPS}${message}\n"
+    if [ -n "$START_PID" ]; then
+        kill "$START_PID" 2>/dev/null || true
+    fi
+    osascript -e "display dialog \"${START_STEPS}\" with title \"AIPrivateSearch\" buttons {\"OK\"} giving up after 300" 2>/dev/null &
+    START_PID=$!
+}
+
 # Start backend server in background
 echo "🔧 Starting servers..."
-osascript -e 'display dialog "Starting AIPrivateSearch servers..." with title "AIPrivateSearch" buttons {"OK"} giving up after 3' 2>/dev/null &
+show_start_progress "⏳ Starting AIPrivateSearch servers... Be patient!"
 
 # Cleanup function - defined before trap
 cleanup() {
@@ -162,7 +176,7 @@ if ! kill -0 $BACKEND_PID 2>/dev/null; then
     exit 1
 fi
 echo "✅ Backend server started"
-osascript -e 'display dialog "✅ Backend server started" with title "AIPrivateSearch" buttons {"OK"} giving up after 3' 2>/dev/null &
+show_start_progress "✅ Backend server started\n⏳ Starting frontend server..."
 
 # Start frontend client
 cd ../../client/c01_client-first-app
@@ -176,12 +190,16 @@ FRONTEND_PID=$!
 sleep 3
 if kill -0 $FRONTEND_PID 2>/dev/null; then
     echo "✅ Frontend server started"
+    show_start_progress "✅ Frontend server started"
 else
     echo "❌ Frontend server failed to start"
 fi
 
 echo ""
 echo "✅ Application started successfully!"
+show_start_progress "✅ Application started successfully!\n🌐 Opening browser..."
+sleep 2
+if [ -n "\$START_PID" ]; then kill "\$START_PID" 2>/dev/null || true; fi
 echo "🔗 Frontend: http://localhost:$FRONTEND_PORT"
 echo "🔗 Backend API: http://localhost:$BACKEND_PORT"
 echo ""
