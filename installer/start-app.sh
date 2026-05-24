@@ -77,16 +77,14 @@ fi
 
 # Progress tracking for No option
 START_STEPS=""
-START_PID=""
 
 show_start_progress() {
     local message="$1"
+    local timeout="${2:-300}"
     START_STEPS="${START_STEPS}${message}\n"
-    if [ -n "$START_PID" ]; then
-        kill "$START_PID" 2>/dev/null || true
-    fi
-    osascript -e "display dialog \"${START_STEPS}\" with title \"AIPrivateSearch\" buttons {\"OK\"} giving up after 300" 2>/dev/null &
-    START_PID=$!
+    # Kill any existing progress dialog
+    pkill -f "AIPrivateSearch.*giving up" 2>/dev/null || true
+    osascript -e "display dialog \"${START_STEPS}\" with title \"AIPrivateSearch\" buttons {\"OK\"} giving up after ${timeout}" 2>/dev/null &
 }
 
 # Start backend server in background
@@ -197,9 +195,7 @@ fi
 
 echo ""
 echo "✅ Application started successfully!"
-show_start_progress "✅ Application started successfully!\n🌐 Opening browser..."
-sleep 3
-if [ -n "$START_PID" ]; then kill "$START_PID" 2>/dev/null || true; fi
+show_start_progress "✅ Application started successfully!\n🌐 Opening browser..." 3
 echo "🔗 Frontend: http://localhost:$FRONTEND_PORT"
 echo "🔗 Backend API: http://localhost:$BACKEND_PORT"
 echo ""
