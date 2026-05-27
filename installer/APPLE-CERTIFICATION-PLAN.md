@@ -97,12 +97,24 @@ warnings, Gatekeeper blocks, or Rosetta prompts.
 
 ### 2.4 Store Credentials Locally ✅ COMPLETE
 
-Credentials stored at `/Users/Shared/AIPrivateSearch/signing-credentials.sh` (chmod 600, not committed to git):
+Credentials stored at `~/.aips/signing-credentials.sh` (chmod 600, not committed to git, safe from uninstaller):
 ```bash
 export APPLE_ID="bruce.troutman@gmail.com"
 export APPLE_TEAM_ID="5YY6H9M6Q3"
 export APPLE_APP_PASSWORD="xxxx-xxxx-xxxx-xxxx"
 export SIGNING_IDENTITY="Developer ID Application: CHARLES TROUTMAN (5YY6H9M6Q3)"
+```
+
+To create:
+```bash
+mkdir -p ~/.aips
+cat > ~/.aips/signing-credentials.sh << 'EOF'
+export APPLE_ID="bruce.troutman@gmail.com"
+export APPLE_TEAM_ID="5YY6H9M6Q3"
+export APPLE_APP_PASSWORD="xxxx-xxxx-xxxx-xxxx"
+export SIGNING_IDENTITY="Developer ID Application: CHARLES TROUTMAN (5YY6H9M6Q3)"
+EOF
+chmod 600 ~/.aips/signing-credentials.sh
 ```
 
 ---

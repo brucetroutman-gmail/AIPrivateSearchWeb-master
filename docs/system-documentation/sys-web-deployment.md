@@ -83,7 +83,7 @@ Use the `release` command in Amazon Q to bump all three automatically.
 
 ## Signing Credentials
 
-Stored at `/Users/Shared/AIPrivateSearch/signing-credentials.sh` (gitignored):
+Stored at `~/.aips/signing-credentials.sh` (gitignored, safe from uninstaller):
 ```bash
 export APPLE_ID="bruce.troutman@gmail.com"
 export APPLE_TEAM_ID="5YY6H9M6Q3"

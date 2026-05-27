@@ -24,7 +24,7 @@ AIPrivateSearch.dmg is signed and notarized with an Apple Developer ID Applicati
 | CSR | `installer/AIPrivateSearch.csr` |
 | Certificate | `installer/developerID_application.cer` |
 | Intermediate CA | `installer/DeveloperIDG2CA.cer` |
-| Signing credentials | `/Users/Shared/AIPrivateSearch/signing-credentials.sh` |
+| Signing credentials | `~/.aips/signing-credentials.sh` |
 | Entitlements | `installer/entitlements.plist` |
 
 ## Entitlements

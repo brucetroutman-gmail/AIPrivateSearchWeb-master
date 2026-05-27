@@ -218,6 +218,26 @@ echo "✅ Configuration preserved at: $APP_SUPPORT/.env-aips"
 echo "✅ User data preserved at: $APP_SUPPORT/data/"
 echo "✅ Documents preserved at: $APP_SUPPORT/sources/"
 
+# Update Sample_ collections from new version
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  Updating sample collections..."
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+
+SAMPLE_SRC="$APP_SUPPORT/repo/aiprivatesearch/sources/local-documents"
+SAMPLE_DST="$APP_SUPPORT/sources/local-documents"
+mkdir -p "$SAMPLE_DST"
+
+for src_folder in "$SAMPLE_SRC"/Sample_*/; do
+    folder_name=$(basename "$src_folder")
+    echo "Updating $folder_name..."
+    rm -rf "$SAMPLE_DST/$folder_name"
+    cp -r "$src_folder" "$SAMPLE_DST/$folder_name"
+done
+
+echo "✅ Sample collections updated"
+
 # Show completion
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

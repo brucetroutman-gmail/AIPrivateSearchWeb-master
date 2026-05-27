@@ -36,10 +36,10 @@ echo "📦 Building DMG with install app..."
 # Step 5: Sign and notarize
 echo ""
 echo "🔐 Loading signing credentials..."
-if [ ! -f "/Users/Shared/AIPrivateSearch/signing-credentials.sh" ]; then
-    echo "❌ signing-credentials.sh not found - skipping signing"
+if [ ! -f "$HOME/.aips/signing-credentials.sh" ]; then
+    echo "❌ signing-credentials.sh not found at ~/.aips/signing-credentials.sh - skipping signing"
 else
-    source /Users/Shared/AIPrivateSearch/signing-credentials.sh
+    source "$HOME/.aips/signing-credentials.sh"
 
     # Unlock signing keychain
     echo "🔑 Unlocking signing keychain..."
