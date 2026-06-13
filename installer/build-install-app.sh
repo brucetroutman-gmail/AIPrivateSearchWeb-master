@@ -642,12 +642,18 @@ NODE_ENV=development
 DEFAULT_ADMIN_EMAIL=adm-std@a.com
 DEFAULT_ADMIN_PASSWORD=123
 
-# Member Database Configuration
+# Database Configuration
 DB_HOST=92.112.184.206
 DB_PORT=3306
-DB_DATABASE=iodd2
-DB_USERNAME=iodd-api
-DB_PASSWORD=IODD@Api
+DB_DATABASE=aiprivatesearch
+DB_USERNAME=aips-readwrite
+DB_PASSWORD=AipS!1234rw
+
+# Email Configuration
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=aiprivatesearch@gmail.com
+EMAIL_PASSWORD=ocun euna aawk mznx
 ENVEOF
     echo "✅ .env-aips created"
 else
