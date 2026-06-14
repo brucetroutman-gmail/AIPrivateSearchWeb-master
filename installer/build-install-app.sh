@@ -399,9 +399,15 @@ echo ""
 # Check if Node.js already installed in our custom location
 if [ -f "\$APP_SUPPORT/node/bin/node" ]; then
     CURRENT_NODE=\$("\$APP_SUPPORT/node/bin/node" --version)
-    echo "✅ Node.js already installed: \$CURRENT_NODE"
-    echo "Skipping Node.js installation"
-else
+    echo "🔍 Node.js already installed: \$CURRENT_NODE"
+    if [ "\$CURRENT_NODE" = "\$NODE_VERSION" ]; then
+        echo "✅ Node.js is up to date, skipping installation"
+    else
+        echo "🔄 Node.js version mismatch (installed: \$CURRENT_NODE, bundled: \$NODE_VERSION) - updating..."
+        rm -rf "\$APP_SUPPORT/node"
+    fi
+fi
+if [ ! -f "\$APP_SUPPORT/node/bin/node" ]; then
     echo "📥 Installing Node.js \$NODE_VERSION for \$NODE_ARCH..."
     
     cd "\$APP_SUPPORT"
@@ -486,33 +492,60 @@ echo "🔍 Checking for existing Ollama..."
 echo "   /Applications/Ollama.app: $([ -f "/Applications/Ollama.app/Contents/Resources/ollama" ] && echo "EXISTS" || echo "NOT FOUND")"
 echo "   $APP_SUPPORT/ollama: $([ -f "$APP_SUPPORT/ollama" ] && echo "EXISTS" || echo "NOT FOUND")"
 
+# Get bundled Ollama version for comparison
+BUNDLED_OLLAMA_VERSION=""
+if [ -n "\$DMG_RESOURCES" ] && [ -f "\$DMG_RESOURCES/ollama" ]; then
+    BUNDLED_OLLAMA_VERSION=\$("\$DMG_RESOURCES/ollama" --version 2>/dev/null || echo "")
+fi
+echo "📦 Bundled Ollama version: \${BUNDLED_OLLAMA_VERSION:-unknown}"
+
 if [ -f "/Applications/Ollama.app/Contents/Resources/ollama" ]; then
-    echo "✅ Ollama already installed at /Applications"
-    OLLAMA_VERSION=\$(/Applications/Ollama.app/Contents/Resources/ollama --version 2>/dev/null || echo "Unknown version")
-    echo "📝 Current version: \$OLLAMA_VERSION"
-    
-    # Check if Ollama service is running
-    if pgrep -f "ollama serve" > /dev/null; then
-        echo "✅ Ollama service is running"
-    else
-        echo "🔄 Starting Ollama service..."
-        nohup /Applications/Ollama.app/Contents/Resources/ollama serve > "\$APP_SUPPORT/logs/ollama.log" 2>&1 &
-        sleep 2
-        echo "✅ Ollama service started"
-    fi
-elif [ -f "\$APP_SUPPORT/ollama" ]; then
-    echo "✅ Ollama already installed at \$APP_SUPPORT"
-    OLLAMA_VERSION=\$("\$APP_SUPPORT/ollama" --version 2>/dev/null || echo "Unknown version")
-    echo "📝 Current version: \$OLLAMA_VERSION"
-    
-    # Check if Ollama service is running
-    if pgrep -f "ollama serve" > /dev/null; then
-        echo "✅ Ollama service is running"
-    else
-        echo "🔄 Starting Ollama service..."
+    OLLAMA_VERSION=\$(/Applications/Ollama.app/Contents/Resources/ollama --version 2>/dev/null || echo "unknown")
+    echo "🔍 Ollama already installed at /Applications: \$OLLAMA_VERSION"
+    if [ -n "\$BUNDLED_OLLAMA_VERSION" ] && [ "\$OLLAMA_VERSION" != "\$BUNDLED_OLLAMA_VERSION" ]; then
+        echo "🔄 Ollama version mismatch - updating from \$OLLAMA_VERSION to \$BUNDLED_OLLAMA_VERSION..."
+        pkill -f "ollama serve" 2>/dev/null || true
+        sleep 1
+        cp "\$DMG_RESOURCES/ollama" "\$APP_SUPPORT/ollama"
+        chmod +x "\$APP_SUPPORT/ollama"
+        echo "✅ Ollama updated"
         nohup "\$APP_SUPPORT/ollama" serve > "\$APP_SUPPORT/logs/ollama.log" 2>&1 &
         sleep 2
         echo "✅ Ollama service started"
+    else
+        echo "✅ Ollama is up to date"
+        if pgrep -f "ollama serve" > /dev/null; then
+            echo "✅ Ollama service is running"
+        else
+            echo "🔄 Starting Ollama service..."
+            nohup /Applications/Ollama.app/Contents/Resources/ollama serve > "\$APP_SUPPORT/logs/ollama.log" 2>&1 &
+            sleep 2
+            echo "✅ Ollama service started"
+        fi
+    fi
+elif [ -f "\$APP_SUPPORT/ollama" ]; then
+    OLLAMA_VERSION=\$("\$APP_SUPPORT/ollama" --version 2>/dev/null || echo "unknown")
+    echo "🔍 Ollama already installed at \$APP_SUPPORT: \$OLLAMA_VERSION"
+    if [ -n "\$BUNDLED_OLLAMA_VERSION" ] && [ "\$OLLAMA_VERSION" != "\$BUNDLED_OLLAMA_VERSION" ]; then
+        echo "🔄 Ollama version mismatch - updating from \$OLLAMA_VERSION to \$BUNDLED_OLLAMA_VERSION..."
+        pkill -f "ollama serve" 2>/dev/null || true
+        sleep 1
+        cp "\$DMG_RESOURCES/ollama" "\$APP_SUPPORT/ollama"
+        chmod +x "\$APP_SUPPORT/ollama"
+        echo "✅ Ollama updated"
+        nohup "\$APP_SUPPORT/ollama" serve > "\$APP_SUPPORT/logs/ollama.log" 2>&1 &
+        sleep 2
+        echo "✅ Ollama service started"
+    else
+        echo "✅ Ollama is up to date"
+        if pgrep -f "ollama serve" > /dev/null; then
+            echo "✅ Ollama service is running"
+        else
+            echo "🔄 Starting Ollama service..."
+            nohup "\$APP_SUPPORT/ollama" serve > "\$APP_SUPPORT/logs/ollama.log" 2>&1 &
+            sleep 2
+            echo "✅ Ollama service started"
+        fi
     fi
 else
     echo "📥 Installing Ollama from bundle..."
