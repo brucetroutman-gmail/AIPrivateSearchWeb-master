@@ -9,10 +9,10 @@ export PATH="/Users/Shared/AIPrivateSearch:$PATH"
 # Resolve ollama command
 if [ -f "/Applications/Ollama.app/Contents/Resources/ollama" ]; then
     OLLAMA_CMD="/Applications/Ollama.app/Contents/Resources/ollama"
-elif [ -f "/Users/Shared/AIPrivateSearch/ollama" ]; then
-    OLLAMA_CMD="/Users/Shared/AIPrivateSearch/ollama"
 else
-    OLLAMA_CMD="ollama"
+    echo "❌ ERROR: Ollama not found at /Applications/Ollama.app"
+    echo "❌ Please reinstall AIPrivateSearch to install Ollama"
+    exit 1
 fi
 
 # Change to repository directory

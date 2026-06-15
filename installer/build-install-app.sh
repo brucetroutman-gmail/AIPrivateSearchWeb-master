@@ -467,6 +467,15 @@ if [ ! -f "\$APP_SUPPORT/node/bin/node" ]; then
                 else
                     echo "✅ Node.js PATH already configured"
                 fi
+
+                # Check if Ollama PATH entry already exists
+                if ! grep -q "/Applications/Ollama.app/Contents/Resources" "\$SHELL_RC" 2>/dev/null; then
+                    echo '# AIPrivateSearch Ollama' >> "\$SHELL_RC"
+                    echo 'export PATH="/Applications/Ollama.app/Contents/Resources:\$PATH"' >> "\$SHELL_RC"
+                    echo "✅ Ollama added to \$SHELL_RC"
+                else
+                    echo "✅ Ollama PATH already configured"
+                fi
             else
                 echo "❌ Node.js verification failed"
             fi
@@ -488,118 +497,86 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 
 # Check if Ollama already installed
+# Check if Ollama already installed and get version
 echo "🔍 Checking for existing Ollama..."
-echo "   /Applications/Ollama.app: $([ -f "/Applications/Ollama.app/Contents/Resources/ollama" ] && echo "EXISTS" || echo "NOT FOUND")"
-echo "   $APP_SUPPORT/ollama: $([ -f "$APP_SUPPORT/ollama" ] && echo "EXISTS" || echo "NOT FOUND")"
+OLLAMA_LATEST_URL="https://ollama.com/download/Ollama-darwin.dmg"
+OLLAMA_REQUIRED="0.30.7"
 
-# Get bundled Ollama version for comparison
-BUNDLED_OLLAMA_VERSION=""
-if [ -n "\$DMG_RESOURCES" ] && [ -f "\$DMG_RESOURCES/ollama" ]; then
-    BUNDLED_OLLAMA_VERSION=\$("\$DMG_RESOURCES/ollama" --version 2>/dev/null || echo "")
-fi
-echo "📦 Bundled Ollama version: \${BUNDLED_OLLAMA_VERSION:-unknown}"
-
-if [ -f "/Applications/Ollama.app/Contents/Resources/ollama" ]; then
-    OLLAMA_VERSION=\$(/Applications/Ollama.app/Contents/Resources/ollama --version 2>/dev/null || echo "unknown")
-    echo "🔍 Ollama already installed at /Applications: \$OLLAMA_VERSION"
-    if [ -n "\$BUNDLED_OLLAMA_VERSION" ] && [ "\$OLLAMA_VERSION" != "\$BUNDLED_OLLAMA_VERSION" ]; then
-        echo "🔄 Ollama version mismatch - updating from \$OLLAMA_VERSION to \$BUNDLED_OLLAMA_VERSION..."
-        pkill -f "ollama serve" 2>/dev/null || true
-        sleep 1
-        cp "\$DMG_RESOURCES/ollama" "\$APP_SUPPORT/ollama"
-        chmod +x "\$APP_SUPPORT/ollama"
-        # Update llama-server if bundled
-        if [ -f "\$DMG_RESOURCES/lib/ollama/llama-server" ]; then
-            mkdir -p "\$APP_SUPPORT/lib/ollama"
-            cp "\$DMG_RESOURCES/lib/ollama/llama-server" "\$APP_SUPPORT/lib/ollama/llama-server"
-            chmod +x "\$APP_SUPPORT/lib/ollama/llama-server"
-            echo "✅ llama-server updated"
-        fi
-        echo "✅ Ollama updated"
-        nohup "\$APP_SUPPORT/ollama" serve > "\$APP_SUPPORT/logs/ollama.log" 2>&1 &
-        sleep 2
-        echo "✅ Ollama service started"
+get_ollama_version() {
+    if [ -f "/Applications/Ollama.app/Contents/Resources/ollama" ]; then
+        /Applications/Ollama.app/Contents/Resources/ollama --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1
     else
-        echo "✅ Ollama is up to date"
-        if pgrep -f "ollama serve" > /dev/null; then
-            echo "✅ Ollama service is running"
-        else
-            echo "🔄 Starting Ollama service..."
-            nohup /Applications/Ollama.app/Contents/Resources/ollama serve > "\$APP_SUPPORT/logs/ollama.log" 2>&1 &
-            sleep 2
-            echo "✅ Ollama service started"
-        fi
+        echo ""
     fi
-elif [ -f "\$APP_SUPPORT/ollama" ]; then
-    OLLAMA_VERSION=\$("\$APP_SUPPORT/ollama" --version 2>/dev/null || echo "unknown")
-    echo "🔍 Ollama already installed at \$APP_SUPPORT: \$OLLAMA_VERSION"
-    if [ -n "\$BUNDLED_OLLAMA_VERSION" ] && [ "\$OLLAMA_VERSION" != "\$BUNDLED_OLLAMA_VERSION" ]; then
-        echo "🔄 Ollama version mismatch - updating from \$OLLAMA_VERSION to \$BUNDLED_OLLAMA_VERSION..."
-        pkill -f "ollama serve" 2>/dev/null || true
-        sleep 1
-        cp "\$DMG_RESOURCES/ollama" "\$APP_SUPPORT/ollama"
-        chmod +x "\$APP_SUPPORT/ollama"
-        # Update llama-server if bundled
-        if [ -f "\$DMG_RESOURCES/lib/ollama/llama-server" ]; then
-            mkdir -p "\$APP_SUPPORT/lib/ollama"
-            cp "\$DMG_RESOURCES/lib/ollama/llama-server" "\$APP_SUPPORT/lib/ollama/llama-server"
-            chmod +x "\$APP_SUPPORT/lib/ollama/llama-server"
-            echo "✅ llama-server updated"
-        fi
-        echo "✅ Ollama updated"
-        nohup "\$APP_SUPPORT/ollama" serve > "\$APP_SUPPORT/logs/ollama.log" 2>&1 &
-        sleep 2
-        echo "✅ Ollama service started"
-    else
-        echo "✅ Ollama is up to date"
-        if pgrep -f "ollama serve" > /dev/null; then
-            echo "✅ Ollama service is running"
+}
+
+INSTALLED_VERSION=\$(get_ollama_version)
+echo "📦 Required Ollama version: \$OLLAMA_REQUIRED"
+echo "📦 Installed Ollama version: \${INSTALLED_VERSION:-none}"
+
+install_ollama() {
+    echo "📥 Downloading Ollama \$OLLAMA_REQUIRED..."
+    show_progress "\${COMPLETED_STEPS}⏳ Downloading Ollama... Be patient!"
+    OLLAMA_DMG="/tmp/Ollama-darwin.dmg"
+    if curl -L -o "\$OLLAMA_DMG" "\$OLLAMA_LATEST_URL"; then
+        echo "✅ Ollama downloaded"
+        echo "📦 Mounting Ollama DMG..."
+        hdiutil attach "\$OLLAMA_DMG" -nobrowse -quiet 2>/dev/null
+        if [ -d "/Volumes/Ollama" ]; then
+            echo "📋 Installing Ollama.app to /Applications..."
+            pkill -f "ollama serve" 2>/dev/null || true
+            pkill -f "Ollama" 2>/dev/null || true
+            sleep 1
+            rm -rf /Applications/Ollama.app
+            cp -R "/Volumes/Ollama/Ollama.app" /Applications/
+            hdiutil detach "/Volumes/Ollama" -quiet 2>/dev/null
+            rm -f "\$OLLAMA_DMG"
+            echo "✅ Ollama.app installed to /Applications"
         else
-            echo "🔄 Starting Ollama service..."
-            nohup "\$APP_SUPPORT/ollama" serve > "\$APP_SUPPORT/logs/ollama.log" 2>&1 &
-            sleep 2
-            echo "✅ Ollama service started"
+            echo "❌ Failed to mount Ollama DMG"
+            rm -f "\$OLLAMA_DMG"
+            return 1
         fi
+    else
+        echo "❌ Failed to download Ollama"
+        return 1
+    fi
+}
+
+# Install if not present or older than required
+if [ -z "\$INSTALLED_VERSION" ]; then
+    echo "📥 Ollama not installed - downloading..."
+    install_ollama
+elif [ "\$INSTALLED_VERSION" != "\$OLLAMA_REQUIRED" ]; then
+    NEWER=\$(printf '%s\n%s' "\$INSTALLED_VERSION" "\$OLLAMA_REQUIRED" | sort -V | tail -1)
+    if [ "\$NEWER" = "\$OLLAMA_REQUIRED" ] && [ "\$INSTALLED_VERSION" != "\$OLLAMA_REQUIRED" ]; then
+        echo "🔄 Updating Ollama from \$INSTALLED_VERSION to \$OLLAMA_REQUIRED..."
+        install_ollama
+    else
+        echo "✅ Installed Ollama \$INSTALLED_VERSION is newer than required - skipping"
     fi
 else
-    echo "📥 Installing Ollama from bundle..."
-    
-    if [ -n "\$DMG_RESOURCES" ] && [ -f "\$DMG_RESOURCES/ollama" ]; then
-        echo "📦 Using bundled Ollama from DMG"
-        cp "\$DMG_RESOURCES/ollama" "\$APP_SUPPORT/ollama"
-        chmod +x "\$APP_SUPPORT/ollama"
-        
-        # Install llama-server if bundled (required by Ollama v0.7+)
-        if [ -f "\$DMG_RESOURCES/lib/ollama/llama-server" ]; then
-            mkdir -p "\$APP_SUPPORT/lib/ollama"
-            cp "\$DMG_RESOURCES/lib/ollama/llama-server" "\$APP_SUPPORT/lib/ollama/llama-server"
-            chmod +x "\$APP_SUPPORT/lib/ollama/llama-server"
-            echo "✅ llama-server installed"
-        fi
-        
-        if "\$APP_SUPPORT/ollama" --version > /dev/null 2>&1; then
-            echo "✅ Ollama installed from bundle"
-            echo "🔄 Starting Ollama service..."
-            nohup "\$APP_SUPPORT/ollama" serve > "\$APP_SUPPORT/logs/ollama.log" 2>&1 &
-            sleep 3
-            echo "✅ Ollama service started"
-        else
-            echo "❌ CRITICAL ERROR: Bundled Ollama binary is invalid"
-            show_dialog "Installation Failed" \\
-                "Bundled Ollama binary is corrupted!\n\nRebuild DMG with:\nbash build-prepare-resources.sh\nbash build-all.sh" \\
-                "stop"
-            exit 1
-        fi
-    else
-        echo "❌ CRITICAL ERROR: Bundled Ollama not found"
-        show_dialog "Installation Failed" \\
-            "Ollama binary not found in DMG!\n\nRebuild DMG with:\nbash build-prepare-resources.sh\nbash build-all.sh" \\
-            "stop"
-        exit 1
-    fi
+    echo "✅ Ollama \$INSTALLED_VERSION is already up to date"
 fi
 
-echo "✅ Ollama installation completed!"
+# Start Ollama service
+OLLAMA_CMD="/Applications/Ollama.app/Contents/Resources/ollama"
+if [ -f "\$OLLAMA_CMD" ]; then
+    if pgrep -f "ollama serve" > /dev/null; then
+        echo "✅ Ollama service is running"
+    else
+        echo "🔄 Starting Ollama service..."
+        nohup "\$OLLAMA_CMD" serve > "\$APP_SUPPORT/logs/ollama.log" 2>&1 &
+        sleep 3
+        echo "✅ Ollama service started"
+    fi
+else
+    echo "❌ CRITICAL ERROR: Ollama installation failed"
+    show_dialog "Installation Failed" \\
+        "Ollama could not be installed.\\n\\nPlease check your internet connection and try again." \\
+        "stop"
+    exit 1
+fi
 show_progress "✅ Ollama installed\n⏳ Downloading repository... Be patient!"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -846,15 +823,15 @@ fi
 # Verify Ollama is available
 if [ -f "/Applications/Ollama.app/Contents/Resources/ollama" ]; then
     OLLAMA_CMD="/Applications/Ollama.app/Contents/Resources/ollama"
-elif [ -f "\$APP_SUPPORT/ollama" ]; then
-    OLLAMA_CMD="\$APP_SUPPORT/ollama"
-elif command -v ollama &> /dev/null; then
-    OLLAMA_CMD="ollama"
 else
-    echo "❌ CRITICAL ERROR: Ollama not found"
+    echo "❌ CRITICAL ERROR: Ollama not found at /Applications/Ollama.app"
     echo "❌ Cannot download AI models without Ollama"
-    echo "❌ Installation failed at Step 7"
-    
+    echo "❌ Installation failed at Step 6"
+    show_dialog "Installation Failed" \\
+        "Ollama is not installed.\n\nOllama installation must have failed in Step 3.\n\nPlease check the log:\n\$LOG_FILE" \\
+        "stop"
+    exit 1
+fi
     show_dialog "Installation Failed" \\
         "Ollama installation failed!
 
