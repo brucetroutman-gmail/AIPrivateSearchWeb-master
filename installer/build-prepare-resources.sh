@@ -49,6 +49,26 @@ else
     exit 1
 fi
 
+# Copy llama-server binary (required by Ollama v0.7+)
+echo ""
+echo "📥 Copying llama-server binary..."
+LLAMA_SERVER_SRC=""
+if [ -f "/Applications/Ollama.app/Contents/Resources/lib/ollama/llama-server" ]; then
+    LLAMA_SERVER_SRC="/Applications/Ollama.app/Contents/Resources/lib/ollama/llama-server"
+elif [ -f "./llama-server-binary" ]; then
+    LLAMA_SERVER_SRC="./llama-server-binary"
+fi
+
+if [ -n "$LLAMA_SERVER_SRC" ]; then
+    mkdir -p "$RESOURCES_DIR/lib/ollama"
+    cp "$LLAMA_SERVER_SRC" "$RESOURCES_DIR/lib/ollama/llama-server"
+    chmod +x "$RESOURCES_DIR/lib/ollama/llama-server"
+    echo "✅ llama-server copied from: $LLAMA_SERVER_SRC"
+else
+    echo "⚠️  llama-server not found — Ollama v0.7+ requires it"
+    echo "⚠️  Run: cp /Applications/Ollama.app/Contents/Resources/lib/ollama/llama-server ./llama-server-binary"
+fi
+
 # Copy start-app.sh
 echo ""
 echo "📥 Copying start-app.sh..."

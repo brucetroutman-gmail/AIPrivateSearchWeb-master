@@ -508,6 +508,13 @@ if [ -f "/Applications/Ollama.app/Contents/Resources/ollama" ]; then
         sleep 1
         cp "\$DMG_RESOURCES/ollama" "\$APP_SUPPORT/ollama"
         chmod +x "\$APP_SUPPORT/ollama"
+        # Update llama-server if bundled
+        if [ -f "\$DMG_RESOURCES/lib/ollama/llama-server" ]; then
+            mkdir -p "\$APP_SUPPORT/lib/ollama"
+            cp "\$DMG_RESOURCES/lib/ollama/llama-server" "\$APP_SUPPORT/lib/ollama/llama-server"
+            chmod +x "\$APP_SUPPORT/lib/ollama/llama-server"
+            echo "✅ llama-server updated"
+        fi
         echo "✅ Ollama updated"
         nohup "\$APP_SUPPORT/ollama" serve > "\$APP_SUPPORT/logs/ollama.log" 2>&1 &
         sleep 2
@@ -532,6 +539,13 @@ elif [ -f "\$APP_SUPPORT/ollama" ]; then
         sleep 1
         cp "\$DMG_RESOURCES/ollama" "\$APP_SUPPORT/ollama"
         chmod +x "\$APP_SUPPORT/ollama"
+        # Update llama-server if bundled
+        if [ -f "\$DMG_RESOURCES/lib/ollama/llama-server" ]; then
+            mkdir -p "\$APP_SUPPORT/lib/ollama"
+            cp "\$DMG_RESOURCES/lib/ollama/llama-server" "\$APP_SUPPORT/lib/ollama/llama-server"
+            chmod +x "\$APP_SUPPORT/lib/ollama/llama-server"
+            echo "✅ llama-server updated"
+        fi
         echo "✅ Ollama updated"
         nohup "\$APP_SUPPORT/ollama" serve > "\$APP_SUPPORT/logs/ollama.log" 2>&1 &
         sleep 2
@@ -554,6 +568,14 @@ else
         echo "📦 Using bundled Ollama from DMG"
         cp "\$DMG_RESOURCES/ollama" "\$APP_SUPPORT/ollama"
         chmod +x "\$APP_SUPPORT/ollama"
+        
+        # Install llama-server if bundled (required by Ollama v0.7+)
+        if [ -f "\$DMG_RESOURCES/lib/ollama/llama-server" ]; then
+            mkdir -p "\$APP_SUPPORT/lib/ollama"
+            cp "\$DMG_RESOURCES/lib/ollama/llama-server" "\$APP_SUPPORT/lib/ollama/llama-server"
+            chmod +x "\$APP_SUPPORT/lib/ollama/llama-server"
+            echo "✅ llama-server installed"
+        fi
         
         if "\$APP_SUPPORT/ollama" --version > /dev/null 2>&1; then
             echo "✅ Ollama installed from bundle"
@@ -694,14 +716,10 @@ else
 fi
 
 # Copy config files
-if [ "\$UPDATE_MODE" != "true" ] && [ ! -f "\$APP_SUPPORT/config/app.json" ]; then
-    if [ -f "\$APP_SUPPORT/repo/aiprivatesearch/client/c01_client-first-app/config/app.json" ]; then
-        echo "📁 Copying config files..."
-        cp -r "\$APP_SUPPORT/repo/aiprivatesearch/client/c01_client-first-app/config/"* "\$APP_SUPPORT/config/"
-        echo "✅ Config files copied"
-    fi
-else
-    echo "⏭️  Skipping config files (preserving existing)"
+if [ -f "\$APP_SUPPORT/repo/aiprivatesearch/client/c01_client-first-app/config/app.json" ]; then
+    echo "📁 Syncing config files from repo..."
+    cp -r "\$APP_SUPPORT/repo/aiprivatesearch/client/c01_client-first-app/config/"* "\$APP_SUPPORT/config/"
+    echo "✅ Config files synced"
 fi
 
 # Copy data files
