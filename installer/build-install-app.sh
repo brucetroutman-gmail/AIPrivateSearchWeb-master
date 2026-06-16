@@ -499,8 +499,8 @@ echo ""
 # Check if Ollama already installed
 # Check if Ollama already installed and get version
 echo "🔍 Checking for existing Ollama..."
-OLLAMA_LATEST_URL="https://ollama.com/download/Ollama-darwin.dmg"
-OLLAMA_REQUIRED="0.30.7"
+OLLAMA_LATEST_URL="https://github.com/ollama/ollama/releases/download/v0.30.8/Ollama-darwin.zip"
+OLLAMA_REQUIRED="0.30.8"
 
 get_ollama_version() {
     if [ -f "/Applications/Ollama.app/Contents/Resources/ollama" ]; then
@@ -517,24 +517,20 @@ echo "📦 Installed Ollama version: \${INSTALLED_VERSION:-none}"
 install_ollama() {
     echo "📥 Downloading Ollama \$OLLAMA_REQUIRED..."
     show_progress "\${COMPLETED_STEPS}⏳ Downloading Ollama... Be patient!"
-    OLLAMA_DMG="/tmp/Ollama-darwin.dmg"
-    if curl -L -o "\$OLLAMA_DMG" "\$OLLAMA_LATEST_URL"; then
+    OLLAMA_ZIP="/tmp/Ollama-darwin.zip"
+    if curl -L -A "Mozilla/5.0" -o "\$OLLAMA_ZIP" "\$OLLAMA_LATEST_URL"; then
         echo "✅ Ollama downloaded"
-        echo "📦 Mounting Ollama DMG..."
-        hdiutil attach "\$OLLAMA_DMG" -nobrowse -quiet 2>/dev/null
-        if [ -d "/Volumes/Ollama" ]; then
-            echo "📋 Installing Ollama.app to /Applications..."
-            pkill -f "ollama serve" 2>/dev/null || true
-            pkill -f "Ollama" 2>/dev/null || true
-            sleep 1
-            rm -rf /Applications/Ollama.app
-            cp -R "/Volumes/Ollama/Ollama.app" /Applications/
-            hdiutil detach "/Volumes/Ollama" -quiet 2>/dev/null
-            rm -f "\$OLLAMA_DMG"
+        echo "📦 Extracting Ollama..."
+        pkill -f "ollama serve" 2>/dev/null || true
+        pkill -f "Ollama" 2>/dev/null || true
+        sleep 1
+        rm -rf /Applications/Ollama.app
+        unzip -q "\$OLLAMA_ZIP" -d /Applications/
+        rm -f "\$OLLAMA_ZIP"
+        if [ -d "/Applications/Ollama.app" ]; then
             echo "✅ Ollama.app installed to /Applications"
         else
-            echo "❌ Failed to mount Ollama DMG"
-            rm -f "\$OLLAMA_DMG"
+            echo "❌ Failed to extract Ollama.app"
             return 1
         fi
     else
