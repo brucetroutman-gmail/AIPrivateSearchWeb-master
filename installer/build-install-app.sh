@@ -844,7 +844,7 @@ fi
 echo "✅ Ollama available at: \$OLLAMA_CMD"
 
 # Read models from models-list.json
-MODEL_LIST_FILE="\$APP_SUPPORT/repo/aiprivatesearch/client/c01_client-first-app/config/models-list.json"
+MODEL_LIST_FILE="\$APP_SUPPORT/config/models-list.json"
 
 if [ -f "\$MODEL_LIST_FILE" ]; then
     echo "📝 Reading models from \$MODEL_LIST_FILE"
