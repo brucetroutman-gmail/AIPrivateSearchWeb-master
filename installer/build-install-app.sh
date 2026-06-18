@@ -817,8 +817,13 @@ else
 fi
 
 # Verify Ollama is available
+echo "🔍 DEBUG: Checking Ollama at /Applications/Ollama.app/Contents/Resources/ollama"
+ls -la "/Applications/Ollama.app/Contents/Resources/ollama" 2>&1 || echo "DEBUG: file not found"
+echo "🔍 DEBUG: /Applications/Ollama.app exists: $([ -d /Applications/Ollama.app ] && echo YES || echo NO)"
+echo "🔍 DEBUG: Contents/Resources exists: $([ -d /Applications/Ollama.app/Contents/Resources ] && echo YES || echo NO)"
 if [ -f "/Applications/Ollama.app/Contents/Resources/ollama" ]; then
     OLLAMA_CMD="/Applications/Ollama.app/Contents/Resources/ollama"
+    echo "🔍 DEBUG: OLLAMA_CMD set to \$OLLAMA_CMD"
 else
     echo "❌ CRITICAL ERROR: Ollama not found at /Applications/Ollama.app"
     echo "❌ Cannot download AI models without Ollama"
@@ -828,23 +833,14 @@ else
         "stop"
     exit 1
 fi
-    show_dialog "Installation Failed" \\
-        "Ollama installation failed!
-
-AI models cannot be downloaded without Ollama.
-
-Please check the log:
-\$LOG_FILE
-
-Installation cannot continue." \\
-        "stop"
-    exit 1
-fi
 
 echo "✅ Ollama available at: \$OLLAMA_CMD"
 
 # Read models from models-list.json
 MODEL_LIST_FILE="\$APP_SUPPORT/config/models-list.json"
+echo "🔍 DEBUG: Looking for models-list at \$MODEL_LIST_FILE"
+echo "🔍 DEBUG: File exists: $([ -f "\$MODEL_LIST_FILE" ] && echo YES || echo NO)"
+ls -la "\$APP_SUPPORT/config/" 2>&1 | head -10
 
 if [ -f "\$MODEL_LIST_FILE" ]; then
     echo "📝 Reading models from \$MODEL_LIST_FILE"
