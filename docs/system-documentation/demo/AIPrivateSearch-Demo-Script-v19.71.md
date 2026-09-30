@@ -118,21 +118,21 @@ The script is designed for professional screen recording with clear instructions
 
 ### SCENE 2: Quick Installation (45 seconds)
 
-**SCREEN**: Finder window showing load-aiss.command  
+**SCREEN**: Finder window showing AIPrivateSearch installer  
 **NARRATION**:
-"Installation takes just two minutes. Simply double-click the load-aiss.command file. The system automatically installs all dependencies including Node.js, Ollama AI models, and Chrome browser. No technical expertise required."
+"Installation takes just two minutes. Simply double-click the AIPrivateSearch installer. The system automatically installs all dependencies including Node.js, Ollama AI models, and Chrome browser. No technical expertise required."
 
 **SNAGIT INSTRUCTIONS**:
-- Show Finder window with load-aiss.command highlighted
-- Double-click the file
+- Show Finder window with the AIPrivateSearch installer highlighted
+- Double-click the installer
 - Show Terminal window with installation progress
 - Speed up installation process (time-lapse effect)
 - Show "Installation Complete" message
 - Show browser opening to localhost:3000
 
 **SCREEN ACTIONS**:
-1. Navigate to /Users/Shared/
-2. Double-click load-aiss.command
+1. Open the AIPrivateSearch installer (DMG or Applications)
+2. Double-click the AIPrivateSearch installer
 3. Wait for installation (speed up in editing)
 4. Show browser opening automatically
 

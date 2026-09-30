@@ -303,41 +303,6 @@ aiprivatesearch.dmg
 └── README.txt
 ```
 
-## Comparison: App vs Terminal
-
-### load-AIPrivateSearch-improved.command (Terminal Mode)
-**Location**: `installer/load-AIPrivateSearch-improved.command`
-
-This script is designed for terminal execution with interactive prompts:
-
-| Feature | App Mode | Terminal Mode (.command) |
-|---------|----------|--------------------------|
-| Running process check | ✓ Yes | ✓ Yes |
-| Architecture detection | ✓ Yes | ✓ Yes |
-| Node.js install | ✓ Yes | ✓ Yes |
-| Ollama install | ✓ Yes | ✓ Yes |
-| Chrome install | ✓ Yes | ✓ Yes |
-| Repository download | ✓ Yes | ✓ Yes |
-| .env-aips creation | ✓ Yes | ✓ Yes |
-| Config file copy | ✓ Yes | ✓ Yes |
-| Data file copy | ✓ Yes | ✓ Yes |
-| npm install | ✓ Yes | ✓ Yes |
-| AI model download | ✓ Yes | ✓ Yes |
-| Progress dialogs | ✓ Optional (Yes/No) | ✗ No |
-| Terminal log viewer | ✓ Optional (Yes/No) | ✓ Always |
-| Verbose mode | ✓ Yes | ✗ No |
-| User prompts | ✗ No | ✓ Yes (y/n) |
-| Admin password | ✓ Once (cached) | ✓ Per operation |
-
-**Key Differences:**
-- **App**: Optional verbose mode with Terminal + dialogs, or silent mode
-- **App**: Caches admin password for all operations
-- **Terminal**: Interactive y/n prompts for each component
-- **App**: Uses AppleScript dialogs for user feedback (when verbose)
-- **Terminal**: Uses console output for logging
-- **App**: Designed for end-users (double-click to install)
-- **Terminal**: Designed for developers (full control)
-
 ## Installation Time
 
 **First Run (typical):**

@@ -207,6 +207,60 @@ rm -f aiprivatesearch-new.zip
 
 echo "✅ New version installed"
 
+# Install project dependencies
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  Installing dependencies..."
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+
+# Prefer the bundled Node.js; fall back to system node if present
+if [ -d "$APP_SUPPORT/node/bin" ]; then
+    export PATH="$APP_SUPPORT/node/bin:$PATH"
+fi
+
+cd "$APP_SUPPORT/repo/aiprivatesearch"
+
+if ! command -v npm &> /dev/null; then
+    show_dialog "Dependency Installation Skipped" \
+        "Node.js/npm was not found, so dependencies were not updated.
+
+The code was updated successfully, but you may need to reinstall
+to refresh dependencies before launching.
+
+Backup location: $BACKUP_DIR" \
+        "caution"
+    echo "⚠️  npm not found - skipping dependency installation"
+else
+    NODE_VERSION=$(node --version 2>/dev/null)
+    NPM_VERSION=$(npm --version 2>/dev/null)
+    echo "✅ Node.js $NODE_VERSION and npm $NPM_VERSION available"
+
+    # Install main project dependencies (root package.json)
+    echo "📦 Installing main project dependencies..."
+    if npm install; then
+        echo "✅ Main project dependencies installed successfully"
+    else
+        echo "❌ Main project dependency installation failed"
+    fi
+
+    # Install server dependencies
+    echo "📦 Installing server dependencies..."
+    if [ -d "server/s01_server-first-app" ]; then
+        cd "server/s01_server-first-app"
+        if npm install; then
+            echo "✅ Server dependencies installed successfully"
+        else
+            echo "❌ Server dependency installation failed"
+        fi
+        cd "$APP_SUPPORT/repo/aiprivatesearch"
+    else
+        echo "⚠️  Server directory not found - skipping server dependencies"
+    fi
+fi
+
+echo "✅ Dependency installation completed"
+
 # Preserve user data and configuration
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

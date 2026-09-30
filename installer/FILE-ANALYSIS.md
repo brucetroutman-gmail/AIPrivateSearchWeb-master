@@ -36,10 +36,6 @@ build-all.sh
 1. **build-app.sh** - Old app builder (replaced by build-install-app.sh)
 2. **build-auto-install.sh** - Alternative installer builder
 
-### Terminal Installers (Standalone)
-4. **load-AIPrivateSearch-1108.command** - Original terminal installer
-5. **load-AIPrivateSearch-improved.command** - Improved terminal installer
-
 ### Development/Template Scripts
 6. **installer-modular-template.sh** - Template for creating installers
 7. **integrate-source.sh** - Source integration utility
@@ -54,13 +50,11 @@ build-all.sh
 - build-start-app.sh
 - build-dmg.sh
 - start-user-app.sh
-- load-AIPrivateSearch-improved.command (standalone terminal installer)
 - All documentation files (*.md)
 
 ### Archive/Remove (Not in build-all.sh)
 - build-app.sh (superseded by build-install-app.sh)
 - build-auto-install.sh (duplicate functionality)
-- load-AIPrivateSearch-1108.command (superseded by improved version)
 - installer-modular-template.sh (development template)
 - integrate-source.sh (utility script)
 - setup.sh (utility script)
@@ -77,10 +71,8 @@ build-all.sh
 | start-user-app.sh | Runtime script | ✅ Active |
 | GITHUB-CODE-SIGNING-GUIDE.md | Signing automation | ✅ Active |
 | CODE-SIGNING-GUIDE.md | Manual signing | ✅ Active |
-| load-AIPrivateSearch-improved.command | Terminal installer | ✅ Active (standalone) |
 | build-app.sh | Old app builder | ⚠️ Legacy |
 | build-auto-install.sh | Alt installer | ⚠️ Duplicate |
-| load-AIPrivateSearch-1108.command | Old terminal installer | ⚠️ Legacy |
 | installer-modular-template.sh | Template | 📝 Dev tool |
 | integrate-source.sh | Utility | 📝 Dev tool |
 | setup.sh | Utility | 📝 Dev tool |
@@ -90,7 +82,6 @@ build-all.sh
 1. **Move to archive/** folder:
    - build-app.sh
    - build-auto-install.sh
-   - load-AIPrivateSearch-1108.command
 
 2. **Move to templates/** folder:
    - installer-modular-template.sh
@@ -99,4 +90,3 @@ build-all.sh
 
 3. **Keep in root**:
    - All active build scripts
-   - load-AIPrivateSearch-improved.command (for users who prefer terminal)

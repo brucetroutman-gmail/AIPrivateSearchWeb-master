@@ -25,11 +25,11 @@ Medical practices, law firms and human resources teams handle thousands of confi
 ## Demo 02: One-Click Installation (30 seconds)
 
 **NARRATION**:
-Installation takes just two minutes. Simply double-click the load A-I-S-S dot command file. The system automatically installs all dependencies including Node dot J-S, Ollama A-I models, and Chrome browser. No technical expertise required.
+Installation takes just two minutes. Simply double-click the AIPrivateSearch installer. The system automatically installs all dependencies including Node dot J-S, Ollama A-I models, and Chrome browser. No technical expertise required.
 
 **SCREEN ACTIONS**:
-1. Show Finder window with load-aiss.command
-2. Double-click the file
+1. Show Finder window with the AIPrivateSearch installer
+2. Double-click the installer
 3. Show Terminal installation progress (time-lapse)
 4. Show browser opening to localhost:3000
 
