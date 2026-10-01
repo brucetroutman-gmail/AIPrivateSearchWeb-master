@@ -5,6 +5,10 @@
 
 set -e
 
+# Load pinned dependency versions (single source of truth)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/versions.conf"
+
 # Read version from package.json
 NEW_VERSION=$(node -p "require('../package.json').version" 2>/dev/null || echo "1.00")
 
@@ -381,7 +385,7 @@ if command -v system_profiler &> /dev/null; then
 fi
 
 # Node.js URL
-NODE_VERSION="v20.11.0"
+NODE_VERSION="${NODE_VERSION}"
 NODE_TAR="node-\${NODE_VERSION}-darwin-\${NODE_ARCH}.tar.gz"
 NODE_URL="https://nodejs.org/dist/\${NODE_VERSION}/\${NODE_TAR}"
 

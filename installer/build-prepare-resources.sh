@@ -5,6 +5,10 @@
 
 set -e
 
+# Load pinned dependency versions (single source of truth)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/versions.conf"
+
 echo "📦 Preparing Resources for DMG"
 echo "==============================="
 
@@ -24,7 +28,6 @@ echo "🖥️  Architecture: arm64 (Apple Silicon default)"
 # Download Node.js
 echo ""
 echo "📥 Downloading Node.js..."
-NODE_VERSION="v20.11.0"
 NODE_TAR="node-${NODE_VERSION}-darwin-${NODE_ARCH}.tar.gz"
 NODE_URL="https://nodejs.org/dist/${NODE_VERSION}/${NODE_TAR}"
 
@@ -36,38 +39,12 @@ else
     exit 1
 fi
 
-# Copy Ollama binary from installer folder
-echo ""
-echo "📥 Copying Ollama binary..."
-if [ -f "./ollama-binary" ]; then
-    cp "./ollama-binary" "$RESOURCES_DIR/ollama"
-    chmod +x "$RESOURCES_DIR/ollama"
-    echo "✅ Ollama binary copied from installer folder"
-else
-    echo "❌ ollama-binary not found in installer folder"
-    echo "❌ Run: cp /Applications/Ollama.app/Contents/Resources/ollama ./ollama-binary"
-    exit 1
-fi
-
-# Copy llama-server binary (required by Ollama v0.7+)
-echo ""
-echo "📥 Copying llama-server binary..."
-LLAMA_SERVER_SRC=""
-if [ -f "/Applications/Ollama.app/Contents/Resources/lib/ollama/llama-server" ]; then
-    LLAMA_SERVER_SRC="/Applications/Ollama.app/Contents/Resources/lib/ollama/llama-server"
-elif [ -f "./llama-server-binary" ]; then
-    LLAMA_SERVER_SRC="./llama-server-binary"
-fi
-
-if [ -n "$LLAMA_SERVER_SRC" ]; then
-    mkdir -p "$RESOURCES_DIR/lib/ollama"
-    cp "$LLAMA_SERVER_SRC" "$RESOURCES_DIR/lib/ollama/llama-server"
-    chmod +x "$RESOURCES_DIR/lib/ollama/llama-server"
-    echo "✅ llama-server copied from: $LLAMA_SERVER_SRC"
-else
-    echo "⚠️  llama-server not found — Ollama v0.7+ requires it"
-    echo "⚠️  Run: cp /Applications/Ollama.app/Contents/Resources/lib/ollama/llama-server ./llama-server-binary"
-fi
+# NOTE: Ollama is NOT bundled here. The installer (build-install-app.sh)
+# downloads a complete, self-contained official Ollama.app from GitHub
+# (see OLLAMA_VERSION / OLLAMA_LATEST_URL there) and runs it from
+# /Applications/Ollama.app. That bundle ships its own llama-server and
+# dylibs, so copying a bare ollama/llama-server binary here was dead weight
+# (never consumed by the installer) and is intentionally omitted.
 
 # Copy start-app.sh
 echo ""
@@ -89,7 +66,7 @@ AIPrivateSearch Resources
 =========================
 Architecture: $ARCH
 Node.js: $NODE_VERSION ($NODE_ARCH)
-Ollama: darwin (universal)
+Ollama: $OLLAMA_VERSION (downloaded by installer at runtime)
 Downloaded: $(date)
 EOF
 

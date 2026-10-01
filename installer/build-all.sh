@@ -11,7 +11,7 @@ cd "$REPO_ROOT/installer"
 
 # Step 1: Prepare fresh resources
 echo ""
-echo "📦 Preparing bundled resources (Node.js, Ollama, start-app.sh)..."
+echo "📦 Preparing bundled resources (Node.js, start-app.sh)..."
 ./build-prepare-resources.sh
 
 echo "🏗️  Building AIPrivateSearch Manager Package"
