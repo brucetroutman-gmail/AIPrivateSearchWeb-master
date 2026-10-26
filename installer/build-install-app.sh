@@ -503,8 +503,26 @@ echo ""
 # Check if Ollama already installed
 # Check if Ollama already installed and get version
 echo "🔍 Checking for existing Ollama..."
-OLLAMA_LATEST_URL="https://github.com/ollama/ollama/releases/download/v0.30.8/Ollama-darwin.zip"
-OLLAMA_REQUIRED="0.30.8"
+
+# Fallback version used only if the GitHub API cannot be reached.
+# Baked in at build time from versions.conf (OLLAMA_VERSION), 'v' prefix stripped.
+OLLAMA_FALLBACK="${OLLAMA_VERSION#v}"
+
+# Resolve the latest Ollama release tag dynamically from the GitHub API.
+echo "🌐 Resolving latest Ollama release from GitHub..."
+OLLAMA_REQUIRED=\$(curl -s -A "Mozilla/5.0" "https://api.github.com/repos/ollama/ollama/releases/latest" 2>/dev/null \\
+    | grep -oE '"tag_name"[[:space:]]*:[[:space:]]*"v[0-9]+\.[0-9]+\.[0-9]+"' \\
+    | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' \\
+    | head -1)
+
+if [ -z "\$OLLAMA_REQUIRED" ]; then
+    echo "⚠️ Could not resolve latest Ollama version from GitHub - falling back to \$OLLAMA_FALLBACK"
+    OLLAMA_REQUIRED="\$OLLAMA_FALLBACK"
+else
+    echo "✅ Latest Ollama release: \$OLLAMA_REQUIRED"
+fi
+
+OLLAMA_LATEST_URL="https://github.com/ollama/ollama/releases/download/v\${OLLAMA_REQUIRED}/Ollama-darwin.zip"
 
 get_ollama_version() {
     if [ -f "/Applications/Ollama.app/Contents/Resources/ollama" ]; then
